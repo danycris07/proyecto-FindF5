@@ -9,6 +9,20 @@ TeamModel.belongsTo(UserModel, { foreignKey: "captainId", as: "captain" });
 UserModel.belongsToMany(TeamModel, { through: "TeamMember", as: "teams" });
 TeamModel.belongsToMany(UserModel, { through: "TeamMember", as: "players" });
 
+// Relación: Quién organizó el Partido
+TeamModel.hasMany(MatchModel, { foreignKey: "teamId", as: "matches" });
+MatchModel.belongsTo(TeamModel, { foreignKey: "teamId", as: "team" });
+
+// Relación: Quién hizo la Reserva de la Cancha
+UserModel.hasMany(FieldReservationModel, {
+  foreignKey: "userId",
+  as: "reservations",
+});
+FieldReservationModel.belongsTo(UserModel, {
+  foreignKey: "userId",
+  as: "user",
+});
+
 // Relación con el Usuario (Dueño)
 // Un usuario (dueño de cancha) puede tener MUCHAS canchas
 UserModel.hasMany(FieldModel, { foreignKey: "ownerId", as: "fields" });

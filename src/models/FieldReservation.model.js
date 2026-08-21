@@ -11,6 +11,8 @@ export const FieldReservationModel = sequelize.define(
         model: "fields",
         key: "id",
       },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     userId: {
       type: DataTypes.INTEGER,

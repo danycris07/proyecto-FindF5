@@ -32,7 +32,7 @@ export const FieldModel = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "Users",
+        model: "users",
         key: "id",
       },
       onUpdate: "CASCADE",

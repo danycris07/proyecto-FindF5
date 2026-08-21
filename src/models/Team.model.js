@@ -12,6 +12,14 @@ export const TeamModel = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    captainId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
   },
   {
     paranoid: true,
