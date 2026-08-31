@@ -75,3 +75,16 @@ PlayerApplicationModel.belongsTo(UserModel, {
   foreignKey: "userId",
   as: "user",
 });
+
+MatchModel.hasMany(MatchPlayerModel, {
+  foreignKey: "matchId",
+  as: "confirmedPlayers",
+});
+MatchPlayerModel.belongsTo(MatchModel, { foreignKey: "matchId", as: "match" });
+
+// Un usuario puede estar confirmado en muchos partidos
+UserModel.hasMany(MatchPlayerModel, {
+  foreignKey: "userId",
+  as: "matchesToPlay",
+});
+MatchPlayerModel.belongsTo(UserModel, { foreignKey: "userId", as: "user" });
