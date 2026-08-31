@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { UserModel } from "../models/User.model.js";
+import { UserModel } from "../models/user.model.js";
 import { generarJWT } from "../helpers/jwt.helper.js";
 
 //Crear cuenta nueva

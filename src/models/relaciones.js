@@ -1,8 +1,11 @@
-import { UserModel } from "./User.model.js";
-import { TeamModel } from "./Team.model.js";
-import { FieldModel } from "./Field.model.js";
-import { FieldReservationModel } from "./FieldReservation.model.js";
-import { MatchModel } from "./Match.model.js";
+import { UserModel } from "./user.model.js";
+import { TeamModel } from "./team.model.js";
+import { FieldModel } from "./field.model.js";
+import { FieldReservationModel } from "./fieldReservation.model.js";
+import { MatchModel } from "./match.model.js";
+import { PlayerApplicationModel } from "./playerApplication.model.js";
+import { PlayerRequestModel } from "./playerRequest.model.js";
+
 UserModel.hasMany(TeamModel, { foreignKey: "captainId", as: "captainedTeams" });
 TeamModel.belongsTo(UserModel, { foreignKey: "captainId", as: "captain" });
 
@@ -40,7 +43,35 @@ FieldReservationModel.belongsTo(FieldModel, {
   as: "field",
 });
 
-// Relación con Partidos
 // Una cancha es sede de MUCHOS partidos
 FieldModel.hasMany(MatchModel, { foreignKey: "fieldId", as: "matches" });
 MatchModel.belongsTo(FieldModel, { foreignKey: "fieldId", as: "field" });
+
+MatchModel.hasMany(PlayerRequestModel, {
+  foreignKey: "matchId",
+  as: "playerRequests",
+});
+PlayerRequestModel.belongsTo(MatchModel, {
+  foreignKey: "matchId",
+  as: "match",
+});
+
+// Una publicación tiene a varios pibes postulándose
+PlayerRequestModel.hasMany(PlayerApplicationModel, {
+  foreignKey: "playerRequestId",
+  as: "applications",
+});
+PlayerApplicationModel.belongsTo(PlayerRequestModel, {
+  foreignKey: "playerRequestId",
+  as: "request",
+});
+
+// Para saber a cuántas búsquedas se anotó un usuario
+UserModel.hasMany(PlayerApplicationModel, {
+  foreignKey: "userId",
+  as: "playerApplications",
+});
+PlayerApplicationModel.belongsTo(UserModel, {
+  foreignKey: "userId",
+  as: "user",
+});
