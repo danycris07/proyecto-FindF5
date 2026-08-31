@@ -16,11 +16,7 @@ export const MatchModel = sequelize.define(
     },
     fieldId: {
       type: DataTypes.INTEGER,
-      allowNull: true, //  null temporalmente si el equipo que busca rival aún no reservó cancha
-      references: {
-        model: "fields",
-        key: "id",
-      },
+      allowNull: true,
       onUpdate: "CASCADE",
       onDelete: "SET NULL", // Si borran la cancha, el partido queda sin sede pero no se borra
     },
@@ -44,6 +40,11 @@ export const MatchModel = sequelize.define(
       type: DataTypes.ENUM("OPEN", "FULL", "FINISHED", "CANCELLED"),
       defaultValue: "OPEN", //abierto para que se sume jugadores o rivales
       allowNull: false,
+    },
+    maxPlayers: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 5,
     },
   },
   {
