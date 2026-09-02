@@ -6,6 +6,7 @@ export const createFieldValidation = [
   body("name")
     .isString()
     .withMessage("El nombre debe ser texto")
+    .bail()
     .trim()
     .notEmpty()
     .withMessage("El nombre es obligatorio"),
@@ -13,6 +14,7 @@ export const createFieldValidation = [
   body("address")
     .isString()
     .withMessage("La dirección debe ser texto")
+    .bail()
     .notEmpty()
     .withMessage("La dirección es obligatoria"),
 
@@ -26,9 +28,7 @@ export const createFieldValidation = [
     .isDecimal()
     .withMessage("La longitud no es válida"),
 
-  body("price")
-    .isDecimal()
-    .withMessage("El precio debe ser decimal"),
+  body("price").isDecimal().withMessage("El precio debe ser decimal"),
 
   body("description")
     .optional()
@@ -38,6 +38,7 @@ export const createFieldValidation = [
   body("ownerId")
     .isInt()
     .withMessage("El ownerId debe ser entero")
+    .bail()
     .custom(async (ownerId) => {
       const usuario = await UserModel.findByPk(ownerId);
 
@@ -53,6 +54,7 @@ export const getFieldByIdValidation = [
   param("id")
     .isInt()
     .withMessage("El id debe ser entero")
+    .bail()
     .custom(async (id) => {
       const cancha = await FieldModel.findByPk(id);
 

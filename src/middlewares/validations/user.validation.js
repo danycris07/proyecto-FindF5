@@ -13,6 +13,7 @@ export const createUserValidation = [
     .isEmail()
     .withMessage("Debe ingresar un email válido")
     .normalizeEmail()
+    .bail()
     .custom(async (email) => {
       const usuario = await UserModel.findOne({
         where: { email },
@@ -47,6 +48,7 @@ export const getUserByIdValidation = [
   param("id")
     .isInt()
     .withMessage("El id debe ser entero")
+    .bail()
     .custom(async (id) => {
       const usuario = await UserModel.findByPk(id);
 

@@ -7,6 +7,7 @@ export const createPlayerApplicationValidation = [
   body("playerRequestId")
     .isInt()
     .withMessage("El playerRequestId debe ser entero")
+    .bail()
     .custom(async (playerRequestId) => {
       const solicitud = await PlayerRequestModel.findByPk(playerRequestId);
 
@@ -24,6 +25,7 @@ export const createPlayerApplicationValidation = [
   body("userId")
     .isInt()
     .withMessage("El userId debe ser entero")
+    .bail()
     .custom(async (userId) => {
       const usuario = await UserModel.findByPk(userId);
 
@@ -33,17 +35,17 @@ export const createPlayerApplicationValidation = [
 
       return true;
     })
+    .bail()
     .custom(async (userId, { req }) => {
       const { playerRequestId } = req.body;
 
-      const solicitudExistente =
-        await PlayerApplicationModel.findOne({
-          where: {
-            playerRequestId,
-            userId,
-            status: ["PENDING", "ACCEPTED"],
-          },
-        });
+      const solicitudExistente = await PlayerApplicationModel.findOne({
+        where: {
+          playerRequestId,
+          userId,
+          status: ["PENDING", "ACCEPTED"],
+        },
+      });
 
       if (solicitudExistente) {
         throw new Error("El usuario ya se postuló a esta búsqueda");
@@ -57,6 +59,7 @@ export const getPlayerApplicationByIdValidation = [
   param("id")
     .isInt()
     .withMessage("El id debe ser entero")
+    .bail()
     .custom(async (id) => {
       const aplicacion = await PlayerApplicationModel.findByPk(id);
 

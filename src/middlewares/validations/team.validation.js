@@ -6,6 +6,7 @@ export const createTeamValidation = [
   body("name")
     .isString()
     .withMessage("El nombre debe ser texto")
+    .bail()
     .trim()
     .notEmpty()
     .withMessage("El nombre es obligatorio"),
@@ -18,6 +19,7 @@ export const createTeamValidation = [
   body("captainId")
     .isInt()
     .withMessage("El captainId debe ser entero")
+    .bail()
     .custom(async (captainId) => {
       const usuario = await UserModel.findByPk(captainId);
 
@@ -33,6 +35,7 @@ export const getTeamByIdValidation = [
   param("id")
     .isInt()
     .withMessage("El id debe ser entero")
+    .bail()
     .custom(async (id) => {
       const equipo = await TeamModel.findByPk(id);
 

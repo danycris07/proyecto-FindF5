@@ -6,6 +6,7 @@ export const createPlayerRequestValidation = [
   body("matchId")
     .isInt()
     .withMessage("El matchId debe ser entero")
+    .bail()
     .custom(async (matchId) => {
       const partido = await MatchModel.findByPk(matchId);
 
@@ -30,6 +31,7 @@ export const getPlayerRequestByIdValidation = [
   param("id")
     .isInt()
     .withMessage("El id debe ser entero")
+    .bail()
     .custom(async (id) => {
       const solicitud = await PlayerRequestModel.findByPk(id);
 

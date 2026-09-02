@@ -8,6 +8,7 @@ export const createReservationValidation = [
   body("fieldId")
     .isInt()
     .withMessage("El fieldId debe ser entero")
+    .bail()
     .custom(async (fieldId) => {
       const cancha = await FieldModel.findByPk(fieldId);
 
@@ -21,6 +22,7 @@ export const createReservationValidation = [
   body("userId")
     .isInt()
     .withMessage("El userId debe ser entero")
+    .bail()
     .custom(async (userId) => {
       const usuario = await UserModel.findByPk(userId);
 
@@ -31,9 +33,7 @@ export const createReservationValidation = [
       return true;
     }),
 
-  body("date")
-    .isISO8601()
-    .withMessage("La fecha no es válida"),
+  body("date").isISO8601().withMessage("La fecha no es válida"),
 
   body("startTime")
     .matches(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/)
@@ -48,7 +48,7 @@ export const createReservationValidation = [
 
     if (endTime <= startTime) {
       throw new Error(
-        "La hora de finalización debe ser posterior a la hora de inicio"
+        "La hora de finalización debe ser posterior a la hora de inicio",
       );
     }
 
@@ -69,9 +69,7 @@ export const createReservationValidation = [
     });
 
     if (reserva) {
-      throw new Error(
-        "La cancha ya está reservada en ese horario"
-      );
+      throw new Error("La cancha ya está reservada en ese horario");
     }
 
     return true;

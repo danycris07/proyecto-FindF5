@@ -5,6 +5,7 @@ export const acceptPlayerApplicationValidation = [
   param("id")
     .isInt()
     .withMessage("El id debe ser entero")
+    .bail()
     .custom(async (id) => {
       const solicitud = await PlayerApplicationModel.findByPk(id);
 

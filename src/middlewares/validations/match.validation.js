@@ -7,6 +7,7 @@ export const createMatchValidation = [
   body("teamId")
     .isInt()
     .withMessage("El teamId debe ser entero")
+    .bail()
     .custom(async (teamId) => {
       const equipo = await TeamModel.findByPk(teamId);
 
@@ -21,6 +22,7 @@ export const createMatchValidation = [
     .optional()
     .isInt()
     .withMessage("El fieldId debe ser entero")
+    .bail()
     .custom(async (fieldId) => {
       const cancha = await FieldModel.findByPk(fieldId);
 
@@ -31,9 +33,7 @@ export const createMatchValidation = [
       return true;
     }),
 
-  body("date")
-    .isISO8601()
-    .withMessage("La fecha no es válida"),
+  body("date").isISO8601().withMessage("La fecha no es válida"),
 
   body("startTime")
     .matches(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/)
@@ -43,9 +43,7 @@ export const createMatchValidation = [
     .matches(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/)
     .withMessage("La hora de finalización no es válida"),
 
-  body("pricePerPlayer")
-    .isDecimal()
-    .withMessage("El precio debe ser decimal"),
+  body("pricePerPlayer").isDecimal().withMessage("El precio debe ser decimal"),
 
   body("maxPlayers")
     .isInt({ min: 1 })
@@ -56,6 +54,7 @@ export const getMatchByIdValidation = [
   param("id")
     .isInt()
     .withMessage("El id debe ser entero")
+    .bail()
     .custom(async (id) => {
       const partido = await MatchModel.findByPk(id);
 
