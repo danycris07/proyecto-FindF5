@@ -1,7 +1,7 @@
 import { body, param } from "express-validator";
-import { MatchModel } from "../models/match.model.js";
-import { TeamModel } from "../models/team.model.js";
-import { FieldModel } from "../models/field.model.js";
+import { MatchModel } from "../../models/match.model.js";
+import { TeamModel } from "../../models/team.model.js";
+import { FieldModel } from "../../models/field.model.js";
 
 export const createMatchValidation = [
   body("teamId")

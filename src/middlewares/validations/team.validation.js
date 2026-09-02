@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
-import { TeamModel } from "../models/team.model.js";
-import { UserModel } from "../models/user.model.js";
+import { TeamModel } from "../../models/team.model.js";
+import { UserModel } from "../../models/user.model.js";
 
 export const createTeamValidation = [
   body("name")

@@ -1,85 +1,80 @@
+// src/controllers/auth.controller.js
+import { matchedData } from "express-validator";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { UserModel } from "../models/user.model.js";
-import { generarJWT } from "../helpers/jwt.helper.js";
+import { ProfileModel } from "../models/profile.model.js";
 
-//Crear cuenta nueva
-export const registrarUsuario = async (req, res) => {
-  const { name, email, password, phone, role } = req.body;
+// REGISTRO
+export const register = async (req, res) => {
   try {
-    //ver si el email ya esta registrado
-    const existeEmail = await UserModel.findOne({ where: { email } });
-    if (existeEmail) {
-      return res.status(400).json({
-        msg: "El correo electrónico ya está registrado.",
-      });
-    }
+    const datos = matchedData(req);
 
-    //  encriptar la contraseña
-    const salt = bcrypt.genSaltSync(10);
-    const passwordHasheada = bcrypt.hashSync(password, salt);
+    // 1. Encriptar la contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(datos.password, salt);
+    datos.password = hashedPassword;
 
-    //  crear el usuario en la BD
-    const nuevoUsuario = await UserModel.create({
-      name,
-      email,
-      password: passwordHasheada,
-      phone,
-      role,
-    });
+    // 2. Crear el usuario
+    const usuario = await UserModel.create(datos);
 
-    //  Generamos el token JWT con tu helper
-    const token = generarJWT(nuevoUsuario.id, nuevoUsuario.role);
+    // 3. Crear el perfil vacío automáticamente vinculado a este usuario
+    await ProfileModel.create({ userId: usuario.id });
 
-    //  Respondemos al cliente con los datos básicos y el token
-    return res.status(201).json({
-      uid: nuevoUsuario.id,
-      name: nuevoUsuario.name,
-      role: nuevoUsuario.role,
+    // 4. Generar el JWT para que ya quede logueado al registrarse
+    const token = jwt.sign(
+      { id: usuario.id, role: usuario.role }, 
+      process.env.JWT_SECRET || "mi_clave_super_secreta_123", // Cambiá esto en tu archivo .env
+      { expiresIn: "7d" } // El token dura 7 días
+    );
+
+    // Borramos el password de la respuesta por seguridad
+    const userWithoutPassword = usuario.toJSON();
+    delete userWithoutPassword.password;
+
+    res.status(201).json({
+      message: "Usuario registrado correctamente",
+      user: userWithoutPassword,
       token,
     });
   } catch (error) {
-    console.error("Error en registrarUsuario:", error);
-    return res.status(500).json({
-      msg: "Error inesperado al registrar.",
-    });
+    res.status(500).json({ message: "Error al registrar el usuario" });
   }
 };
 
-//Iniciar sesion
-export const loginUsuario = async (req, res) => {
-  const { email, password } = req.body;
-
+// LOGIN
+export const login = async (req, res) => {
   try {
-    //  ver si el usuario existe mediante su email
+    const { email, password } = matchedData(req);
+
+    // 1. Verificar si el usuario existe
     const usuario = await UserModel.findOne({ where: { email } });
     if (!usuario) {
-      return res.status(400).json({
-        msg: "Usuario o contraseña incorrectos.",
-      });
+      return res.status(401).json({ message: "Credenciales incorrectas" });
     }
 
-    // Comparar la contraseña ingresada con la contraseña hasheada de la BD
-    const passwordValida = bcrypt.compareSync(password, usuario.password);
-    if (!passwordValida) {
-      return res.status(400).json({
-        msg: "Usuario o contraseña incorrectos.",
-      });
+    // 2. Verificar si la contraseña coincide
+    const validPassword = await bcrypt.compare(password, usuario.password);
+    if (!validPassword) {
+      return res.status(401).json({ message: "Credenciales incorrectas" });
     }
 
-    //  Si todo coincide, generamos el JWT
-    const token = generarJWT(usuario.id, usuario.role);
+    // 3. Generar el JWT
+    const token = jwt.sign(
+      { id: usuario.id, role: usuario.role },
+      process.env.JWT_SECRET || "mi_clave_super_secreta_123",
+      { expiresIn: "7d" }
+    );
 
-    // envia el token
-    return res.status(200).json({
-      uid: usuario.id,
-      name: usuario.name,
-      role: usuario.role,
+    const userWithoutPassword = usuario.toJSON();
+    delete userWithoutPassword.password;
+
+    res.status(200).json({
+      message: "Login exitoso",
+      user: userWithoutPassword,
       token,
     });
   } catch (error) {
-    console.error("Error en loginUsuario:", error);
-    return res.status(500).json({
-      msg: "Error inesperado al iniciar sesión.",
-    });
+    res.status(500).json({ message: "Error al iniciar sesión" });
   }
 };

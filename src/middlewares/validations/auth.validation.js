@@ -1,7 +1,7 @@
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 import { UserModel } from "../../models/user.model.js";
 
-export const createUserValidation = [
+export const registerValidation = [
   body("name")
     .isString()
     .withMessage("El nombre debe ser texto")
@@ -44,18 +44,13 @@ export const createUserValidation = [
     .withMessage("El rol no es válido"),
 ];
 
-export const getUserByIdValidation = [
-  param("id")
-    .isInt()
-    .withMessage("El id debe ser entero")
-    .bail()
-    .custom(async (id) => {
-      const usuario = await UserModel.findByPk(id);
+export const loginValidation = [
+  body("email")
+    .isEmail()
+    .withMessage("Debe ingresar un email válido")
+    .normalizeEmail()
+    .notEmpty()
+    .withMessage("El email es obligatorio"),
 
-      if (!usuario) {
-        throw new Error("El usuario no existe");
-      }
-
-      return true;
-    }),
+  body("password").notEmpty().withMessage("La contraseña es obligatoria"),
 ];

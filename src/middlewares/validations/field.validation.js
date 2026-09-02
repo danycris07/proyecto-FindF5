@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
-import { FieldModel } from "../models/field.model.js";
-import { UserModel } from "../models/user.model.js";
+import { FieldModel } from "../../models/field.model.js";
+import { UserModel } from "../../models/user.model.js";
 
 export const createFieldValidation = [
   body("name")

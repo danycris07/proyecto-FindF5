@@ -1,8 +1,8 @@
 import { body, param } from "express-validator";
 import { Op } from "sequelize";
-import { FieldReservationModel } from "../models/fieldReservation.model.js";
-import { FieldModel } from "../models/field.model.js";
-import { UserModel } from "../models/user.model.js";
+import { FieldReservationModel } from "../../models/fieldReservation.model.js";
+import { FieldModel } from "../../models/field.model.js";
+import { UserModel } from "../../models/user.model.js";
 
 export const createReservationValidation = [
   body("fieldId")

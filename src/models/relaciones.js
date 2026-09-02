@@ -6,6 +6,7 @@ import { MatchModel } from "./match.model.js";
 import { PlayerApplicationModel } from "./playerApplication.model.js";
 import { PlayerRequestModel } from "./playerRequest.model.js";
 import { ProfileModel } from "./profile.model.js";
+import { MatchPlayerModel } from "./matchPlayer.model.js";
 
 UserModel.hasMany(TeamModel, { foreignKey: "captainId", as: "captainedTeams" });
 TeamModel.belongsTo(UserModel, { foreignKey: "captainId", as: "captain" });

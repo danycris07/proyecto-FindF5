@@ -3,7 +3,13 @@ import { FieldModel } from "../models/field.model.js";
 
 export const obtenerTodasLasCanchas = async (req, res) => {
   try {
-    const canchas = await FieldModel.findAll();
+    const canchas = await FieldModel.findAll({
+      include: {
+        model: UserModel,
+        as: "owner",
+        attributes: ["id", "name", "phone"], // Le mandas el teléfono para que los pibes se contacten si pasa algo
+      },
+    });
 
     res.status(200).json(canchas);
   } catch (error) {
@@ -16,8 +22,13 @@ export const obtenerTodasLasCanchas = async (req, res) => {
 export const obtenerCanchaPorId = async (req, res) => {
   try {
     const { id } = matchedData(req);
-
-    const cancha = await FieldModel.findByPk(id);
+    const canchas = await FieldModel.findAll(id, {
+      include: {
+        model: UserModel,
+        as: "owner",
+        attributes: ["id", "name", "phone"], // Le mandas el teléfono para que los pibes se contacten si pasa algo
+      },
+    });
 
     res.status(200).json(cancha);
   } catch (error) {

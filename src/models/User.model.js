@@ -1,5 +1,5 @@
+import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database.js";
-const { DataTypes } = sequelize;
 
 export const UserModel = sequelize.define(
   "User",
@@ -8,19 +8,23 @@ export const UserModel = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     email: {
       type: DataTypes.STRING,
       unique: true,
       allowNull: false,
     },
+
     password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     phone: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     role: {
       type: DataTypes.ENUM("PLAYER", "FIELD_OWNER", "ADMIN"),
       defaultValue: "PLAYER",

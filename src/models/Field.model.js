@@ -1,5 +1,5 @@
+import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database.js";
-const { DataTypes } = sequelize;
 
 export const FieldModel = sequelize.define(
   "Field",
