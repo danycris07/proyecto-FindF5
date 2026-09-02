@@ -5,12 +5,21 @@ import { FieldReservationModel } from "./fieldReservation.model.js";
 import { MatchModel } from "./match.model.js";
 import { PlayerApplicationModel } from "./playerApplication.model.js";
 import { PlayerRequestModel } from "./playerRequest.model.js";
+import { ProfileModel } from "./profile.model.js";
 
 UserModel.hasMany(TeamModel, { foreignKey: "captainId", as: "captainedTeams" });
 TeamModel.belongsTo(UserModel, { foreignKey: "captainId", as: "captain" });
 
 UserModel.belongsToMany(TeamModel, { through: "TeamMember", as: "teams" });
 TeamModel.belongsToMany(UserModel, { through: "TeamMember", as: "players" });
+
+UserModel.hasOne(ProfileModel, {
+  foreignKey: "userId",
+});
+
+ProfileModel.belongsTo(UserModel, {
+  foreignKey: "userId",
+});
 
 // Relación: Quién organizó el Partido
 TeamModel.hasMany(MatchModel, { foreignKey: "teamId", as: "matches" });
