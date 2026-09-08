@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 import { PlayerRequestModel } from "../../models/playerRequest.model.js";
-import { MatchModel } from "../../models/match.model.js";
+import { MatchModel } from "../../models/Match.model.js";
 
 export const createPlayerRequestValidation = [
   body("matchId")

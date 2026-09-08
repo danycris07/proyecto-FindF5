@@ -2,7 +2,7 @@ import { UserModel } from "./user.model.js";
 import { TeamModel } from "./team.model.js";
 import { FieldModel } from "./field.model.js";
 import { FieldReservationModel } from "./fieldReservation.model.js";
-import { MatchModel } from "./match.model.js";
+import { MatchModel } from "./Match.model.js";
 import { PlayerApplicationModel } from "./playerApplication.model.js";
 import { PlayerRequestModel } from "./playerRequest.model.js";
 import { ProfileModel } from "./profile.model.js";
