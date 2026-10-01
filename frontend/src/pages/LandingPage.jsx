@@ -36,6 +36,7 @@
 import Navbar from "../components/ui/Navbar";
 import Hero from "../components/ui/Hero";
 import ComoFunciona from "../components/ui/ComoFunciona";
+import PreguntasFrecuentes from "../components/ui/PreguntasFrecuentes";
 
 // Estilos compartidos (cuando armes componentes, estos pasan a <Button />)
 const btnBase =
@@ -85,28 +86,7 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* ───────────── PREGUNTAS FRECUENTES ───────────── */}
-        <section
-          id="preguntas-frecuentes"
-          className="scroll-mt-6 border-t border-border"
-        >
-          <div className="mx-auto max-w-3xl px-4 py-12 md:py-16">
-            <h2 className={sectionTitle}>Preguntas frecuentes</h2>
-            <div className="mt-6 space-y-3">
-              {[1, 2, 3].map((pregunta) => (
-                <div
-                  key={pregunta}
-                  className="rounded-lg border border-border bg-surface p-4"
-                >
-                  <h3 className="font-semibold">Pregunta frecuente {pregunta}</h3>
-                  <p className="mt-1 text-sm text-text-secondary">
-                    Respuesta de la pregunta.
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <PreguntasFrecuentes sectionTitle={sectionTitle} />
       </main>
 
       {/* ───────────── FOOTER ───────────── */}
