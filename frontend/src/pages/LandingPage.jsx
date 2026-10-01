@@ -37,6 +37,7 @@ import Navbar from "../components/ui/Navbar.jsx";
 import Hero from "../components/ui/Hero.jsx";
 import ComoFunciona from "../components/ui/ComoFunciona.jsx";
 import Canchas from "../components/ui/Canchas.jsx";
+import Footer from "../components/ui/Footer.jsx";
 
 
 // Estilos compartidos (cuando armes componentes, estos pasan a <Button />)
@@ -69,15 +70,7 @@ function LandingPage() {
         <PreguntasFrecuentes sectionTitle={sectionTitle} />
       </main>
 
-      {/* ───────────── FOOTER ───────────── */}
-      <footer className="relative border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-text-secondary sm:flex-row sm:justify-between">
-          <p className="font-display font-bold uppercase tracking-wider text-text-primary">
-            FindF5
-          </p>
-          <p className="tabular-nums">© 2026 FindF5. Todos los derechos reservados.</p>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Círculo del wireframe (esquina inferior derecha): botón flotante sin definir */}
       <button
