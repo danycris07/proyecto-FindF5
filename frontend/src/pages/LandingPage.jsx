@@ -33,14 +33,15 @@
  * `text-text-primary` y `text-text-secondary` (color "text-primary" + prefijo "text-").
  */
 
-import Navbar from "../components/ui/Navbar";
-import Hero from "../components/ui/Hero";
-import ComoFunciona from "../components/ui/ComoFunciona";
-import PreguntasFrecuentes from "../components/ui/PreguntasFrecuentes";
+import Navbar from "../components/ui/Navbar.jsx";
+import Hero from "../components/ui/Hero.jsx";
+import ComoFunciona from "../components/ui/ComoFunciona.jsx";
+import Canchas from "../components/ui/Canchas.jsx";
+
 
 // Estilos compartidos (cuando armes componentes, estos pasan a <Button />)
 const btnBase =
-  "inline-flex items-center justify-center rounded px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:px-4 md:py-2.5";
+"inline-flex items-center justify-center rounded px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:px-4 md:py-2.5";
 const btnPrimary = `${btnBase} bg-primary text-background hover:bg-primary/90 focus-visible:outline-primary`;
 const btnSecondary = `${btnBase} border border-border text-text-primary hover:bg-surface focus-visible:outline-text-primary`;
 
@@ -63,28 +64,7 @@ function LandingPage() {
 
         <ComoFunciona sectionTitle={sectionTitle} />
 
-        {/* ───────────── CANCHAS ───────────── */}
-        <section id="canchas" className="scroll-mt-6 border-t border-border">
-          <div className="mx-auto max-w-6xl px-4 py-12 md:py-16">
-            <h2 className={sectionTitle}>Canchas</h2>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((cancha) => (
-                <div
-                  key={cancha}
-                  className="overflow-hidden rounded-lg border border-border bg-surface"
-                >
-                  <div className="aspect-video bg-background" />
-                  <div className="p-4">
-                    <h3 className="font-semibold">Nombre de la cancha</h3>
-                    <p className="mt-1 text-sm text-text-secondary tabular-nums">
-                      Zona · Horarios · Precio
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <Canchas sectionTitle={sectionTitle} />
 
         <PreguntasFrecuentes sectionTitle={sectionTitle} />
       </main>
