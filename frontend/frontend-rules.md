@@ -65,6 +65,23 @@ Al procesar código copiado de v0.dev, en este orden:
 5. Validar que la interfaz sea totalmente responsiva antes de dar la tarea por completada.
 
 > Nota: las reglas de comportamiento de la IA (qué no inventar, cuándo preguntar, no modificar cosas innecesarias, herramientas obligatorias, memoria, Trello) viven en `agente.md`, para no duplicarlas acá.
+>
+> Aclaración: la nota anterior conserva su referencia original; en este repositorio, el archivo vigente con esas reglas es `AGENT.md`.
+
+## 12. Aplicación de las Reglas al Código Existente
+
+- Antes de usar una carpeta, componente, hook, servicio o dependencia mencionados en estas reglas, comprobá que exista en el proyecto y revisá cómo se resuelve actualmente ese caso.
+- Las rutas de la sección 2 describen la organización prevista; no crees carpetas ni dupliques lógica si la estructura actual resuelve la tarea de otra manera.
+- Comprobá `package.json` antes de importar una biblioteca. Si no está instalada, no agregues dependencias sin autorización explícita; consultá cómo continuar si la tarea requiere esa biblioteca.
+- Conservá las reglas de este documento y las instrucciones generales de `AGENT.md` en conjunto. Si parecen entrar en conflicto, no elijas una interpretación que cambie el comportamiento existente: inspeccioná el código y consultá al usuario cuando la decisión no se pueda resolver con el contexto disponible.
+
+## 13. Validación de Cambios Frontend
+
+- Revisá los scripts definidos en `package.json` y ejecutá las comprobaciones pertinentes desde la carpeta `frontend/`; actualmente están disponibles `npm run lint` y `npm run build`.
+- Preferí lint focalizado para los archivos afectados y ejecutá el build para verificar la integración cuando el entorno lo permita.
+- Para cambios de interfaz, verificá tamaños móviles y de escritorio, además de estados de carga, error y vacío cuando el componente consuma datos asíncronos.
+- En PowerShell, si la ejecución de `npm` está bloqueada por la política de scripts, usá `npm.cmd` para ejecutar el mismo script.
+- Informá las comprobaciones realizadas y sus resultados; no atribuyas al cambio errores que ya existían o que están fuera de su alcance.
 
 <!-- rtk-instructions v2 -->
 
