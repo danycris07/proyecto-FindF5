@@ -19,7 +19,7 @@ function Hero({ btnPrimary, btnSecondary }) {
         </div>
       </div>
 
-      <div className="aspect-[4/3] overflow-hidden rounded-lg border border-border bg-surface">
+      <div className="aspect-4/3 overflow-hidden rounded-lg border border-border bg-surface">
         {/*
           PARA USAR TU IMAGEN: borrá el <svg> de abajo y poné:
           <img src="/tu-imagen.jpg" alt="Descripción de la imagen" className="h-full w-full object-cover" />

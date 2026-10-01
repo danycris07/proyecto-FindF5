@@ -56,7 +56,7 @@ function LandingPage() {
       {/* Luz de reflector: degradado radial sutil arriba de todo */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(ellipse_at_top,rgba(204,255,0,0.10),transparent_70%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 bg-[radial-gradient(ellipse_at_top,rgba(204,255,0,0.10),transparent_70%)]"
       />
 
       <Navbar btnPrimary={btnPrimary} btnSecondary={btnSecondary} />

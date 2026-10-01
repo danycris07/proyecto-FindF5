@@ -17,7 +17,7 @@ function Navbar({ btnPrimary, btnSecondary }) {
 
         <nav
           aria-label="Principal"
-          className="order-last w-full md:order-none md:w-auto"
+          className="order-last w-full md:order-0 md:w-auto"
         >
           <ul className="flex gap-6 overflow-x-auto text-sm font-medium text-text-secondary">
             {NAV_LINKS.map((link) => (
