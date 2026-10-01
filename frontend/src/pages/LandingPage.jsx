@@ -37,6 +37,7 @@ import Navbar from "../components/ui/Navbar.jsx";
 import Hero from "../components/ui/Hero.jsx";
 import ComoFunciona from "../components/ui/ComoFunciona.jsx";
 import Canchas from "../components/ui/Canchas.jsx";
+import PreguntasFrecuentes from "../components/ui/PreguntasFrecuentes.jsx";
 import Footer from "../components/ui/Footer.jsx";
 
 
