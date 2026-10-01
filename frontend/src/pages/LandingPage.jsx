@@ -50,6 +50,9 @@ const btnSecondary = `${btnBase} border border-border text-text-primary hover:bg
 const sectionTitle =
   "font-display text-2xl font-extrabold uppercase tracking-wider md:text-3xl";
 
+/**
+ * Ensambla las secciones del landing en orden y comparte estilos entre ellas.
+ */
 function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-background font-sans text-text-primary">

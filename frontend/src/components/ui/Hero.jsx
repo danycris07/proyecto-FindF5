@@ -1,3 +1,7 @@
+/**
+ * Presenta la propuesta de valor, sus acciones y una ilustración de cancha.
+ * @param {{ btnPrimary: string, btnSecondary: string }} props Clases compartidas de botones.
+ */
 function Hero({ btnPrimary, btnSecondary }) {
   return (
     <section className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-2 md:items-center md:gap-12 md:py-20">

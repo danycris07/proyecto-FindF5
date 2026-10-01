@@ -1,5 +1,9 @@
 import preguntasFrecuentes from "../../mocks/preguntasFrecuentes";
 
+/**
+ * Renderiza las preguntas y respuestas desde el mock del frontend.
+ * @param {{ sectionTitle: string }} props Clase compartida para el título de sección.
+ */
 function PreguntasFrecuentes({ sectionTitle }) {
   return (
     <section

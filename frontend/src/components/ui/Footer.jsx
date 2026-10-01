@@ -1,3 +1,4 @@
+/** Cierra la landing con la marca y el aviso de derechos reservados. */
 function Footer() {
   return (
     <footer className="relative border-t border-border">

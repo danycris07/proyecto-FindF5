@@ -1,3 +1,7 @@
+/**
+ * Presenta las tarjetas de ejemplo para descubrir canchas.
+ * @param {{ sectionTitle: string }} props Clase compartida para el título de sección.
+ */
 function Canchas({ sectionTitle }) {
   return (
     <section id="canchas" className="scroll-mt-6 border-t border-border">

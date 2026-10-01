@@ -4,6 +4,11 @@ const NAV_LINKS = [
   { label: "Preguntas frecuentes", href: "#preguntas-frecuentes" },
 ];
 
+/**
+ * Muestra la marca, los enlaces a secciones y las acciones de acceso.
+ * Los href de NAV_LINKS corresponden a los ids de la landing.
+ * @param {{ btnPrimary: string, btnSecondary: string }} props Clases compartidas de botones.
+ */
 function Navbar({ btnPrimary, btnSecondary }) {
   return (
     <header className="relative border-b border-border">

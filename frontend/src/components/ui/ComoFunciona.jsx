@@ -1,3 +1,7 @@
+/**
+ * Explica en tres pasos el flujo principal de la aplicación.
+ * @param {{ sectionTitle: string }} props Clase compartida para el título de sección.
+ */
 function ComoFunciona({ sectionTitle }) {
   return (
     <section id="como-funciona" className="scroll-mt-6 border-t border-border">
