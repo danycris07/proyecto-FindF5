@@ -43,23 +43,23 @@ import Footer from "../components/ui/Footer.jsx";
 
 // Estilos compartidos (cuando armes componentes, estos pasan a <Button />)
 const btnBase =
-"inline-flex items-center justify-center rounded px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:px-4 md:py-2.5";
-const btnPrimary = `${btnBase} bg-primary text-background hover:bg-primary/90 focus-visible:outline-primary`;
-const btnSecondary = `${btnBase} border border-border text-text-primary hover:bg-surface focus-visible:outline-text-primary`;
+  "inline-flex min-h-11 items-center justify-center rounded-sm px-4 py-2.5 text-sm font-bold transition-[background-color,border-color,color,transform,box-shadow] duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 motion-reduce:transition-none md:px-5";
+const btnPrimary = `${btnBase} bg-primary text-background shadow-[0_8px_30px_rgba(204,255,0,0.14)] hover:-translate-y-0.5 hover:bg-[#d9ff42] hover:shadow-[0_12px_34px_rgba(204,255,0,0.22)] active:translate-y-0 focus-visible:outline-primary`;
+const btnSecondary = `${btnBase} border border-white/15 bg-white/[0.02] text-text-primary hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/[0.06] active:translate-y-0 focus-visible:outline-text-primary`;
 
 const sectionTitle =
-  "font-display text-2xl font-extrabold uppercase tracking-wider md:text-3xl";
+  "flex items-center gap-4 font-display text-3xl font-extrabold uppercase leading-none before:h-1 before:w-9 before:shrink-0 before:bg-primary before:content-[''] md:text-4xl";
 
 /**
  * Ensambla las secciones del landing en orden y comparte estilos entre ellas.
  */
 function LandingPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background font-sans text-text-primary">
+    <div className="relative isolate min-h-screen overflow-hidden bg-background font-sans text-text-primary">
       {/* Luz de reflector: degradado radial sutil arriba de todo */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 bg-[radial-gradient(ellipse_at_top,rgba(204,255,0,0.10),transparent_70%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[38rem] bg-[radial-gradient(ellipse_at_top,rgba(204,255,0,0.08),transparent_70%)]"
       />
 
       <Navbar btnPrimary={btnPrimary} btnSecondary={btnSecondary} />
@@ -80,7 +80,7 @@ function LandingPage() {
       <button
         type="button"
         aria-label="Botón flotante (por definir)"
-        className="fixed bottom-4 right-4 h-12 w-12 rounded-full border border-border bg-surface"
+        className="fixed bottom-5 right-5 h-12 w-12 rounded-full border border-primary/25 bg-surface/80 shadow-[0_0_28px_rgba(204,255,0,0.08)] backdrop-blur transition-colors duration-200 hover:border-primary/60 motion-reduce:transition-none"
       />
     </div>
   );
