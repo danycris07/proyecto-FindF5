@@ -11,23 +11,26 @@ const NAV_LINKS = [
  */
 function Navbar({ btnPrimary, btnSecondary }) {
   return (
-    <header className="relative border-b border-border">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-4">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-4 lg:flex-nowrap lg:px-8">
         <a
           href="#"
-          className="font-display text-2xl font-extrabold uppercase tracking-wider"
+          className="font-display text-3xl font-extrabold uppercase leading-none tracking-wider text-text-primary transition-colors duration-200 hover:text-text-secondary"
         >
           FindF5
         </a>
 
         <nav
           aria-label="Principal"
-          className="order-last w-full md:order-0 md:w-auto"
+          className="order-last w-full lg:order-none lg:w-auto"
         >
-          <ul className="flex gap-6 overflow-x-auto text-sm font-medium text-text-secondary">
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 overflow-x-auto text-sm font-semibold text-text-secondary sm:gap-7 lg:overflow-visible">
             {NAV_LINKS.map((link) => (
               <li key={link.href} className="shrink-0">
-                <a href={link.href} className="hover:text-text-primary">
+                <a
+                  href={link.href}
+                  className="transition-colors duration-200 hover:text-text-primary"
+                >
                   {link.label}
                 </a>
               </li>
@@ -35,7 +38,7 @@ function Navbar({ btnPrimary, btnSecondary }) {
           </ul>
         </nav>
 
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2 sm:gap-3">
           <a href="#" className={btnSecondary}>
             Iniciar sesión
           </a>

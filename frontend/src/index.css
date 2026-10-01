@@ -29,12 +29,16 @@
 html {
   min-width: 320px;
   scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
 }
 
 body {
   min-width: 320px;
   min-height: 100svh;
   margin: 0;
+  background:
+    radial-gradient(ellipse at 50% -18%, rgba(36, 50, 74, 0.72), transparent 52%),
+    #0B0F19;
 }
 
 #root {
@@ -42,4 +46,29 @@ body {
   width: 100%;
   min-height: 100svh;
   flex-direction: column;
+}
+
+a {
+  text-decoration: none;
+}
+
+::selection {
+  color: #F1F5F9;
+  background: #24324A;
+}
+
+:focus-visible {
+  outline: 2px solid #CCFF00;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
