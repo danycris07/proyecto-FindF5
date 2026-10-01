@@ -37,7 +37,7 @@ body {
   min-height: 100svh;
   margin: 0;
   background:
-    radial-gradient(ellipse at 50% -18%, rgba(204, 255, 0, 0.09), transparent 52%),
+    radial-gradient(ellipse at 50% -18%, rgba(36, 50, 74, 0.72), transparent 52%),
     #0B0F19;
 }
 
@@ -53,8 +53,8 @@ a {
 }
 
 ::selection {
-  color: #0B0F19;
-  background: #CCFF00;
+  color: #F1F5F9;
+  background: #24324A;
 }
 
 :focus-visible {

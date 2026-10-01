@@ -11,11 +11,11 @@ const NAV_LINKS = [
  */
 function Navbar({ btnPrimary, btnSecondary }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 bg-background/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-4 lg:flex-nowrap lg:px-8">
         <a
           href="#"
-          className="font-display text-3xl font-extrabold uppercase leading-none text-text-primary transition-colors duration-200 hover:text-primary"
+          className="font-display text-3xl font-extrabold uppercase leading-none tracking-wider text-text-primary transition-colors duration-200 hover:text-text-secondary"
         >
           FindF5
         </a>
@@ -29,7 +29,7 @@ function Navbar({ btnPrimary, btnSecondary }) {
               <li key={link.href} className="shrink-0">
                 <a
                   href={link.href}
-                  className="transition-colors duration-200 hover:text-primary"
+                  className="transition-colors duration-200 hover:text-text-primary"
                 >
                   {link.label}
                 </a>
