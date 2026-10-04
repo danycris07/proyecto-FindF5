@@ -3,24 +3,24 @@ import CardNav from "./CardNav.jsx";
 const NAV_ITEMS = [
   {
     label: "Cómo funciona",
-    bgColor: "#161F30",
-    textColor: "#F1F5F9",
+    bgColor: "var(--surface)",
+    textColor: "var(--text-primary)",
     links: [
       { label: "Ver los pasos", ariaLabel: "Ir a cómo funciona", href: "#como-funciona" },
     ],
   },
   {
     label: "Canchas",
-    bgColor: "#161F30",
-    textColor: "#F1F5F9",
+    bgColor: "var(--surface)",
+    textColor: "var(--text-primary)",
     links: [
       { label: "Explorar canchas", ariaLabel: "Ir a canchas", href: "#canchas" },
     ],
   },
   {
     label: "Preguntas frecuentes",
-    bgColor: "#161F30",
-    textColor: "#F1F5F9",
+    bgColor: "var(--surface)",
+    textColor: "var(--text-primary)",
     links: [
       { label: "Ver preguntas", ariaLabel: "Ir a preguntas frecuentes", href: "#preguntas-frecuentes" },
     ],

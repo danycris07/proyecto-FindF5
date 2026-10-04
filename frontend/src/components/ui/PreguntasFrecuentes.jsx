@@ -9,7 +9,7 @@ function PreguntasFrecuentes({ sectionTitle, isLoading = false }) {
   return (
     <section
       id="preguntas-frecuentes"
-      className="scroll-mt-24 border-t border-white/[0.07] bg-surface/20"
+      className="scroll-mt-24 border-t border-border/70 bg-surface/20"
       aria-busy={isLoading}
     >
       <div className="mx-auto max-w-4xl px-5 py-20 sm:py-24 lg:px-8">
