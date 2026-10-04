@@ -62,7 +62,7 @@ function LandingPage() {
         className="pointer-events-none absolute inset-x-0 top-0 h-152 bg-[radial-gradient(ellipse_at_top,rgba(36,50,74,0.72),transparent_70%)]"
       />
 
-      <Navbar btnPrimary={btnPrimary} btnSecondary={btnSecondary} />
+      <Navbar />
 
       <main className="relative">
         <Hero btnPrimary={btnPrimary} btnSecondary={btnSecondary} />

@@ -1,0 +1,286 @@
+.card-nav-container {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  z-index: 40;
+  width: calc(100% - 2.5rem);
+  max-width: 80rem;
+  transform: translateX(-50%);
+}
+
+.card-nav {
+  position: relative;
+  display: block;
+  height: 60px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgb(36 50 74 / 80%);
+  border-radius: 0.25rem;
+  background: #0b0f19;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+  will-change: height;
+}
+
+.card-nav-top {
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+  display: flex;
+  height: 60px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem 0.5rem 1.25rem;
+}
+
+.card-nav-brand {
+  color: #f1f5f9;
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-size: 1.875rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 200ms ease;
+}
+
+.card-nav-brand:hover {
+  color: #94a3b8;
+}
+
+.card-nav-controls {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.card-nav-cta-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 0.125rem;
+  padding: 0.5rem 1rem;
+  background: #ccff00;
+  color: #0b0f19;
+  font: 600 0.875rem Inter, sans-serif;
+  cursor: pointer;
+  transition: background-color 200ms ease, transform 200ms ease;
+}
+
+.card-nav-cta-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #d9ff42;
+}
+
+.card-nav-cta-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.card-nav-login-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #24324a;
+  border-radius: 0.125rem;
+  padding: 0.5rem 1rem;
+  background: rgb(255 255 255 / 2%);
+  color: #f1f5f9;
+  font: 600 0.875rem Inter, sans-serif;
+  cursor: pointer;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.card-nav-login-button:hover:not(:disabled) {
+  border-color: rgb(255 255 255 / 35%);
+  background: rgb(255 255 255 / 6%);
+}
+
+.card-nav-login-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.hamburger-menu {
+  display: flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #24324a;
+  border-radius: 0.125rem;
+  background: transparent;
+  color: #f1f5f9;
+  cursor: pointer;
+}
+
+.hamburger-menu:hover .hamburger-line {
+  opacity: 0.75;
+}
+
+.hamburger-line {
+  width: 1.125rem;
+  height: 2px;
+  background: currentColor;
+  transition: transform 250ms ease, opacity 200ms ease;
+}
+
+.hamburger-menu.open .hamburger-line:first-child {
+  transform: translateY(4px) rotate(45deg);
+}
+
+.hamburger-menu.open .hamburger-line:last-child {
+  transform: translateY(-4px) rotate(-45deg);
+}
+
+.card-nav-content {
+  position: absolute;
+  inset: 60px 0 0;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.card-nav.open .card-nav-content {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.nav-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid rgb(36 50 74 / 70%);
+  border-radius: 0.125rem;
+  padding: 0.75rem 1rem;
+  user-select: none;
+}
+
+.nav-card-label {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nav-card-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: auto;
+}
+
+.nav-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: inherit;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: opacity 200ms ease;
+}
+
+.nav-card-link:hover {
+  opacity: 0.75;
+}
+
+.card-nav-mobile-actions {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .card-nav-container {
+    top: 0.75rem;
+    width: calc(100% - 2rem);
+  }
+
+  .card-nav-top {
+    padding-inline: 0.75rem;
+  }
+
+  .card-nav-controls {
+    gap: 0.375rem;
+  }
+
+  .card-nav-cta-button {
+    display: none;
+  }
+
+  .card-nav-login-button {
+    display: none;
+  }
+
+  .card-nav-content {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .card-nav-mobile-actions {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.5rem;
+  }
+
+  .card-nav-mobile-action {
+    display: inline-flex;
+    min-width: 0;
+    min-height: 2.75rem;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #24324a;
+    border-radius: 0.125rem;
+    padding: 0.625rem 0.375rem;
+    background: rgb(255 255 255 / 2%);
+    color: #f1f5f9;
+    font: 600 0.75rem Inter, sans-serif;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .card-nav-mobile-action-primary {
+    border-color: #ccff00;
+    background: #ccff00;
+    color: #0b0f19;
+  }
+
+  .card-nav-mobile-action:disabled {
+    cursor: wait;
+    opacity: 0.7;
+  }
+
+  .nav-card {
+    flex: 1 1 auto;
+    min-height: 3.25rem;
+  }
+
+  .nav-card-label {
+    font-size: 1.125rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-nav-brand,
+  .card-nav-cta-button,
+  .card-nav-login-button,
+  .card-nav-mobile-action,
+  .hamburger-line,
+  .nav-card-link {
+    transition-duration: 0.01ms;
+  }
+}
