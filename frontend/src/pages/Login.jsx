@@ -7,10 +7,10 @@ export function Login() {
 
   const onSubmit = (data) => {
     const usuario = mockUsers.find(
-      (user) => user.name === data.name && user.password === data.password,
+      (user) => user.email === data.email && user.password === data.password,
     );
     if (!usuario) {
-      alert("Nombre o contraseña incorrectos");
+      alert("Correo o contraseña incorrectos");
       return;
     }
 
@@ -37,16 +37,16 @@ export function Login() {
         </div>
 
         <div className="space-y-5">
-          {/* Nombre */}
+          {/* Correo */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-[#D8CBDD]">
-              Nombre
+              Correo electronico
             </label>
 
             <input
               type="text"
-              placeholder="Juan Pérez"
-              {...register("name")}
+              placeholder="Correo@ejemplo.com"
+              {...register("email")}
               className="w-full rounded-lg border border-[#45334F] bg-[#130E17] px-4 py-3 text-[#F5EEF8] placeholder-[#75667B] outline-none transition focus:border-[#8B5BA8] focus:ring-2 focus:ring-[#8B5BA8]/20"
             />
           </div>
