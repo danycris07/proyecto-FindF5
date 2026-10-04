@@ -27,7 +27,7 @@ function Canchas({ sectionTitle, isLoading = false }) {
             : mockFields.map((cancha) => (
                 <div
                   key={cancha.id}
-                  className="group overflow-hidden rounded-sm border border-border bg-surface transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-white/25 hover:shadow-2xl hover:shadow-black/30 motion-reduce:transition-none"
+                  className="group overflow-hidden rounded-sm border border-border bg-surface transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-status hover:shadow-2xl hover:shadow-[var(--shadow-color)] motion-reduce:transition-none"
                 >
                   <div className="relative aspect-video overflow-hidden bg-background">
                     <img

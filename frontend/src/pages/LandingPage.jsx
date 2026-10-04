@@ -1,51 +1,17 @@
-/**
- * LandingPage.jsx — Esqueleto de la landing de FindF5 (mobile-first, Tailwind v4)
- *
- * Sin lógica, sin íconos y sin animaciones: solo estructura y estilos.
- * Pensado para que lo subdividas en componentes (Navbar, Hero, ComoFunciona,
- * Canchas, PreguntasFrecuentes, Footer).
- *
- * ─── SETUP 1: paleta y fuentes en src/index.css ────────────────────────────
- *
- *   @import "tailwindcss";
- *
- *   @theme {
- *     --color-background: #0B0F19;
- *     --color-surface: #161F30;
- *     --color-border: #24324A;
- *     --color-primary: #CCFF00;
- *     --color-status: #00E5FF;
- *     --color-text-primary: #F1F5F9;
- *     --color-text-secondary: #94A3B8;
- *     --font-display: "Barlow Semi Condensed", sans-serif;
- *     --font-sans: "Inter", sans-serif;
- *   }
- *
- *   html { scroll-behavior: smooth; }
- *
- * ─── SETUP 2: fuentes en el <head> de index.html ───────────────────────────
- *
- *   <link rel="preconnect" href="https://fonts.googleapis.com">
- *   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- *   <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
- *
- * Nota: por los nombres del CONTEXT.md, las clases de texto quedan como
- * `text-text-primary` y `text-text-secondary` (color "text-primary" + prefijo "text-").
- */
-
 import Navbar from "../components/ui/Navbar.jsx";
 import Hero from "../components/ui/Hero.jsx";
 import ComoFunciona from "../components/ui/ComoFunciona.jsx";
 import Canchas from "../components/ui/Canchas.jsx";
 import PreguntasFrecuentes from "../components/ui/PreguntasFrecuentes.jsx";
 import Footer from "../components/ui/Footer.jsx";
+import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { useInitialLoading } from "../hooks/useInitialLoading.js";
 
 // Estilos compartidos (cuando armes componentes, estos pasan a <Button />)
 const btnBase =
   "inline-flex min-h-11 items-center justify-center rounded-sm px-4 py-2.5 text-sm font-semibold transition-[background-color,border-color,color,transform,box-shadow] duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 motion-reduce:transition-none md:px-5";
-const btnPrimary = `${btnBase} bg-primary text-background shadow-[0_8px_30px_rgba(204,255,0,0.14)] hover:-translate-y-0.5 hover:bg-[#d9ff42] hover:shadow-[0_12px_34px_rgba(204,255,0,0.22)] active:translate-y-0 focus-visible:outline-primary`;
-const btnSecondary = `${btnBase} border border-border bg-white/[0.02] text-text-primary hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/[0.06] active:translate-y-0 focus-visible:outline-text-primary`;
+const btnPrimary = `${btnBase} border border-primary-foreground bg-primary text-primary-foreground shadow-[0_8px_30px_var(--primary-shadow)] hover:-translate-y-0.5 hover:shadow-[0_12px_34px_var(--primary-shadow-strong)] active:translate-y-0`;
+const btnSecondary = `${btnBase} border border-border bg-surface text-text-primary hover:-translate-y-0.5 hover:border-status active:translate-y-0`;
 
 const sectionTitle =
   "flex items-center gap-4 font-display text-3xl font-extrabold uppercase leading-none tracking-wider before:h-1 before:w-9 before:shrink-0 before:bg-border before:content-[''] md:text-4xl";
@@ -62,7 +28,7 @@ function LandingPage({ isLoading: loadingProp }) {
       {/* Luz de reflector: degradado radial sutil arriba de todo */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-152 bg-[radial-gradient(ellipse_at_top,rgba(36,50,74,0.72),transparent_70%)]"
+        className="landing-glow pointer-events-none absolute inset-x-0 top-0 h-152"
       />
 
       <Navbar />
@@ -81,13 +47,7 @@ function LandingPage({ isLoading: loadingProp }) {
       </main>
 
       <Footer />
-
-      {/* Círculo del wireframe (esquina inferior derecha): botón flotante sin definir */}
-      <button
-        type="button"
-        aria-label="Botón flotante (por definir)"
-        className="fixed bottom-5 right-5 h-12 w-12 rounded-full border border-border bg-surface/80 shadow-lg shadow-black/20 backdrop-blur transition-colors duration-200 hover:border-white/30 motion-reduce:transition-none"
-      />
+      <ThemeToggle />
     </div>
   );
 }

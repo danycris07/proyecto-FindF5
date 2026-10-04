@@ -26,7 +26,7 @@ function Hero({ btnPrimary, btnSecondary }) {
         </div>
       </div>
 
-      <div className="group relative aspect-[1.12] overflow-hidden rounded-sm border border-border bg-background shadow-2xl shadow-black/40 before:absolute before:inset-0 before:z-10 before:bg-[radial-gradient(ellipse_at_50%_48%,transparent_35%,rgba(5,10,18,0.5)_100%)] before:content-['']">
+      <div className="hero-image-shade group relative aspect-[1.12] overflow-hidden rounded-sm border border-border bg-background shadow-2xl shadow-[var(--shadow-color)] before:absolute before:inset-0 before:z-10 before:content-['']">
         {/*
           PARA USAR TU IMAGEN: borrá el <svg> de abajo y poné:
           <img src="/tu-imagen.jpg" alt="Descripción de la imagen" className="h-full w-full object-cover" />
@@ -38,7 +38,7 @@ function Hero({ btnPrimary, btnSecondary }) {
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(115deg,transparent_42%,rgba(148,163,184,0.055)_50%,transparent_58%)]"
+          className="hero-image-glint pointer-events-none absolute inset-0 z-10"
         />
       </div>
     </section>

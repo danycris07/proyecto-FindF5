@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { mockUsers } from "../mocks/MockData";
 import { useNavigate } from "react-router-dom";
 import Skeleton from "../components/ui/Skeleton";
+import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { useInitialLoading } from "../hooks/useInitialLoading.js";
 
 export function Login({ isLoading: loadingProp }) {
@@ -26,14 +27,15 @@ export function Login({ isLoading: loadingProp }) {
 
   return (
     <div
-      className="min-h-screen bg-[#100B14] flex items-center justify-center px-4 py-10"
+      className="flex min-h-screen items-center justify-center bg-background px-4 py-10"
       aria-busy={isLoading}
     >
+      <ThemeToggle />
       {isLoading ? (
         <div
           role="status"
           aria-label="Cargando formulario de inicio de sesión"
-          className="w-full max-w-md space-y-7 rounded-2xl border border-[#3B2947] bg-[#1A121F] p-7 shadow-2xl shadow-black/40"
+          className="w-full max-w-md space-y-7 rounded-2xl border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
         >
           <div className="space-y-3">
             <Skeleton className="h-9 w-2/3" />
@@ -52,15 +54,15 @@ export function Login({ isLoading: loadingProp }) {
       ) : (
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full max-w-md rounded-2xl border border-[#3B2947] bg-[#1A121F] p-7 shadow-2xl shadow-black/40"
+          className="w-full max-w-md rounded-2xl border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
         >
           {/* Encabezado */}
           <div className="mb-7">
-            <h2 className="text-3xl font-bold tracking-tight text-[#F5EEF8]">
+            <h2 className="text-3xl font-bold tracking-tight text-text-primary">
               Iniciar Sesion
             </h2>
 
-            <p className="mt-2 text-sm text-[#A99BAF]">
+            <p className="mt-2 text-sm text-text-secondary">
               Completá tus datos para ingresar
             </p>
           </div>
@@ -68,7 +70,7 @@ export function Login({ isLoading: loadingProp }) {
           <div className="space-y-5">
             {/* Correo */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-[#D8CBDD]">
+              <label className="block text-sm font-medium text-text-primary">
                 Correo electronico
               </label>
 
@@ -76,33 +78,33 @@ export function Login({ isLoading: loadingProp }) {
                 type="text"
                 placeholder="Correo@ejemplo.com"
                 {...register("email")}
-                className="w-full rounded-lg border border-[#45334F] bg-[#130E17] px-4 py-3 text-[#F5EEF8] placeholder-[#75667B] outline-none transition focus:border-[#8B5BA8] focus:ring-2 focus:ring-[#8B5BA8]/20"
+                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
               />
             </div>
 
             {/* contraseña */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-[#D8CBDD]">
+              <label className="block text-sm font-medium text-text-primary">
                 Contraseña
               </label>
 
               <input
                 type="password"
                 {...register("password")}
-                className="w-full rounded-lg border border-[#45334F] bg-[#130E17] px-4 py-3 text-[#F5EEF8] placeholder-[#75667B] outline-none transition focus:border-[#8B5BA8] focus:ring-2 focus:ring-[#8B5BA8]/20"
+                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
               />
             </div>
 
             {/* Botón */}
             <button
               type="submit"
-              className="mt-2 w-full rounded-lg bg-[#6D3F82] px-4 py-3 font-semibold text-white shadow-lg shadow-[#6D3F82]/20 transition hover:bg-[#7B4A91] hover:shadow-[#6D3F82]/30 active:scale-[0.98]"
+              className="mt-2 w-full rounded-lg border border-primary-foreground bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-lg shadow-[var(--primary-shadow)] transition hover:shadow-[var(--primary-shadow-strong)] active:scale-[0.98]"
             >
               Iniciar Sesion
             </button>
           </div>
 
-          <p className="mt-6 text-center text-xs text-[#75667B]">
+          <p className="mt-6 text-center text-xs text-text-secondary">
             Al registrarte podrás comenzar a buscar y reservar canchas.
           </p>
         </form>
