@@ -3,7 +3,7 @@ const NAV_LINKS = [
   { label: "Canchas", href: "#canchas" },
   { label: "Preguntas frecuentes", href: "#preguntas-frecuentes" },
 ];
-
+import { Link } from "react-router-dom";
 /**
  * Muestra la marca, los enlaces a secciones y las acciones de acceso.
  * Los href de NAV_LINKS corresponden a los ids de la landing.
@@ -39,12 +39,12 @@ function Navbar({ btnPrimary, btnSecondary }) {
         </nav>
 
         <div className="flex shrink-0 gap-2 sm:gap-3">
-          <a href="#" className={btnSecondary}>
-            Iniciar sesión
-          </a>
-          <a href="#" className={btnPrimary}>
+          <Link to="/registro" className={btnPrimary}>
             Registrarme
-          </a>
+          </Link>
+          <Link to="/login" className={btnSecondary}>
+            Iniciar Sesion
+          </Link>
         </div>
       </div>
     </header>
