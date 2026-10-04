@@ -39,7 +39,7 @@ import ComoFunciona from "../components/ui/ComoFunciona.jsx";
 import Canchas from "../components/ui/Canchas.jsx";
 import PreguntasFrecuentes from "../components/ui/PreguntasFrecuentes.jsx";
 import Footer from "../components/ui/Footer.jsx";
-
+import { useInitialLoading } from "../hooks/useInitialLoading.js";
 
 // Estilos compartidos (cuando armes componentes, estos pasan a <Button />)
 const btnBase =
@@ -53,7 +53,10 @@ const sectionTitle =
 /**
  * Ensambla las secciones del landing en orden y comparte estilos entre ellas.
  */
-function LandingPage() {
+function LandingPage({ isLoading: loadingProp }) {
+  const initialLoading = useInitialLoading();
+  const isLoading = loadingProp ?? initialLoading;
+
   return (
     <div className="relative isolate min-h-screen overflow-hidden bg-background font-sans text-text-primary">
       {/* Luz de reflector: degradado radial sutil arriba de todo */}
@@ -67,11 +70,14 @@ function LandingPage() {
       <main className="relative">
         <Hero btnPrimary={btnPrimary} btnSecondary={btnSecondary} />
 
-        <ComoFunciona sectionTitle={sectionTitle} />
+        <ComoFunciona sectionTitle={sectionTitle} isLoading={isLoading} />
 
-        <Canchas sectionTitle={sectionTitle} />
+        <Canchas sectionTitle={sectionTitle} isLoading={isLoading} />
 
-        <PreguntasFrecuentes sectionTitle={sectionTitle} />
+        <PreguntasFrecuentes
+          sectionTitle={sectionTitle}
+          isLoading={isLoading}
+        />
       </main>
 
       <Footer />
