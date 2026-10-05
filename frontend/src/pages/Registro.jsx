@@ -3,17 +3,30 @@ import { mockUsers } from "../mocks/MockData";
 import { useNavigate } from "react-router-dom";
 import Skeleton from "../components/ui/Skeleton";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
-import { useInitialLoading } from "../hooks/useInitialLoading.js";
+import {
+  useInitialLoading,
+  waitForInitialLoading,
+} from "../hooks/useInitialLoading.js";
 
 export function Registro({ isLoading: loadingProp }) {
   const initialLoading = useInitialLoading();
-  const isLoading = loadingProp ?? initialLoading;
   const navigate = useNavigate();
-  const { register, handleSubmit, reset } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm();
+  const isLoading = (loadingProp ?? initialLoading) || isSubmitting;
 
-  const onSubmit = (data) => {
-    mockUsers.push(data);
-    console.log("Usuario registrados", mockUsers);
+  const onSubmit = async (data) => {
+    await waitForInitialLoading();
+    const nextId =
+      mockUsers.reduce(
+        (highestId, user) => Math.max(highestId, Number(user.id) || 0),
+        0,
+      ) + 1;
+    mockUsers.push({ ...data, id: nextId });
     reset();
 
     navigate("/login");
@@ -47,6 +60,7 @@ export function Registro({ isLoading: loadingProp }) {
       ) : (
         <form
           onSubmit={handleSubmit(onSubmit)}
+          aria-busy={isSubmitting}
           className="w-full max-w-md rounded-2xl border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
         >
           {/* Encabezado */}

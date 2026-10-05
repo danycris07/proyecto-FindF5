@@ -1,28 +1,52 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { mockUsers } from "../mocks/MockData";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Skeleton from "../components/ui/Skeleton";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
-import { useInitialLoading } from "../hooks/useInitialLoading.js";
+import {
+  useInitialLoading,
+  waitForInitialLoading,
+} from "../hooks/useInitialLoading.js";
+import { setMockSession } from "../services/sessionService.js";
 
 export function Login({ isLoading: loadingProp }) {
   const initialLoading = useInitialLoading();
-  const isLoading = loadingProp ?? initialLoading;
   const navigate = useNavigate();
-  const { register, handleSubmit, reset } = useForm();
+  const location = useLocation();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm();
+  const [loginError, setLoginError] = useState("");
+  const isLoading = (loadingProp ?? initialLoading) || isSubmitting;
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+    setLoginError("");
+    await waitForInitialLoading();
     const usuario = mockUsers.find(
       (user) => user.email === data.email && user.password === data.password,
     );
     if (!usuario) {
-      alert("Correo o contraseña incorrectos");
+      setLoginError("Correo o contraseña incorrectos.");
       return;
     }
 
+    try {
+      setMockSession(usuario);
+    } catch (error) {
+      setLoginError(
+        error instanceof Error
+          ? `No se pudo guardar la sesión en este navegador: ${error.message}`
+          : "No se pudo guardar la sesión en este navegador.",
+      );
+      return;
+    }
     reset();
 
-    navigate("/");
+    navigate(location.state?.from?.pathname || "/", { replace: true });
   };
 
   return (
@@ -54,6 +78,7 @@ export function Login({ isLoading: loadingProp }) {
       ) : (
         <form
           onSubmit={handleSubmit(onSubmit)}
+          aria-busy={isSubmitting}
           className="w-full max-w-md rounded-2xl border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
         >
           {/* Encabezado */}
@@ -67,14 +92,21 @@ export function Login({ isLoading: loadingProp }) {
             </p>
           </div>
 
+          {loginError && (
+            <p role="alert" className="mb-5 text-sm text-red-400">
+              {loginError}
+            </p>
+          )}
+
           <div className="space-y-5">
             {/* Correo */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-primary">
+              <label htmlFor="email" className="block text-sm font-medium text-text-primary">
                 Correo electronico
               </label>
 
               <input
+                id="email"
                 type="text"
                 placeholder="Correo@ejemplo.com"
                 {...register("email")}
@@ -84,11 +116,12 @@ export function Login({ isLoading: loadingProp }) {
 
             {/* contraseña */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-primary">
+              <label htmlFor="password" className="block text-sm font-medium text-text-primary">
                 Contraseña
               </label>
 
               <input
+                id="password"
                 type="password"
                 {...register("password")}
                 className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
