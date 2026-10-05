@@ -22,6 +22,19 @@ export async function createMatch(details, organizerId) {
     throw new Error("Iniciá sesión antes de publicar un partido.");
   }
 
+  const basePricePerPlayer = Number(details.cuota);
+  const playingForCoca = details.jugarPorLaCoca === true;
+  const cocaAmountPerPlayer = playingForCoca
+    ? Number(details.montoExtraCoca)
+    : 0;
+
+  if (!Number.isFinite(basePricePerPlayer) || basePricePerPlayer < 0) {
+    throw new Error("La cuota base debe ser un monto igual o mayor que 0.");
+  }
+  if (playingForCoca && (!Number.isFinite(cocaAmountPerPlayer) || cocaAmountPerPlayer <= 0)) {
+    throw new Error("El monto extra por jugador debe ser mayor que 0.");
+  }
+
   const field = mockFields.find(
     (availableField) => availableField.name === details.cancha,
   );
@@ -33,7 +46,10 @@ export async function createMatch(details, organizerId) {
     date: details.fecha,
     startTime: details.hora,
     expectedPlayers: details.jugadoresEsperados,
-    pricePerPlayer: details.cuota,
+    playingForCoca,
+    basePricePerPlayer,
+    cocaAmountPerPlayer,
+    pricePerPlayer: basePricePerPlayer + cocaAmountPerPlayer,
     organizerId,
     status: "OPEN",
     createdAt: now,
