@@ -1,4 +1,5 @@
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
+import ArmarPartido from "./ArmarPartido.jsx";
 
 function PartidosPage() {
   return (
@@ -18,10 +19,8 @@ function PartidosPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-7xl px-5 py-8 lg:px-8">
-        <p className="text-text-secondary">
-          Desde acá vas a poder gestionar tus convocatorias.
-        </p>
+      <main>
+        <ArmarPartido embedded />
       </main>
     </div>
   );

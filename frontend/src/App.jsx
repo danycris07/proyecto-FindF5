@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { Registro } from "./pages/Registro";
 import { Login } from "./pages/Login";
 import PartidosPage from "./pages/PartidosPage";
+import PartidoPublicado from "./pages/PartidoPublicado";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicLandingRoute from "./components/PublicLandingRoute";
 
@@ -18,6 +19,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PartidosPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/partidos/:partidoId"
+          element={
+            <ProtectedRoute>
+              <PartidoPublicado />
             </ProtectedRoute>
           }
         />
