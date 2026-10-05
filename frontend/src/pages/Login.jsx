@@ -46,7 +46,7 @@ export function Login({ isLoading: loadingProp }) {
     }
     reset();
 
-    navigate(location.state?.from?.pathname || "/", { replace: true });
+    navigate(location.state?.from?.pathname || "/partidos", { replace: true });
   };
 
   return (

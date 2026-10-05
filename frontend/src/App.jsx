@@ -1,18 +1,26 @@
-import { useState } from "react";
 import LandingPage from "./pages/LandingPage";
 import { Route, Routes } from "react-router-dom";
 import { Registro } from "./pages/Registro";
 import { Login } from "./pages/Login";
+import PartidosPage from "./pages/PartidosPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicLandingRoute from "./components/PublicLandingRoute";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
       <Routes>
-        <Route path="/" element={<LandingPage />}></Route>
-        <Route path="/registro" element={<Registro />}></Route>
-        <Route path="/login" element={<Login />}></Route>
+        <Route path="/" element={<PublicLandingRoute><LandingPage /></PublicLandingRoute>} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/partidos"
+          element={
+            <ProtectedRoute>
+              <PartidosPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );
