@@ -28,13 +28,6 @@ function MatchConfirmationCard({ match, animated }) {
       />
 
       <div className="relative z-10">
-        <p className="inline-flex items-center gap-2 rounded-full border border-[#CCFF00]/30 bg-[#CCFF00]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#CCFF00]">
-          <span
-            aria-hidden="true"
-            className="h-2 w-2 animate-pulse rounded-full bg-[#CCFF00]"
-          />
-          Convocatoria publicada
-        </p>
         <h1 className="mt-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text font-display text-4xl font-extrabold uppercase tracking-wider text-transparent sm:text-5xl">
           ¡Partido armado!
         </h1>
@@ -77,11 +70,31 @@ function MatchConfirmationCard({ match, animated }) {
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 sm:col-span-2">
             <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Cuota por jugador
+              {match.playingForCoca
+                ? "Cuota + monto extra"
+                : "Cuota por jugador"}
             </dt>
-            <dd className="mt-2 font-display text-2xl font-extrabold tabular-nums text-[#CCFF00]">
-              {currencyFormatter.format(match.pricePerPlayer)}
-            </dd>
+            {match.playingForCoca ? (
+              <dd className="mt-2 space-y-2">
+                <p className="flex flex-wrap items-center gap-x-2 text-sm tabular-nums text-slate-300">
+                  <span>
+                    Cuota {currencyFormatter.format(match.basePricePerPlayer)}
+                  </span>
+                  <span aria-hidden="true">+</span>
+                  <span>
+                    monto extra
+                    {currencyFormatter.format(match.cocaAmountPerPlayer)}
+                  </span>
+                </p>
+                <p className="font-display text-2xl font-extrabold tabular-nums text-[#CCFF00]">
+                  Total {currencyFormatter.format(match.pricePerPlayer)}
+                </p>
+              </dd>
+            ) : (
+              <dd className="mt-2 font-display text-2xl font-extrabold tabular-nums text-[#CCFF00]">
+                {currencyFormatter.format(match.pricePerPlayer)}
+              </dd>
+            )}
           </div>
         </dl>
 
