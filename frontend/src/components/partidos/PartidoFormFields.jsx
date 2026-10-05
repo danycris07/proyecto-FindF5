@@ -1,21 +1,5 @@
-const inputClassName =
-  "mt-2 min-h-12 w-full rounded-lg border border-slate-800 bg-slate-950/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#CCFF00] focus:ring-2 focus:ring-[#CCFF00]/20";
-
-function Campo({ id, label, error, children }) {
-  return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-      <label htmlFor={id} className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
-        {label}
-      </label>
-      {children}
-      {error && (
-        <p id={`${id}-error`} role="alert" className="mt-2 text-sm text-red-300">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
+import CocaOptionField from "./CocaOptionField.jsx";
+import MatchFormField, { inputClassName } from "./MatchFormField.jsx";
 
 function PartidoFormFields({
   register,
@@ -28,11 +12,15 @@ function PartidoFormFields({
   currentTime,
   selectedDate,
   clearDateTimeErrors,
+  jugarPorLaCoca,
+  cuotaBase,
+  montoExtraCoca,
+  totalPorJugador,
 }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       <div className="sm:col-span-2">
-        <Campo id="cancha" label="Cancha" error={errors.cancha?.message}>
+        <MatchFormField id="cancha" label="Cancha" error={errors.cancha?.message}>
           <input
             id="cancha"
             type="text"
@@ -67,10 +55,10 @@ function PartidoFormFields({
               No hay canchas sugeridas; podés escribir el nombre.
             </p>
           ) : null}
-        </Campo>
+        </MatchFormField>
       </div>
 
-      <Campo id="fecha" label="Día del partido" error={errors.fecha?.message}>
+      <MatchFormField id="fecha" label="Día del partido" error={errors.fecha?.message}>
         <input
           id="fecha"
           type="date"
@@ -83,9 +71,9 @@ function PartidoFormFields({
             onChange: clearDateTimeErrors,
           })}
         />
-      </Campo>
+      </MatchFormField>
 
-      <Campo id="hora" label="Hora" error={errors.hora?.message}>
+      <MatchFormField id="hora" label="Hora" error={errors.hora?.message}>
         <input
           id="hora"
           type="time"
@@ -98,9 +86,9 @@ function PartidoFormFields({
             onChange: clearDateTimeErrors,
           })}
         />
-      </Campo>
+      </MatchFormField>
 
-      <Campo
+      <MatchFormField
         id="jugadoresEsperados"
         label="Jugadores esperados"
         error={errors.jugadoresEsperados?.message}
@@ -124,9 +112,9 @@ function PartidoFormFields({
               "Ingresá un número entero mayor que 0.",
           })}
         />
-      </Campo>
+      </MatchFormField>
 
-      <Campo id="cuota" label="Cuota por jugador ($)" error={errors.cuota?.message}>
+      <MatchFormField id="cuota" label="Cuota por jugador ($)" error={errors.cuota?.message}>
         <input
           id="cuota"
           type="number"
@@ -144,7 +132,16 @@ function PartidoFormFields({
               "La cuota debe ser un número igual o mayor que 0.",
           })}
         />
-      </Campo>
+      </MatchFormField>
+
+      <CocaOptionField
+        register={register}
+        error={errors.montoExtraCoca}
+        enabled={jugarPorLaCoca}
+        baseAmount={cuotaBase}
+        extraAmount={montoExtraCoca}
+        totalAmount={totalPorJugador}
+      />
     </div>
   );
 }

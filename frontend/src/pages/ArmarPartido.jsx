@@ -37,10 +37,28 @@ function ArmarPartido({ embedded = false }) {
     clearErrors,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm({
+    shouldUnregister: true,
+    defaultValues: { jugarPorLaCoca: false, montoExtraCoca: "" },
+  });
   const now = new Date();
   const today = fechaLocal(now);
   const selectedDate = useWatch({ control, name: "fecha" });
+  const jugarPorLaCoca = useWatch({
+    control,
+    name: "jugarPorLaCoca",
+    defaultValue: false,
+  });
+  const cuotaBaseValue = useWatch({ control, name: "cuota", defaultValue: "" });
+  const montoExtraValue = useWatch({
+    control,
+    name: "montoExtraCoca",
+    defaultValue: "",
+  });
+  const cuotaBase = cuotaBaseValue === "" ? 0 : Number(cuotaBaseValue);
+  const montoExtraCoca =
+    jugarPorLaCoca && montoExtraValue !== "" ? Number(montoExtraValue) : 0;
+  const totalPorJugador = cuotaBase + montoExtraCoca;
 
   useEffect(() => {
     let enterFrameId;
@@ -97,6 +115,10 @@ function ArmarPartido({ embedded = false }) {
       currentTime={horaLocal(now)}
       selectedDate={selectedDate}
       clearDateTimeErrors={() => clearErrors(["fecha", "hora"])}
+      jugarPorLaCoca={jugarPorLaCoca}
+      cuotaBase={cuotaBase}
+      montoExtraCoca={montoExtraCoca}
+      totalPorJugador={totalPorJugador}
     />
   );
 
