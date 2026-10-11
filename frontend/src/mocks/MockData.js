@@ -259,12 +259,17 @@ export const mockMatches = [
   {
     id: 1,
     teamId: 1,
-    fieldId: 1, // Puede ser null si aún no se asignó cancha
-    date: "2026-10-10",
+    fieldId: 1,
+    date: "2026-10-18", // una fecha futura
     startTime: "21:00:00",
     endTime: "22:00:00",
+    expectedPlayers: 10,
+    playingForCoca: false,
+    basePricePerPlayer: 1500.0,
+    cocaAmountPerPlayer: 0,
     pricePerPlayer: 1500.0,
-    status: "OPEN", // 'OPEN' | 'FULL' | 'FINISHED' | 'CANCELLED'
+    organizerId: 1,
+    status: "OPEN",
     deletedAt: null,
     createdAt: "2026-09-30T14:00:00.000Z",
     updatedAt: "2026-09-30T14:00:00.000Z",

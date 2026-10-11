@@ -11,7 +11,9 @@ function getSavedMatches() {
 
   const matches = JSON.parse(storedMatches);
   if (!Array.isArray(matches)) {
-    throw new Error("No se pudieron leer los partidos guardados en esta sesión.");
+    throw new Error(
+      "No se pudieron leer los partidos guardados en esta sesión.",
+    );
   }
 
   return matches;
@@ -31,7 +33,10 @@ export async function createMatch(details, organizerId) {
   if (!Number.isFinite(basePricePerPlayer) || basePricePerPlayer < 0) {
     throw new Error("La cuota base debe ser un monto igual o mayor que 0.");
   }
-  if (playingForCoca && (!Number.isFinite(cocaAmountPerPlayer) || cocaAmountPerPlayer <= 0)) {
+  if (
+    playingForCoca &&
+    (!Number.isFinite(cocaAmountPerPlayer) || cocaAmountPerPlayer <= 0)
+  ) {
     throw new Error("El monto extra por jugador debe ser mayor que 0.");
   }
 
@@ -66,5 +71,25 @@ export async function createMatch(details, organizerId) {
 
 export async function getMatchById(matchId) {
   const matches = [...mockMatches, ...getSavedMatches()];
-  return matches.find((match) => String(match.id) === String(matchId)) ?? null;
+  const match = matches.find((m) => String(m.id) === String(matchId));
+  return match ? normalizeMatch(match) : null;
+}
+
+export async function getMatches() {
+  return [...mockMatches, ...getSavedMatches()]
+    .filter((match) => match.status === "OPEN")
+    .map(normalizeMatch)
+    .sort((a, b) =>
+      `${a.date}T${a.startTime}`.localeCompare(`${b.date}T${b.startTime}`),
+    );
+}
+
+function normalizeMatch(match) {
+  return {
+    ...match,
+    fieldName:
+      match.fieldName ??
+      mockFields.find((field) => field.id === match.fieldId)?.name ??
+      "Cancha a confirmar",
+  };
 }

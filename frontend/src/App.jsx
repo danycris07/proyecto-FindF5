@@ -6,12 +6,20 @@ import PartidosPage from "./pages/PartidosPage";
 import PartidoPublicado from "./pages/PartidoPublicado";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicLandingRoute from "./components/PublicLandingRoute";
+import ArmarPartido from "./pages/ArmarPartido";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<PublicLandingRoute><LandingPage /></PublicLandingRoute>} />
+        <Route
+          path="/"
+          element={
+            <PublicLandingRoute>
+              <LandingPage />
+            </PublicLandingRoute>
+          }
+        />
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
         <Route
@@ -19,6 +27,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PartidosPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/partidos/nuevo"
+          element={
+            <ProtectedRoute>
+              <ArmarPartido />
             </ProtectedRoute>
           }
         />
