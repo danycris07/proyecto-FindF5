@@ -1,19 +1,19 @@
-import preguntasFrecuentes from "../../mocks/preguntasFrecuentes";
+import historiasUsuarios from "../../mocks/UsersHistoryData";
 import Skeleton from "./Skeleton";
 
 /**
- * Renderiza las preguntas y respuestas desde el mock del frontend.
+ * Renderiza las historias de usuarios desde el mock del frontend.
  * @param {{ sectionTitle: string }} props Clase compartida para el título de sección.
  */
-function PreguntasFrecuentes({ sectionTitle, isLoading = false }) {
+function UserHistory({ sectionTitle, isLoading = false }) {
   return (
     <section
-      id="preguntas-frecuentes"
+      id="HistoriasUsuarios"
       className="scroll-mt-24 border-t border-border/70 bg-surface/20"
       aria-busy={isLoading}
     >
       <div className="mx-auto max-w-4xl px-5 py-20 sm:py-24 lg:px-8">
-        <h2 className={sectionTitle}>Preguntas frecuentes</h2>
+        <h2 className={sectionTitle}>Historias de usuarios</h2>
         <div className="mt-9">
           {isLoading
             ? Array.from({ length: 4 }, (_, index) => (
@@ -28,16 +28,22 @@ function PreguntasFrecuentes({ sectionTitle, isLoading = false }) {
                   </div>
                 </div>
               ))
-            : preguntasFrecuentes.map((pregunta) => (
+            : historiasUsuarios.map((historia) => (
                 <div
-                  key={pregunta.id}
-                  className="border-b border-border py-6 first:border-t sm:py-7"
+                  key={historia.id}
+                  className="border-b border-border py-6 first:border-t sm:py-10 "
                 >
+                  <div className="relative mb-5 h-25 w-25 rounded-4xl bg-background sm:h-25 sm:w-25">
+                    <img
+                      src={historia.imagen}
+                      className="absolute h-25 w-25 object-cover rounded-4xl"
+                    />
+                  </div>
                   <h3 className="flex items-start gap-4 text-base font-semibold text-text-primary before:mt-1.5 before:h-2.5 before:w-2.5 before:shrink-0 before:rotate-45 before:bg-border before:content-[''] sm:text-lg">
-                    {pregunta.titulo}
+                    {historia.titulo}
                   </h3>
                   <p className="mt-3 pl-6 text-sm leading-7 text-text-secondary sm:text-base">
-                    {pregunta.respuesta}
+                    {historia.respuesta}
                   </p>
                 </div>
               ))}
@@ -47,4 +53,4 @@ function PreguntasFrecuentes({ sectionTitle, isLoading = false }) {
   );
 }
 
-export default PreguntasFrecuentes;
+export default UserHistory;
