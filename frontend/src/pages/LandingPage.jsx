@@ -2,7 +2,7 @@ import Navbar from "../components/ui/Navbar.jsx";
 import Hero from "../components/ui/Hero.jsx";
 import ComoFunciona from "../components/ui/ComoFunciona.jsx";
 import Canchas from "../components/ui/Canchas.jsx";
-import PreguntasFrecuentes from "../components/ui/PreguntasFrecuentes.jsx";
+import UserHistory from "../components/ui/UserHistory.jsx";
 import Footer from "../components/ui/Footer.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { useInitialLoading } from "../hooks/useInitialLoading.js";
@@ -40,10 +40,7 @@ function LandingPage({ isLoading: loadingProp }) {
 
         <Canchas sectionTitle={sectionTitle} isLoading={isLoading} />
 
-        <PreguntasFrecuentes
-          sectionTitle={sectionTitle}
-          isLoading={isLoading}
-        />
+        <UserHistory sectionTitle={sectionTitle} isLoading={isLoading} />
       </main>
 
       <Footer />
