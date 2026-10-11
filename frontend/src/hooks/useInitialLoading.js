@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const INITIAL_LOADING_DURATION = 600;
+const INITIAL_LOADING_DURATION = 450;
 
 export function waitForInitialLoading() {
   return new Promise((resolve) => {

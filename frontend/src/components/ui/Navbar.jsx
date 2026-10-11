@@ -6,7 +6,11 @@ const NAV_ITEMS = [
     bgColor: "var(--surface)",
     textColor: "var(--text-primary)",
     links: [
-      { label: "Ver los pasos", ariaLabel: "Ir a cómo funciona", href: "#como-funciona" },
+      {
+        label: "Ver los pasos",
+        ariaLabel: "Ir a cómo funciona",
+        href: "#como-funciona",
+      },
     ],
   },
   {
@@ -14,15 +18,23 @@ const NAV_ITEMS = [
     bgColor: "var(--surface)",
     textColor: "var(--text-primary)",
     links: [
-      { label: "Explorar canchas", ariaLabel: "Ir a canchas", href: "#canchas" },
+      {
+        label: "Explorar canchas",
+        ariaLabel: "Ir a canchas",
+        href: "#canchas",
+      },
     ],
   },
   {
-    label: "Preguntas frecuentes",
+    label: "Historias de usuarios",
     bgColor: "var(--surface)",
     textColor: "var(--text-primary)",
     links: [
-      { label: "Ver preguntas", ariaLabel: "Ir a preguntas frecuentes", href: "#preguntas-frecuentes" },
+      {
+        label: "Ver historias",
+        ariaLabel: "Ir a Historias de usuarios",
+        href: "#historias-de-usuarios",
+      },
     ],
   },
 ];

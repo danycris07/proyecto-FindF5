@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import MatchConfirmationCard from "../components/partidos/MatchConfirmationCard.jsx";
+import { Link, useParams, useLocation } from "react-router-dom";
+import MatchConfirmationCard from "../components/partidos/MatchDetailCard.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { getMatchById } from "../services/matchService.js";
 
@@ -22,6 +22,9 @@ function PartidoPublicado() {
     resultado.partidoId === partidoId &&
     entrada.partidoId === partidoId &&
     entrada.activa;
+
+  const location = useLocation();
+  const justCreated = location.state?.justCreated === true;
 
   useEffect(() => {
     let activo = true;
@@ -87,8 +90,11 @@ function PartidoPublicado() {
         <section className="mx-auto w-full max-w-3xl rounded-sm border border-border bg-surface p-5 sm:p-8">
           <div role="alert" className="space-y-5">
             <p className="text-red-300">{error}</p>
-            <Link to="/partidos" className="font-semibold text-text-primary underline">
-              Volver a Gestión de partidos
+            <Link
+              to="/partidos"
+              className="font-semibold text-text-primary underline"
+            >
+              Volver a convocatorias
             </Link>
           </div>
         </section>
@@ -101,13 +107,20 @@ function PartidoPublicado() {
             <p className="text-text-secondary">
               Puede que ya no esté disponible en esta sesión de prueba.
             </p>
-            <Link to="/partidos" className="font-semibold text-text-primary underline">
-              Volver a Gestión de partidos
+            <Link
+              to="/partidos"
+              className="font-semibold text-text-primary underline"
+            >
+              Volver a convocatorias
             </Link>
           </div>
         </section>
       ) : (
-        <MatchConfirmationCard match={partido} animated={animarTarjeta} />
+        <MatchConfirmationCard
+          match={partido}
+          animated={animarTarjeta}
+          justCreated={justCreated}
+        />
       )}
     </main>
   );

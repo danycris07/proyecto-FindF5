@@ -15,7 +15,13 @@ function formatoFecha(date) {
   });
 }
 
-function MatchConfirmationCard({ match, animated }) {
+function MatchConfirmationCard({
+  match,
+  animated,
+  justCreated = false,
+  isOrganizer = false,
+  onClose,
+}) {
   return (
     <section
       className={`relative isolate mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#111827] to-[#0B0F19] p-5 shadow-2xl shadow-black/40 transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none sm:p-8 ${
@@ -29,10 +35,12 @@ function MatchConfirmationCard({ match, animated }) {
 
       <div className="relative z-10">
         <h1 className="mt-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text font-display text-4xl font-extrabold uppercase tracking-wider text-transparent sm:text-5xl">
-          ¡Partido armado!
+          {justCreated ? "¡Partido publicado!" : "Detalles del partido"}
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-6 text-slate-400">
-          La convocatoria ya está lista. Estos son los datos del encuentro.
+          {justCreated
+            ? "La convocatoria ya está lista. Estos son los datos del encuentro."
+            : "Estos son los datos del encuentro."}
         </p>
 
         <dl className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -97,13 +105,22 @@ function MatchConfirmationCard({ match, animated }) {
             )}
           </div>
         </dl>
-
-        <Link
-          to="/partidos"
-          className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-sm border border-[#CCFF00] bg-[#CCFF00] px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-black shadow-[0_8px_30px_rgba(204,255,0,0.16)] transition-[transform,box-shadow,filter] duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(204,255,0,0.38)] active:translate-y-0 motion-reduce:transition-none sm:w-auto"
-        >
-          Volver a Gestión de partidos
-        </Link>
+        {onClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-8 inline-flex min-h-12 items-center justify-center rounded-sm border border-slate-700 px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-white hover:border-white"
+          >
+            Cerrar
+          </button>
+        ) : (
+          <Link
+            to="/partidos"
+            className="inline-flex min-h-12 items-center justify-center rounded-sm border border-slate-700 px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-white hover:border-white"
+          >
+            Volver a convocatorias
+          </Link>
+        )}
       </div>
     </section>
   );

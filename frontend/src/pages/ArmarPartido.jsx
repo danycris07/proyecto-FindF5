@@ -6,6 +6,11 @@ import PartidoFormFields from "../components/partidos/PartidoFormFields.jsx";
 import { createMatch } from "../services/matchService.js";
 import { getMockSession } from "../services/sessionService.js";
 import { useAvailableFields } from "../hooks/useAvailableFields.js";
+import {
+  useInitialLoading,
+  waitForInitialLoading,
+} from "../hooks/useInitialLoading.js";
+import Skeleton from "../components/ui/Skeleton.jsx";
 
 function fechaLocal(date) {
   const year = date.getFullYear();
@@ -21,6 +26,7 @@ function horaLocal(date) {
 }
 
 function ArmarPartido({ embedded = false }) {
+  const initialLoading = useInitialLoading();
   const navigate = useNavigate();
   const [hasEntered, setHasEntered] = useState(false);
   const [errorEnvio, setErrorEnvio] = useState("");
@@ -59,6 +65,7 @@ function ArmarPartido({ embedded = false }) {
   const montoExtraCoca =
     jugarPorLaCoca && montoExtraValue !== "" ? Number(montoExtraValue) : 0;
   const totalPorJugador = cuotaBase + montoExtraCoca;
+  const isLoading = initialLoading || isSubmitting;
 
   useEffect(() => {
     let enterFrameId;
@@ -76,6 +83,7 @@ function ArmarPartido({ embedded = false }) {
 
   const onSubmit = async (data) => {
     setErrorEnvio("");
+    await waitForInitialLoading();
     const fechaHora = new Date(`${data.fecha}T${data.hora}`);
 
     if (Number.isNaN(fechaHora.getTime()) || fechaHora <= new Date()) {
@@ -87,13 +95,18 @@ function ArmarPartido({ embedded = false }) {
 
     const session = getMockSession();
     if (!session) {
-      setErrorEnvio("Tu sesión de prueba venció. Iniciá sesión para continuar.");
+      setErrorEnvio(
+        "Tu sesión de prueba venció. Iniciá sesión para continuar.",
+      );
       return;
     }
 
     try {
       const match = await createMatch(data, session.id);
-      navigate(`/partidos/${match.id}`, { replace: true });
+      navigate(`/partidos/${match.id}`, {
+        replace: true,
+        state: { justCreated: true },
+      });
     } catch (error) {
       setErrorEnvio(
         error instanceof Error
@@ -145,17 +158,47 @@ function ArmarPartido({ embedded = false }) {
   }
 
   return (
-    <main className="min-h-screen bg-background px-4 py-10 font-sans text-text-primary sm:px-6 sm:py-14">
-      <div className="mx-auto w-full max-w-3xl">
-        <Link
-          to="/"
-          className="text-sm font-semibold text-text-secondary underline-offset-4 hover:text-text-primary hover:underline"
+    <div className="flex justify-center min-h-screen bg-background px-4 py-10 font-sans text-text-primary sm:px-6 sm:py-14">
+      {isLoading ? (
+        <div
+          role="status"
+          aria-label="Cargando formulario de inicio de sesión"
+          className="w-full max-w-3xl space-y-8 overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#111827] to-[#0B0F19] p-5 shadow-2xl shadow-black/40 sm:p-8"
         >
-          Volver al inicio
-        </Link>
-        <div className="mt-6">{panel}</div>
-      </div>
-    </main>
+          <div className="space-y-2">
+            <Skeleton className="mt-4 h-10 w-3/4 rounded-sm bg-slate-700 sm:h-12" />
+            <Skeleton className="h-4 w-full max-w-xl rounded-sm bg-slate-800" />
+            <Skeleton className="h-4 w-2/3 max-w-md rounded-sm bg-slate-800" />
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {Array.from({ length: 5 }, (_, index) => (
+              <div
+                key={index}
+                className={
+                  index === 0 ? "space-y-2 sm:col-span-2" : "space-y-2"
+                }
+              >
+                <Skeleton className="h-4 w-32 rounded-sm bg-slate-700" />
+                <Skeleton className="h-12 w-full rounded-xl bg-slate-800" />
+                <Skeleton className="h-12 w-40 rounded-sm bg-[#CCFF00]/60" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <main className="min-h-screen bg-background px-4 py-10 font-sans text-text-primary sm:px-6 sm:py-14">
+          <div className="mx-auto w-full max-w-3xl">
+            <Link
+              to="/partidos"
+              className="text-sm font-semibold text-text-secondary underline-offset-4 hover:text-text-primary hover:underline"
+            >
+              Volver al inicio de convocatorias
+            </Link>
+            <div className="mt-6">{panel}</div>
+          </div>
+        </main>
+      )}
+    </div>
   );
 }
 

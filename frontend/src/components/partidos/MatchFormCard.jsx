@@ -18,13 +18,6 @@ function MatchFormCard({
       />
 
       <div className="relative z-10">
-        <p className="inline-flex items-center gap-2 rounded-full border border-[#CCFF00]/30 bg-[#CCFF00]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#CCFF00]">
-          <span
-            aria-hidden="true"
-            className="h-2 w-2 animate-pulse rounded-full bg-[#CCFF00]"
-          />
-          Nueva convocatoria
-        </p>
         {embedded ? (
           <h2 className="mt-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text font-display text-4xl font-extrabold uppercase tracking-wider text-transparent sm:text-5xl">
             Armar partido
