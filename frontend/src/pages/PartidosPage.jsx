@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import MatchCard from "../components/partidos/MatchCard.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { getMatches } from "../services/matchService.js";
@@ -7,6 +7,7 @@ import MatchConfirmationCard from "../components/partidos/MatchDetailCard.jsx";
 import MatchModal from "../components/partidos/MatchModal.jsx";
 import { getMockSession } from "../services/sessionService.js";
 import { waitForInitialLoading } from "../hooks/useInitialLoading.js";
+import DeleteMatchDialog from "../components/partidos/DeleteMatchDialog.jsx";
 
 const CTA_CLASSES =
   "inline-flex min-h-11 items-center justify-center rounded-sm border border-primary bg-primary px-5 py-2 text-sm font-extrabold uppercase tracking-wider text-primary-foreground";
@@ -21,6 +22,9 @@ function PartidosPage() {
     error: "",
   });
   const [partidoSeleccionado, setPartidoSeleccionado] = useState(null);
+  const location = useLocation();
+  const [aviso, setAviso] = useState(location.state?.aviso ?? "");
+  const [partidoAEliminar, setPartidoAEliminar] = useState(null);
   const session = getMockSession();
 
   const handleOpenForm = async () => {
@@ -30,6 +34,16 @@ function PartidosPage() {
     setOpeningForm(true);
     await waitForInitialLoading();
     navigate("/partidos/nuevo");
+  };
+
+  const partidoEliminado = (partido) => {
+    setEstado((actual) => ({
+      ...actual,
+      partidos: actual.partidos.filter((item) => item.id !== partido.id),
+    }));
+    setPartidoAEliminar(null);
+    setPartidoSeleccionado(null);
+    setAviso(`Partido eliminado: ${partido.fieldName}.`);
   };
 
   const armarPartidoButton = (
@@ -90,6 +104,14 @@ function PartidosPage() {
       </header>
 
       <main className="mx-auto w-full max-w-7xl px-5 py-8 lg:px-8">
+        {aviso && (
+          <p
+            role="status"
+            className="mb-6 rounded-sm border border-status/40 bg-status/10 px-4 py-3 text-sm text-status"
+          >
+            {aviso}
+          </p>
+        )}
         {estado.status === "cargando" && (
           <p role="status" className="text-text-secondary">
             Cargando convocatorias...
@@ -134,9 +156,16 @@ function PartidosPage() {
                 String(partidoSeleccionado.organizerId) === String(session?.id)
               }
               onClose={() => setPartidoSeleccionado(null)}
+              onDelete={() => setPartidoAEliminar(partidoSeleccionado)}
             />
           )}
         </MatchModal>
+        <DeleteMatchDialog
+          match={partidoAEliminar}
+          userId={session?.id}
+          onClose={() => setPartidoAEliminar(null)}
+          onDeleted={partidoEliminado}
+        />
       </main>
     </div>
   );

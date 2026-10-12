@@ -15,6 +15,10 @@ function formatoFecha(date) {
 function MatchCard({ match, onSelect }) {
   return (
     <button
+      onSelect={(partido) => {
+        setAviso("");
+        setPartidoSeleccionado(partido);
+      }}
       onClick={() => onSelect(match)}
       className="block rounded-sm border border-border bg-surface p-5 transition-colors hover:border-primary"
     >

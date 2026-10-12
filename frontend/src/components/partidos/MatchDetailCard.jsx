@@ -21,6 +21,7 @@ function MatchConfirmationCard({
   justCreated = false,
   isOrganizer = false,
   onClose,
+  onDelete,
 }) {
   return (
     <section
@@ -105,22 +106,33 @@ function MatchConfirmationCard({
             )}
           </div>
         </dl>
-        {onClose ? (
-          <button
-            type="button"
-            onClick={onClose}
-            className="mt-8 inline-flex min-h-12 items-center justify-center rounded-sm border border-slate-700 px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-white hover:border-white"
-          >
-            Cerrar
-          </button>
-        ) : (
-          <Link
-            to="/partidos"
-            className="inline-flex min-h-12 items-center justify-center rounded-sm border border-slate-700 px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-white hover:border-white"
-          >
-            Volver a convocatorias
-          </Link>
-        )}
+        <div className="mt-8 flex flex-wrap gap-3">
+          {isOrganizer && onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-red-400/60 px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-red-300 hover:border-red-300 hover:bg-red-500/10"
+            >
+              Eliminar partido
+            </button>
+          )}
+          {onClose ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-slate-700 px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-white hover:border-white"
+            >
+              Cerrar
+            </button>
+          ) : (
+            <Link
+              to="/partidos"
+              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-slate-700 px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-white hover:border-white"
+            >
+              Volver a convocatorias
+            </Link>
+          )}
+        </div>
       </div>
     </section>
   );
