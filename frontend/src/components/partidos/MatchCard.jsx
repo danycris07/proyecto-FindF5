@@ -1,42 +1,80 @@
+import { GoClock, GoPeople } from "react-icons/go";
+
 const currencyFormatter = new Intl.NumberFormat("es-AR", {
   style: "currency",
   currency: "ARS",
   maximumFractionDigits: 0,
 });
 
-function formatoFecha(date) {
-  return new Date(`${date}T12:00:00`).toLocaleDateString("es-AR", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
+function partesFecha(date) {
+  const dia = new Date(`${date}T12:00:00`);
+  return {
+    semana: dia
+      .toLocaleDateString("es-AR", { weekday: "short" })
+      .replace(".", ""),
+    numero: dia.getDate(),
+    mes: dia.toLocaleDateString("es-AR", { month: "short" }).replace(".", ""),
+  };
+}
+
+function etiquetaDia(date) {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const dia = new Date(`${date}T00:00:00`);
+  const diferencia = Math.round((dia - hoy) / 86400000);
+
+  if (diferencia === 0) return "Hoy";
+  if (diferencia === 1) return "Mañana";
+  return null;
 }
 
 function MatchCard({ match, onSelect }) {
+  const { semana, numero, mes } = partesFecha(match.date);
+  const etiqueta = etiquetaDia(match.date);
+
   return (
     <button
-      onSelect={(partido) => {
-        setAviso("");
-        setPartidoSeleccionado(partido);
-      }}
+      type="button"
       onClick={() => onSelect(match)}
-      className="block rounded-sm border border-border bg-surface p-5 transition-colors hover:border-primary"
+      className="flex w-full gap-4 rounded-sm border border-border bg-surface p-4 text-left transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status motion-reduce:transition-none"
     >
-      <p className="font-display text-sm font-bold uppercase tracking-wider text-text-secondary">
-        {formatoFecha(match.date)} · {match.startTime.slice(0, 5)} hs
-      </p>
-      <h2 className="mt-2 font-display text-2xl font-extrabold uppercase tracking-wider text-text-primary">
-        {match.fieldName}
-      </h2>
-      <div className="mt-4 flex items-end justify-between">
-        <p className="font-display text-xl font-extrabold tabular-nums text-primary">
-          {currencyFormatter.format(match.pricePerPlayer)}
-        </p>
-        {match.expectedPlayers && (
-          <p className="text-sm tabular-nums text-text-secondary">
-            {match.expectedPlayers} jugadores
-          </p>
+      <div className="flex w-16 shrink-0 flex-col items-center justify-center rounded-sm border border-border bg-background py-2">
+        <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          {semana}
+        </span>
+        <span className="font-display text-3xl font-extrabold leading-none text-text-primary">
+          {numero}
+        </span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          {mes}
+        </span>
+      </div>
+
+      <div className="min-w-0 flex-1">
+        {etiqueta && (
+          <span className="mb-1 inline-block rounded-sm border border-status/40 bg-status/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-status">
+            {etiqueta}
+          </span>
         )}
+        <h2 className="truncate font-display text-xl font-extrabold uppercase tracking-wider text-text-primary">
+          {match.fieldName}
+        </h2>
+        <p className="mt-1 flex items-center gap-1.5 text-sm tabular-nums text-text-secondary">
+          <GoClock aria-hidden="true" />
+          {match.startTime.slice(0, 5)} hs
+        </p>
+
+        <div className="mt-3 flex items-end justify-between gap-3">
+          <p className="font-display text-xl font-extrabold tabular-nums text-primary">
+            {currencyFormatter.format(match.pricePerPlayer)}
+          </p>
+          {match.expectedPlayers && (
+            <p className="flex items-center gap-1.5 text-sm tabular-nums text-text-secondary">
+              <GoPeople aria-hidden="true" />
+              {match.expectedPlayers} jugadores
+            </p>
+          )}
+        </div>
       </div>
     </button>
   );
