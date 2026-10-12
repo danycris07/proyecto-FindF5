@@ -9,7 +9,6 @@ import { getMockSession } from "../services/sessionService.js";
 import { waitForInitialLoading } from "../hooks/useInitialLoading.js";
 import DeleteMatchDialog from "../components/partidos/DeleteMatchDialog.jsx";
 import { GoPlus } from "react-icons/go";
-import LogoutButton from "../components/LogoutButton.jsx";
 
 const CTA_CLASSES =
   "inline-flex min-h-11 items-center justify-center rounded-sm border border-primary bg-primary px-5 py-2 text-sm font-extrabold uppercase tracking-wider text-primary-foreground";
@@ -115,7 +114,6 @@ function PartidosPage() {
               )}
             </div>
             <div className="flex flex-col items-end gap-2">
-              <LogoutButton />
               {armarPartidoButton}
             </div>
           </div>
