@@ -7,6 +7,18 @@ import PartidoPublicado from "./pages/PartidoPublicado";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicLandingRoute from "./components/PublicLandingRoute";
 import ArmarPartido from "./pages/ArmarPartido";
+import UserMenu from "./components/UserMenu.jsx";
+
+function AuthenticatedLayout({ children }) {
+  return (
+    <ProtectedRoute>
+      <>
+        <UserMenu />
+        {children}
+      </>
+    </ProtectedRoute>
+  );
+}
 
 function App() {
   return (
@@ -25,25 +37,25 @@ function App() {
         <Route
           path="/partidos"
           element={
-            <ProtectedRoute>
+            <AuthenticatedLayout>
               <PartidosPage />
-            </ProtectedRoute>
+            </AuthenticatedLayout>
           }
         />
         <Route
           path="/partidos/nuevo"
           element={
-            <ProtectedRoute>
+            <AuthenticatedLayout>
               <ArmarPartido />
-            </ProtectedRoute>
+            </AuthenticatedLayout>
           }
         />
         <Route
           path="/partidos/:partidoId"
           element={
-            <ProtectedRoute>
+            <AuthenticatedLayout>
               <PartidoPublicado />
-            </ProtectedRoute>
+            </AuthenticatedLayout>
           }
         />
       </Routes>
