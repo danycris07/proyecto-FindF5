@@ -10,6 +10,10 @@ export function setMockSession(user) {
   localStorage.setItem(SESSION_USER_KEY, String(user.id));
 }
 
+export function clearMockSession() {
+  localStorage.removeItem(SESSION_USER_KEY);
+}
+
 export function getMockSession() {
   const userId = localStorage.getItem(SESSION_USER_KEY);
 
