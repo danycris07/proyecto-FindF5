@@ -1,22 +1,39 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import MatchConfirmationCard from "../components/partidos/MatchDetailCard.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { getMatchById } from "../services/matchService.js";
+import DeleteMatchDialog from "../components/partidos/DeleteMatchDialog.jsx";
+import { getMockSession } from "../services/sessionService.js";
 
 function PartidoPublicado() {
   const { partidoId } = useParams();
+
   const [entrada, setEntrada] = useState({ partidoId: null, activa: false });
+
   const [resultado, setResultado] = useState({
     partidoId: null,
     partido: null,
     error: "",
     estado: "cargando",
   });
+
   const cargando =
     resultado.partidoId !== partidoId || resultado.estado === "cargando";
+
   const partido = resultado.partidoId === partidoId ? resultado.partido : null;
+
+  const navigate = useNavigate();
+
+  const session = getMockSession();
+
+  const [partidoAEliminar, setPartidoAEliminar] = useState(null);
+
+  const isOrganizer =
+    partido !== null && String(partido.organizerId) === String(session?.id);
+
   const error = resultado.partidoId === partidoId ? resultado.error : "";
+
   const animarTarjeta =
     resultado.estado === "cargado" &&
     resultado.partidoId === partidoId &&
@@ -24,6 +41,7 @@ function PartidoPublicado() {
     entrada.activa;
 
   const location = useLocation();
+
   const justCreated = location.state?.justCreated === true;
 
   useEffect(() => {
@@ -120,8 +138,21 @@ function PartidoPublicado() {
           match={partido}
           animated={animarTarjeta}
           justCreated={justCreated}
+          isOrganizer={isOrganizer}
+          onDelete={() => setPartidoAEliminar(partido)}
         />
       )}
+      <DeleteMatchDialog
+        match={partidoAEliminar}
+        userId={session?.id}
+        onClose={() => setPartidoAEliminar(null)}
+        onDeleted={(eliminado) =>
+          navigate("/partidos", {
+            replace: true,
+            state: { aviso: `Partido eliminado: ${eliminado.fieldName}.` },
+          })
+        }
+      />
     </main>
   );
 }

@@ -1,7 +1,31 @@
 import { mockFields, mockMatches } from "../mocks/MockData.js";
 
 const MATCHES_STORAGE_KEY = "findf5-published-matches";
+const DELETED_STORAGE_KEY = "findf5-deleted-matches";
 
+function getDeletedMatches() {
+  const stored = localStorage.getItem(DELETED_STORAGE_KEY);
+  if (!stored) return {};
+
+  const deleted = JSON.parse(stored);
+  if (
+    deleted === null ||
+    typeof deleted !== "object" ||
+    Array.isArray(deleted)
+  ) {
+    throw new Error(
+      "No se pudieron leer los partidos eliminados de esta sesión.",
+    );
+  }
+  return deleted;
+}
+
+function getActiveMatches() {
+  const deleted = getDeletedMatches();
+  return [...mockMatches, ...getSavedMatches()].filter(
+    (match) => !deleted[match.id],
+  );
+}
 function getSavedMatches() {
   const storedMatches = localStorage.getItem(MATCHES_STORAGE_KEY);
 
@@ -69,14 +93,8 @@ export async function createMatch(details, organizerId) {
   return match;
 }
 
-export async function getMatchById(matchId) {
-  const matches = [...mockMatches, ...getSavedMatches()];
-  const match = matches.find((m) => String(m.id) === String(matchId));
-  return match ? normalizeMatch(match) : null;
-}
-
 export async function getMatches() {
-  return [...mockMatches, ...getSavedMatches()]
+  return getActiveMatches()
     .filter((match) => match.status === "OPEN")
     .map(normalizeMatch)
     .sort((a, b) =>
@@ -84,6 +102,12 @@ export async function getMatches() {
     );
 }
 
+export async function getMatchById(matchId) {
+  const match = getActiveMatches().find(
+    (item) => String(item.id) === String(matchId),
+  );
+  return match ? normalizeMatch(match) : null;
+}
 function normalizeMatch(match) {
   return {
     ...match,
@@ -92,4 +116,26 @@ function normalizeMatch(match) {
       mockFields.find((field) => field.id === match.fieldId)?.name ??
       "Cancha a confirmar",
   };
+}
+export async function deleteMatch(matchId, userId) {
+  // Simula la demora de la red. Borrar esta línea cuando exista el backend.
+  await new Promise((resolve) => setTimeout(resolve, 600));
+
+  const match = getActiveMatches().find(
+    (item) => String(item.id) === String(matchId),
+  );
+  if (!match) {
+    throw new Error("No encontramos ese partido.");
+  }
+  if (!userId || String(match.organizerId) !== String(userId)) {
+    throw new Error("Solo el organizador puede eliminar este partido.");
+  }
+
+  localStorage.setItem(
+    DELETED_STORAGE_KEY,
+    JSON.stringify({
+      ...getDeletedMatches(),
+      [match.id]: new Date().toISOString(),
+    }),
+  );
 }
