@@ -1,7 +1,61 @@
 import { mockFields, mockMatches } from "../mocks/MockData.js";
+import {
+  useInitialLoading,
+  waitForInitialLoading,
+} from "../hooks/useInitialLoading.js";
 
 const MATCHES_STORAGE_KEY = "findf5-published-matches";
 const DELETED_STORAGE_KEY = "findf5-deleted-matches";
+const SLOTS_STORAGE_KEY = "findf5-match-slots";
+
+function getMatchSlots() {
+  const stored = localStorage.getItem(SLOTS_STORAGE_KEY);
+  return stored ? JSON.parse(stored) : {};
+}
+
+function normalizeMatch(match) {
+  const slots = getMatchSlots();
+  // Si no se editó nunca, los jugadores faltantes son los esperados inicialmente
+  const missingPlayers =
+    slots[match.id] !== undefined
+      ? slots[match.id]
+      : (match.missingPlayers ?? match.expectedPlayers);
+
+  return {
+    ...match,
+    missingPlayers,
+    fieldName:
+      match.fieldName ??
+      mockFields.find((field) => field.id === match.fieldId)?.name ??
+      "Cancha a confirmar",
+  };
+}
+
+export async function decreaseMatchSlot(matchId, userId) {
+  // Simulamos el tiempo de respuesta del servidor (400ms)
+  waitForInitialLoading();
+
+  const match = await getMatchById(matchId);
+  if (!match) throw new Error("No encontramos ese partido.");
+
+  if (String(match.organizerId) !== String(userId)) {
+    throw new Error("Solo el organizador puede editar los cupos.");
+  }
+
+  if (match.missingPlayers <= 0) {
+    throw new Error("La cancha ya está llena.");
+  }
+
+  // Para testear el Criterio de Aceptación 5 (Rollback), podés descomentar la siguiente línea:
+  if (Math.random() > 0.5)
+    throw new Error("Error de conexión al servidor. Reintentá.");
+
+  const slots = getMatchSlots();
+  slots[matchId] = match.missingPlayers - 1;
+  localStorage.setItem(SLOTS_STORAGE_KEY, JSON.stringify(slots));
+
+  return { ...match, missingPlayers: match.missingPlayers - 1 };
+}
 
 function getDeletedMatches() {
   const stored = localStorage.getItem(DELETED_STORAGE_KEY);
@@ -107,15 +161,6 @@ export async function getMatchById(matchId) {
     (item) => String(item.id) === String(matchId),
   );
   return match ? normalizeMatch(match) : null;
-}
-function normalizeMatch(match) {
-  return {
-    ...match,
-    fieldName:
-      match.fieldName ??
-      mockFields.find((field) => field.id === match.fieldId)?.name ??
-      "Cancha a confirmar",
-  };
 }
 export async function deleteMatch(matchId, userId) {
   // Simula la demora de la red. Borrar esta línea cuando exista el backend.

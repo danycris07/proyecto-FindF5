@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import MatchCard from "../components/partidos/MatchCard.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
-import { getMatches } from "../services/matchService.js";
+import { getMatches, decreaseMatchSlot } from "../services/matchService.js";
 import MatchConfirmationCard from "../components/partidos/MatchDetailCard.jsx";
 import MatchModal from "../components/partidos/MatchModal.jsx";
 import { getMockSession } from "../services/sessionService.js";
@@ -14,7 +14,36 @@ const CTA_CLASSES =
   "inline-flex min-h-11 items-center justify-center rounded-sm border border-primary bg-primary px-5 py-2 text-sm font-extrabold uppercase tracking-wider text-primary-foreground";
 
 function PartidosPage() {
+  const [decreaseError, setDecreaseError] = useState("");
+
+  const handleDecreaseSlot = async () => {
+    if (!partidoSeleccionado || partidoSeleccionado.missingPlayers <= 0) return;
+
+    setDecreaseError("");
+    const prevSlots = partidoSeleccionado.missingPlayers;
+
+    // Criterio 2: Actualización Optimista (Al instante)
+    setPartidoSeleccionado((p) => ({ ...p, missingPlayers: prevSlots - 1 }));
+
+    try {
+      const updated = await decreaseMatchSlot(
+        partidoSeleccionado.id,
+        session.id,
+      );
+      setPartidoSeleccionado(updated);
+      setEstado((prev) => ({
+        ...prev,
+        partidos: prev.partidos.map((p) => (p.id === updated.id ? updated : p)),
+      }));
+    } catch (err) {
+      // Criterio 5: Rollback visual con mensaje de error
+      setPartidoSeleccionado((p) => ({ ...p, missingPlayers: prevSlots }));
+      setDecreaseError(err.message);
+    }
+  };
+
   const navigate = useNavigate();
+
   const [openingForm, setOpeningForm] = useState(false);
   const openingFormRef = useRef(false);
   const [estado, setEstado] = useState({
@@ -193,6 +222,8 @@ function PartidosPage() {
                 }
                 onClose={() => setPartidoSeleccionado(null)}
                 onDelete={() => setPartidoAEliminar(partidoSeleccionado)}
+                onDecreaseSlot={handleDecreaseSlot}
+                decreaseError={decreaseError}
               />
             )}
           </MatchModal>
