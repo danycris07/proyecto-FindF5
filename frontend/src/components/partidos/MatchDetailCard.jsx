@@ -22,7 +22,11 @@ function MatchConfirmationCard({
   isOrganizer = false,
   onClose,
   onDelete,
+  onDecreaseSlot,
+  decreaseError,
 }) {
+  const isFull = match.missingPlayers === 0;
+
   return (
     <section
       className={`relative isolate mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#111827] to-[#0B0F19] p-5 shadow-2xl shadow-black/40 transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none sm:p-8 ${
@@ -35,14 +39,25 @@ function MatchConfirmationCard({
       />
 
       <div className="relative z-10">
-        <h1 className="mt-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text font-display text-4xl font-extrabold uppercase tracking-wider text-transparent sm:text-5xl">
-          {justCreated ? "¡Partido publicado!" : "Detalles del partido"}
-        </h1>
-        <p className="mt-3 max-w-xl text-sm leading-6 text-slate-400">
-          {justCreated
-            ? "La convocatoria ya está lista. Estos son los datos del encuentro."
-            : "Estos son los datos del encuentro."}
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="mt-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text font-display text-4xl font-extrabold uppercase tracking-wider text-transparent sm:text-5xl">
+              {justCreated ? "¡Partido publicado!" : "Detalles del partido"}
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-400">
+              {justCreated
+                ? "La convocatoria ya está lista. Estos son los datos del encuentro."
+                : "Estos son los datos del encuentro."}
+            </p>
+          </div>
+
+          {/* Criterio 3: Estado Cancha Llena */}
+          {isFull && (
+            <div className="mt-4 inline-flex items-center rounded-sm border border-status/40 bg-status/10 px-3 py-1.5 text-sm font-bold uppercase tracking-wider text-status">
+              Cancha llena
+            </div>
+          )}
+        </div>
 
         <dl className="mt-8 grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
@@ -69,14 +84,40 @@ function MatchConfirmationCard({
               {match.startTime}
             </dd>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-            <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Cupos previstos
-            </dt>
-            <dd className="mt-2 font-semibold tabular-nums text-white">
-              {match.expectedPlayers}
-            </dd>
+
+          {/* Criterio 1 y 4: Visor de Cupos y Botón Restar */}
+          <div className="flex flex-col justify-between rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Cupos faltantes
+              </dt>
+              <dd className="mt-2 font-display text-2xl font-extrabold tabular-nums text-white">
+                {match.missingPlayers}{" "}
+                <span className="text-sm font-medium text-slate-400">
+                  / {match.expectedPlayers}
+                </span>
+              </dd>
+            </div>
+
+            {isOrganizer && (
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={onDecreaseSlot}
+                  disabled={isFull}
+                  className="inline-flex items-center justify-center rounded-sm border border-primary/50 bg-primary/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Restar cupo
+                </button>
+                {decreaseError && (
+                  <p className="mt-2 text-xs font-medium text-red-400">
+                    {decreaseError}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
+
           <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 sm:col-span-2">
             <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               {match.playingForCoca
@@ -106,7 +147,17 @@ function MatchConfirmationCard({
             )}
           </div>
         </dl>
+
         <div className="mt-8 flex flex-wrap gap-3">
+          {/* Criterio 3: Deshabilita la opción de sumarse si la cancha está llena */}
+          {!isFull && !isOrganizer && (
+            <button
+              type="button"
+              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-primary bg-primary px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-black transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(204,255,0,0.38)]"
+            >
+              Sumarme
+            </button>
+          )}
           {isOrganizer && onDelete && (
             <button
               type="button"

@@ -68,10 +68,14 @@ function MatchCard({ match, onSelect }) {
           <p className="font-display text-xl font-extrabold tabular-nums text-primary">
             {currencyFormatter.format(match.pricePerPlayer)}
           </p>
-          {match.expectedPlayers && (
-            <p className="flex items-center gap-1.5 text-sm tabular-nums text-text-secondary">
+          {match.missingPlayers !== undefined && (
+            <p
+              className={`flex items-center gap-1.5 text-sm tabular-nums font-semibold ${match.missingPlayers === 0 ? "text-status" : "text-text-secondary"}`}
+            >
               <GoPeople aria-hidden="true" />
-              {match.expectedPlayers} jugadores
+              {match.missingPlayers > 0
+                ? `Faltan ${match.missingPlayers}`
+                : "Cancha llena"}
             </p>
           )}
         </div>
