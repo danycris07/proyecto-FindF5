@@ -16,11 +16,17 @@ function PartidoFormFields({
   cuotaBase,
   montoExtraCoca,
   totalPorJugador,
+  isEditMode,
+  jugadoresEsperadosValue,
 }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       <div className="sm:col-span-2">
-        <MatchFormField id="cancha" label="Cancha" error={errors.cancha?.message}>
+        <MatchFormField
+          id="cancha"
+          label="Cancha"
+          error={errors.cancha?.message}
+        >
           <input
             id="cancha"
             type="text"
@@ -28,9 +34,15 @@ function PartidoFormFields({
             autoComplete="off"
             aria-invalid={Boolean(errors.cancha)}
             aria-describedby={errors.cancha ? "cancha-error" : undefined}
-            placeholder={canchasLoading ? "Cargando canchas..." : "Elegí o escribí una cancha"}
+            placeholder={
+              canchasLoading
+                ? "Cargando canchas..."
+                : "Elegí o escribí una cancha"
+            }
             className={inputClassName}
-            {...register("cancha", { required: "Indicá la cancha del partido." })}
+            {...register("cancha", {
+              required: "Indicá la cancha del partido.",
+            })}
           />
           <datalist id="lista-canchas">
             {canchas.map((cancha) => (
@@ -58,7 +70,11 @@ function PartidoFormFields({
         </MatchFormField>
       </div>
 
-      <MatchFormField id="fecha" label="Día del partido" error={errors.fecha?.message}>
+      <MatchFormField
+        id="fecha"
+        label="Día del partido"
+        error={errors.fecha?.message}
+      >
         <input
           id="fecha"
           type="date"
@@ -114,7 +130,38 @@ function PartidoFormFields({
         />
       </MatchFormField>
 
-      <MatchFormField id="cuota" label="Cuota por jugador ($)" error={errors.cuota?.message}>
+      {isEditMode && (
+        <MatchFormField
+          id="cuposFaltantes"
+          label="Cupos faltantes"
+          error={errors.cuposFaltantes?.message}
+        >
+          <input
+            id="cuposFaltantes"
+            type="number"
+            min="0"
+            max={jugadoresEsperadosValue || 1}
+            step="1"
+            inputMode="numeric"
+            aria-invalid={Boolean(errors.cuposFaltantes)}
+            className={`${inputClassName} tabular-nums`}
+            {...register("cuposFaltantes", {
+              required: "Indicá cuántos cupos faltan.",
+              setValueAs: (value) => (value === "" ? "" : Number(value)),
+              validate: (value) =>
+                (Number.isInteger(value) &&
+                  value >= 0 &&
+                  value <= Number(jugadoresEsperadosValue)) ||
+                "Los cupos faltantes no pueden superar a los esperados.",
+            })}
+          />
+        </MatchFormField>
+      )}
+      <MatchFormField
+        id="cuota"
+        label="Cuota por jugador ($)"
+        error={errors.cuota?.message}
+      >
         <input
           id="cuota"
           type="number"

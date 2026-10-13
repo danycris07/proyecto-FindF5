@@ -76,9 +76,12 @@ function getDeletedMatches() {
 
 function getActiveMatches() {
   const deleted = getDeletedMatches();
-  return [...mockMatches, ...getSavedMatches()].filter(
-    (match) => !deleted[match.id],
-  );
+  const saved = getSavedMatches();
+  const savedIds = new Set(saved.map((m) => String(m.id)));
+
+  const activeMocks = mockMatches.filter((m) => !savedIds.has(String(m.id)));
+
+  return [...activeMocks, ...saved].filter((match) => !deleted[match.id]);
 }
 function getSavedMatches() {
   const storedMatches = localStorage.getItem(MATCHES_STORAGE_KEY);
@@ -183,4 +186,65 @@ export async function deleteMatch(matchId, userId) {
       [match.id]: new Date().toISOString(),
     }),
   );
+}
+
+// Y agrega esta nueva función al final del archivo:
+export async function updateMatch(matchId, userId, details) {
+  // Simulamos red
+  await new Promise((resolve) => setTimeout(resolve, 600));
+
+  const match = await getMatchById(matchId);
+  if (!match) throw new Error("No encontramos ese partido.");
+  if (String(match.organizerId) !== String(userId)) {
+    throw new Error("Solo el organizador puede editar el partido.");
+  }
+
+  const basePricePerPlayer = Number(details.cuota);
+  const playingForCoca = details.jugarPorLaCoca === true;
+  const cocaAmountPerPlayer = playingForCoca
+    ? Number(details.montoExtraCoca)
+    : 0;
+
+  if (!Number.isFinite(basePricePerPlayer) || basePricePerPlayer < 0) {
+    throw new Error("La cuota base debe ser un monto igual o mayor que 0.");
+  }
+
+  const field = mockFields.find((f) => f.name === details.cancha);
+
+  const updatedMatch = {
+    ...match,
+    fieldId: field?.id ?? null,
+    fieldName: details.cancha,
+    date: details.fecha,
+    startTime: details.hora,
+    expectedPlayers: details.jugadoresEsperados,
+    playingForCoca,
+    basePricePerPlayer,
+    cocaAmountPerPlayer,
+    pricePerPlayer: basePricePerPlayer + cocaAmountPerPlayer,
+    updatedAt: new Date().toISOString(),
+  };
+
+  // Criterio 7: Actualizar cupos faltantes
+  const missing = Number(details.cuposFaltantes);
+  if (!Number.isNaN(missing)) {
+    const slots = getMatchSlots(); // Asume que getMatchSlots de BUS-8 ya existe
+    slots[matchId] = missing;
+    localStorage.setItem(SLOTS_STORAGE_KEY, JSON.stringify(slots));
+  }
+
+  // Actualizar la lista de guardados
+  const savedMatches = getSavedMatches();
+  const index = savedMatches.findIndex((m) => String(m.id) === String(matchId));
+
+  if (index >= 0) {
+    savedMatches[index] = updatedMatch;
+  } else {
+    // Si era un mock sin modificaciones previas, lo guardamos ahora
+    savedMatches.push(updatedMatch);
+  }
+
+  localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(savedMatches));
+
+  return await getMatchById(matchId);
 }
