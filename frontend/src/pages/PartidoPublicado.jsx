@@ -44,6 +44,8 @@ function PartidoPublicado() {
 
   const justCreated = location.state?.justCreated === true;
 
+  const aviso = location.state?.aviso;
+
   useEffect(() => {
     let activo = true;
     let primerFrameId;
@@ -98,6 +100,11 @@ function PartidoPublicado() {
   return (
     <main className="min-h-screen bg-background px-4 py-10 font-sans text-text-primary sm:px-6 sm:py-14">
       <ThemeToggle />
+      {aviso && (
+        <div className="mx-auto w-full max-w-3xl mb-6 rounded-sm border border-status/40 bg-status/10 px-4 py-3 text-sm font-bold text-status">
+          {aviso}
+        </div>
+      )}
       {cargando ? (
         <section className="mx-auto w-full max-w-3xl rounded-sm border border-border bg-surface p-5 sm:p-8">
           <p role="status" className="text-text-secondary">
