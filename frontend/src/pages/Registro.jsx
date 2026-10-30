@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import AuthShell from "../components/auth/AuthShell.jsx";
+import { AuthField, AuthSubmitButton } from "../components/auth/AuthField.jsx";
 import { mockUsers } from "../mocks/MockData";
-import { useNavigate } from "react-router-dom";
-import Skeleton from "../components/ui/Skeleton";
-import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import {
   useInitialLoading,
   waitForInitialLoading,
@@ -15,9 +15,9 @@ export function Registro({ isLoading: loadingProp }) {
     register,
     handleSubmit,
     reset,
-    formState: { isSubmitting },
-  } = useForm();
-  const isLoading = (loadingProp ?? initialLoading) || isSubmitting;
+    formState: { errors, isSubmitting },
+  } = useForm({ defaultValues: { role: "PLAYER" } });
+  const isLoading = loadingProp ?? initialLoading;
 
   const onSubmit = async (data) => {
     await waitForInitialLoading();
@@ -33,133 +33,101 @@ export function Registro({ isLoading: loadingProp }) {
   };
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-background px-4 py-10"
-      aria-busy={isLoading}
+    <AuthShell
+      eyebrow="Nuevo jugador"
+      title="Armá tu ficha"
+      subtitle="Creá tu cuenta en FindF5 y empezá a sumarte a partidos de fútbol 5."
+      loading={isLoading}
+      loadingLabel="Cargando formulario de registro"
+      skeletonFields={5}
+      footer={
+        <>
+          ¿Ya tenés cuenta?{" "}
+          <Link
+            to="/login"
+            className="font-semibold text-text-primary underline underline-offset-4 hover:text-status"
+          >
+            Iniciá sesión
+          </Link>
+        </>
+      }
     >
-      <ThemeToggle />
-      {isLoading ? (
-        <div
-          role="status"
-          aria-label="Cargando formulario de registro"
-          className="w-full max-w-md space-y-7 rounded-md border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        aria-busy={isSubmitting}
+        className="space-y-5"
+      >
+        <AuthField
+          id="name"
+          label="Nombre"
+          type="text"
+          autoComplete="name"
+          placeholder="Juan Pérez"
+          registration={register("name", {
+            required: "Ingresá tu nombre.",
+            minLength: { value: 2, message: "Escribí al menos 2 letras." },
+          })}
+          error={errors.name?.message}
+        />
+
+        <AuthField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          placeholder="juan@email.com"
+          registration={register("email", {
+            required: "Ingresá tu email.",
+            pattern: {
+              value: /^\S+@\S+\.\S+$/,
+              message: "Revisá el formato del email.",
+            },
+          })}
+          error={errors.email?.message}
+        />
+
+        <AuthField
+          id="phone"
+          label="Teléfono (opcional)"
+          type="tel"
+          autoComplete="tel"
+          placeholder="+54 9 3704..."
+          registration={register("phone", {
+            pattern: {
+              value: /^[+\d][\d\s()-]{6,}$/,
+              message: "Ingresá un teléfono válido.",
+            },
+          })}
+          error={errors.phone?.message}
+        />
+
+        <AuthField
+          id="password"
+          label="Contraseña"
+          type="password"
+          autoComplete="new-password"
+          registration={register("password", {
+            required: "Elegí una contraseña.",
+            minLength: { value: 6, message: "Mínimo 6 caracteres." },
+          })}
+          error={errors.password?.message}
+        />
+
+        <AuthField
+          id="role"
+          as="select"
+          label="Tipo de cuenta"
+          registration={register("role")}
         >
-          <div className="space-y-3">
-            <Skeleton className="h-9 w-2/3" />
-            <Skeleton className="h-4 w-4/5" />
-          </div>
-          <div className="space-y-5">
-            {Array.from({ length: 5 }, (_, index) => (
-              <div key={index} className="space-y-2">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-12 w-full" />
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          aria-busy={isSubmitting}
-          className="w-full max-w-md rounded-md border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
-        >
-          {/* Encabezado */}
-          <div className="mb-7">
-            <h2 className="text-3xl font-bold tracking-tight text-text-primary">
-              Crear cuenta
-            </h2>
+          <option value="PLAYER">Jugador</option>
+          <option value="FIELD_OWNER">Dueño de cancha</option>
+        </AuthField>
 
-            <p className="mt-2 text-sm text-text-secondary">
-              Completá tus datos para registrarte en FindF5.
-            </p>
-          </div>
-
-          <div className="space-y-5">
-            {/* Nombre */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-primary">
-                Nombre
-              </label>
-
-              <input
-                type="text"
-                placeholder="Juan Pérez"
-                {...register("name")}
-                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
-              />
-            </div>
-
-            {/* Email */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-primary">
-                Email
-              </label>
-
-              <input
-                type="email"
-                placeholder="juan@email.com"
-                {...register("email")}
-                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
-              />
-            </div>
-
-            {/* Teléfono */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-primary">
-                Teléfono
-              </label>
-
-              <input
-                type="tel"
-                placeholder="+54 9 3704..."
-                {...register("phone")}
-                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
-              />
-            </div>
-
-            {/* contraseña */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-primary">
-                Contraseña
-              </label>
-
-              <input
-                type="password"
-                {...register("password")}
-                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
-              />
-            </div>
-
-            {/* Rol */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-primary">
-                Tipo de cuenta
-              </label>
-
-              <select
-                {...register("role")}
-                defaultValue="PLAYER"
-                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
-              >
-                <option value="PLAYER">Jugador</option>
-                <option value="FIELD_OWNER">Dueño de cancha</option>
-              </select>
-            </div>
-
-            {/* Botón */}
-            <button
-              type="submit"
-              className="mt-2 w-full rounded-sm border border-primary-foreground bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-lg shadow-[var(--primary-shadow)] transition hover:shadow-[var(--primary-shadow-strong)] active:scale-[0.98]"
-            >
-              Crear cuenta
-            </button>
-          </div>
-
-          <p className="mt-6 text-center text-xs text-text-secondary">
-            Al registrarte podrás comenzar a buscar y reservar canchas.
-          </p>
-        </form>
-      )}
-    </div>
+        <AuthSubmitButton disabled={isSubmitting}>
+          {isSubmitting ? "Creando cuenta..." : "Crear cuenta"}
+        </AuthSubmitButton>
+      </form>
+    </AuthShell>
   );
 }

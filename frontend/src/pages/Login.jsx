@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import AuthShell from "../components/auth/AuthShell.jsx";
+import { AuthField, AuthSubmitButton } from "../components/auth/AuthField.jsx";
 import { mockUsers } from "../mocks/MockData";
-import { useLocation, useNavigate } from "react-router-dom";
-import Skeleton from "../components/ui/Skeleton";
-import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import {
   useInitialLoading,
   waitForInitialLoading,
@@ -18,10 +18,10 @@ export function Login({ isLoading: loadingProp }) {
     register,
     handleSubmit,
     reset,
-    formState: { isSubmitting },
+    formState: { errors, isSubmitting },
   } = useForm();
   const [loginError, setLoginError] = useState("");
-  const isLoading = (loadingProp ?? initialLoading) || isSubmitting;
+  const isLoading = loadingProp ?? initialLoading;
 
   const onSubmit = async (data) => {
     setLoginError("");
@@ -50,104 +50,71 @@ export function Login({ isLoading: loadingProp }) {
   };
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-background px-4 py-10"
-      aria-busy={isLoading}
+    <AuthShell
+      eyebrow="Ingreso"
+      title="Volvé a la cancha"
+      subtitle="Iniciá sesión para ver las convocatorias y sumarte a un partido."
+      loading={isLoading}
+      loadingLabel="Cargando formulario de inicio de sesión"
+      skeletonFields={2}
+      footer={
+        <>
+          ¿Todavía no tenés cuenta?{" "}
+          <Link
+            to="/registro"
+            className="font-semibold text-text-primary underline underline-offset-4 hover:text-status"
+          >
+            Registrate
+          </Link>
+        </>
+      }
     >
-      <ThemeToggle />
-      {isLoading ? (
-        <div
-          role="status"
-          aria-label="Cargando formulario de inicio de sesión"
-          className="w-full max-w-md space-y-7 rounded-md border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
-        >
-          <div className="space-y-3">
-            <Skeleton className="h-9 w-2/3" />
-            <Skeleton className="h-4 w-4/5" />
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        aria-busy={isSubmitting}
+        className="space-y-5"
+      >
+        {loginError && (
+          <div
+            role="alert"
+            className="rounded-sm border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger"
+          >
+            {loginError}
           </div>
-          <div className="space-y-5">
-            {Array.from({ length: 2 }, (_, index) => (
-              <div key={index} className="space-y-2">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-12 w-full" />
-              </div>
-            ))}
-            <Skeleton className="h-12 w-full" />
-          </div>
-        </div>
-      ) : (
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          aria-busy={isSubmitting}
-          className="w-full max-w-md rounded-md border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
-        >
-          {/* Encabezado */}
-          <div className="mb-7">
-            <h2 className="text-3xl font-bold tracking-tight text-text-primary">
-              Iniciar Sesion
-            </h2>
+        )}
 
-            <p className="mt-2 text-sm text-text-secondary">
-              Completá tus datos para ingresar
-            </p>
-          </div>
+        <AuthField
+          id="email"
+          label="Correo electrónico"
+          type="email"
+          autoComplete="email"
+          placeholder="correo@ejemplo.com"
+          registration={register("email", {
+            required: "Ingresá tu correo.",
+            pattern: {
+              value: /^\S+@\S+\.\S+$/,
+              message: "Revisá el formato del correo.",
+            },
+          })}
+          error={errors.email?.message}
+        />
 
-          {loginError && (
-            <p role="alert" className="mb-5 text-sm text-red-400">
-              {loginError}
-            </p>
-          )}
+        <AuthField
+          id="password"
+          label="Contraseña"
+          type="password"
+          autoComplete="current-password"
+          registration={register("password", {
+            required: "Ingresá tu contraseña.",
+          })}
+          error={errors.password?.message}
+        />
 
-          <div className="space-y-5">
-            {/* Correo */}
-            <div className="space-y-2">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-text-primary"
-              >
-                Correo electronico
-              </label>
-
-              <input
-                id="email"
-                type="text"
-                placeholder="Correo@ejemplo.com"
-                {...register("email")}
-                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
-              />
-            </div>
-
-            {/* contraseña */}
-            <div className="space-y-2">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-text-primary"
-              >
-                Contraseña
-              </label>
-
-              <input
-                id="password"
-                type="password"
-                {...register("password")}
-                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
-              />
-            </div>
-
-            {/* Botón */}
-            <button
-              type="submit"
-              className="mt-2 w-full rounded-sm border border-primary-foreground bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-lg shadow-[var(--primary-shadow)] transition hover:shadow-[var(--primary-shadow-strong)] active:scale-[0.98]"
-            >
-              Iniciar Sesion
-            </button>
-          </div>
-
-          <p className="mt-6 text-center text-xs text-text-secondary">
-            Al registrarte podrás comenzar a buscar y reservar canchas.
-          </p>
-        </form>
-      )}
-    </div>
+        <AuthSubmitButton disabled={isSubmitting}>
+          {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
+        </AuthSubmitButton>
+      </form>
+    </AuthShell>
   );
 }
