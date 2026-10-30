@@ -14,7 +14,7 @@ const btnPrimary = `${btnBase} border border-primary-foreground bg-primary text-
 const btnSecondary = `${btnBase} border border-border bg-surface text-text-primary hover:-translate-y-0.5 hover:border-status active:translate-y-0`;
 
 const sectionTitle =
-  "flex items-center gap-4 font-display text-3xl font-extrabold uppercase leading-none tracking-wider before:h-1 before:w-9 before:shrink-0 before:bg-border before:content-[''] md:text-4xl";
+  "flex items-center gap-4 font-display text-3xl font-extrabold uppercase leading-none tracking-wider before:h-1.5 before:w-10 before:shrink-0 before:bg-status before:content-[''] md:text-4xl";
 
 /**
  * Ensambla las secciones del landing en orden y comparte estilos entre ellas.
