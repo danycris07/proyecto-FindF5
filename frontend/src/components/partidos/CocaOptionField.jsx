@@ -20,7 +20,7 @@ function CocaOptionField({
 }) {
   return (
     <div className="sm:col-span-2">
-      <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
+      <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 rounded-sm border border-border bg-background p-4">
         <label
           htmlFor="jugarPorLaCoca"
           className="flex min-h-12 cursor-pointer items-center gap-3 text-sm font-semibold text-text-primary"
@@ -76,16 +76,20 @@ function CocaOptionField({
             </MatchFormField>
           </div>
 
-          <dl className="mt-4 grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 rounded-xl border border-border bg-background p-4 text-sm tabular-nums sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto]">
+          <dl className="mt-4 grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 rounded-sm border border-border bg-background p-4 text-sm tabular-nums sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto]">
             <dt className="text-text-secondary">Cuota</dt>
             <dd className="text-right text-text-primary">
               {formatAmount(baseAmount)}
             </dd>
-            <dt className="text-text-secondary sm:text-right">Extra por jugador</dt>
+            <dt className="text-text-secondary sm:text-right">
+              Extra por jugador
+            </dt>
             <dd className="text-right text-text-primary">
               {formatAmount(extraAmount)}
             </dd>
-            <dt className="font-semibold text-text-primary">Total por jugador</dt>
+            <dt className="font-semibold text-text-primary">
+              Total por jugador
+            </dt>
             <dd className="text-right font-bold text-primary-text">
               {formatAmount(totalAmount)}
             </dd>

@@ -29,7 +29,7 @@ function MatchConfirmationCard({
 
   return (
     <section
-      className={`relative isolate mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none sm:p-8 ${
+      className={`relative isolate mx-auto w-full max-w-3xl overflow-hidden rounded-md border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none sm:p-8 ${
         animated ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
       }`}
     >
@@ -60,7 +60,7 @@ function MatchConfirmationCard({
         </div>
 
         <dl className="mt-8 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-border bg-background p-4">
+          <div className="rounded-sm border border-border bg-background p-4">
             <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Cancha
             </dt>
@@ -68,7 +68,7 @@ function MatchConfirmationCard({
               {match.fieldName ?? "Cancha"}
             </dd>
           </div>
-          <div className="rounded-xl border border-border bg-background p-4">
+          <div className="rounded-sm border border-border bg-background p-4">
             <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Día
             </dt>
@@ -76,7 +76,7 @@ function MatchConfirmationCard({
               {formatoFecha(match.date)}
             </dd>
           </div>
-          <div className="rounded-xl border border-border bg-background p-4">
+          <div className="rounded-sm border border-border bg-background p-4">
             <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Hora
             </dt>
@@ -86,7 +86,7 @@ function MatchConfirmationCard({
           </div>
 
           {/* Criterio 1 y 4: Visor de Cupos y Botón Restar */}
-          <div className="flex flex-col justify-between rounded-xl border border-border bg-background p-4">
+          <div className="flex flex-col justify-between rounded-sm border border-border bg-background p-4">
             <div>
               <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
                 Cupos faltantes
@@ -118,7 +118,7 @@ function MatchConfirmationCard({
             )}
           </div>
 
-          <div className="rounded-xl border border-border bg-background p-4 sm:col-span-2">
+          <div className="rounded-sm border border-border bg-background p-4 sm:col-span-2">
             <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
               {match.playingForCoca
                 ? "Cuota + monto extra"

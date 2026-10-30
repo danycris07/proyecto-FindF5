@@ -49,7 +49,7 @@ function DeleteMatchDialog({ match, userId, onClose, onDeleted }) {
       labelledBy="eliminar-partido-titulo"
     >
       {match && (
-        <section className="rounded-2xl border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] sm:p-6">
+        <section className="rounded-md border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] sm:p-6">
           <h2
             id="eliminar-partido-titulo"
             className="font-display text-2xl font-extrabold uppercase tracking-wider text-text-primary"
@@ -60,10 +60,12 @@ function DeleteMatchDialog({ match, userId, onClose, onDeleted }) {
             Va a desaparecer de las convocatorias.
           </p>
 
-          <dl className="mt-5 space-y-2 rounded-xl border border-border bg-background p-4 text-sm">
+          <dl className="mt-5 space-y-2 rounded-sm border border-border bg-background p-4 text-sm">
             <div className="flex justify-between gap-4">
               <dt className="text-text-secondary">Cancha</dt>
-              <dd className="font-semibold text-text-primary">{match.fieldName}</dd>
+              <dd className="font-semibold text-text-primary">
+                {match.fieldName}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-text-secondary">Día</dt>

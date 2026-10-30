@@ -18,7 +18,7 @@ function MatchFormCard({
       : "Armar partido";
   return (
     <section
-      className={`relative isolate overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none sm:p-8 ${
+      className={`relative isolate overflow-hidden rounded-md border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none sm:p-8 ${
         animated ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
       }`}
     >
@@ -37,7 +37,9 @@ function MatchFormCard({
             {title}
           </h1>
         )}
-        <p className="mt-3 max-w-xl text-sm leading-6 text-text-secondary">{desc}</p>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-text-secondary">
+          {desc}
+        </p>
 
         <form
           className="mt-8 space-y-6"
@@ -50,7 +52,7 @@ function MatchFormCard({
           {error && (
             <p
               role="alert"
-              className="rounded-xl border border-danger/40 bg-danger/10 p-4 text-sm text-danger"
+              className="rounded-sm border border-danger/40 bg-danger/10 p-4 text-sm text-danger"
             >
               {error}
             </p>

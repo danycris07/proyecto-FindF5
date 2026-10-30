@@ -42,7 +42,7 @@ export function Registro({ isLoading: loadingProp }) {
         <div
           role="status"
           aria-label="Cargando formulario de registro"
-          className="w-full max-w-md space-y-7 rounded-2xl border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
+          className="w-full max-w-md space-y-7 rounded-md border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
         >
           <div className="space-y-3">
             <Skeleton className="h-9 w-2/3" />
@@ -61,7 +61,7 @@ export function Registro({ isLoading: loadingProp }) {
         <form
           onSubmit={handleSubmit(onSubmit)}
           aria-busy={isSubmitting}
-          className="w-full max-w-md rounded-2xl border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
+          className="w-full max-w-md rounded-md border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
         >
           {/* Encabezado */}
           <div className="mb-7">
@@ -85,7 +85,7 @@ export function Registro({ isLoading: loadingProp }) {
                 type="text"
                 placeholder="Juan Pérez"
                 {...register("name")}
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
+                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
               />
             </div>
 
@@ -99,7 +99,7 @@ export function Registro({ isLoading: loadingProp }) {
                 type="email"
                 placeholder="juan@email.com"
                 {...register("email")}
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
+                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
               />
             </div>
 
@@ -113,7 +113,7 @@ export function Registro({ isLoading: loadingProp }) {
                 type="tel"
                 placeholder="+54 9 3704..."
                 {...register("phone")}
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
+                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
               />
             </div>
 
@@ -126,7 +126,7 @@ export function Registro({ isLoading: loadingProp }) {
               <input
                 type="password"
                 {...register("password")}
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
+                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
               />
             </div>
 
@@ -139,7 +139,7 @@ export function Registro({ isLoading: loadingProp }) {
               <select
                 {...register("role")}
                 defaultValue="PLAYER"
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
+                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
               >
                 <option value="PLAYER">Jugador</option>
                 <option value="FIELD_OWNER">Dueño de cancha</option>
@@ -149,7 +149,7 @@ export function Registro({ isLoading: loadingProp }) {
             {/* Botón */}
             <button
               type="submit"
-              className="mt-2 w-full rounded-lg border border-primary-foreground bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-lg shadow-[var(--primary-shadow)] transition hover:shadow-[var(--primary-shadow-strong)] active:scale-[0.98]"
+              className="mt-2 w-full rounded-sm border border-primary-foreground bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-lg shadow-[var(--primary-shadow)] transition hover:shadow-[var(--primary-shadow-strong)] active:scale-[0.98]"
             >
               Crear cuenta
             </button>

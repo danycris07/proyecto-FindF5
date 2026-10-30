@@ -59,7 +59,7 @@ export function Login({ isLoading: loadingProp }) {
         <div
           role="status"
           aria-label="Cargando formulario de inicio de sesión"
-          className="w-full max-w-md space-y-7 rounded-2xl border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
+          className="w-full max-w-md space-y-7 rounded-md border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
         >
           <div className="space-y-3">
             <Skeleton className="h-9 w-2/3" />
@@ -79,7 +79,7 @@ export function Login({ isLoading: loadingProp }) {
         <form
           onSubmit={handleSubmit(onSubmit)}
           aria-busy={isSubmitting}
-          className="w-full max-w-md rounded-2xl border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
+          className="w-full max-w-md rounded-md border border-border bg-surface p-7 shadow-2xl shadow-[var(--shadow-color)]"
         >
           {/* Encabezado */}
           <div className="mb-7">
@@ -101,7 +101,10 @@ export function Login({ isLoading: loadingProp }) {
           <div className="space-y-5">
             {/* Correo */}
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-text-primary">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-text-primary"
+              >
                 Correo electronico
               </label>
 
@@ -110,13 +113,16 @@ export function Login({ isLoading: loadingProp }) {
                 type="text"
                 placeholder="Correo@ejemplo.com"
                 {...register("email")}
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
+                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
               />
             </div>
 
             {/* contraseña */}
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-text-primary">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-text-primary"
+              >
                 Contraseña
               </label>
 
@@ -124,14 +130,14 @@ export function Login({ isLoading: loadingProp }) {
                 id="password"
                 type="password"
                 {...register("password")}
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
+                className="w-full rounded-sm border border-border bg-background px-4 py-3 text-text-primary placeholder:text-text-secondary outline-none transition focus:border-status focus:ring-2 focus:ring-status/20"
               />
             </div>
 
             {/* Botón */}
             <button
               type="submit"
-              className="mt-2 w-full rounded-lg border border-primary-foreground bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-lg shadow-[var(--primary-shadow)] transition hover:shadow-[var(--primary-shadow-strong)] active:scale-[0.98]"
+              className="mt-2 w-full rounded-sm border border-primary-foreground bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-lg shadow-[var(--primary-shadow)] transition hover:shadow-[var(--primary-shadow-strong)] active:scale-[0.98]"
             >
               Iniciar Sesion
             </button>

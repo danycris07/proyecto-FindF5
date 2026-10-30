@@ -238,7 +238,7 @@ function ArmarPartido({ embedded = false }) {
             <div
               role="status"
               aria-label="Cargando formulario"
-              className="w-full max-w-3xl space-y-8 overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] sm:p-8"
+              className="w-full max-w-3xl space-y-8 overflow-hidden rounded-md border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] sm:p-8"
             >
               <div className="space-y-2">
                 <Skeleton className="mt-4 h-10 w-3/4 rounded-sm sm:h-12" />
@@ -248,7 +248,7 @@ function ArmarPartido({ embedded = false }) {
                 {Array.from({ length: 5 }, (_, index) => (
                   <div key={index} className="space-y-2">
                     <Skeleton className="h-4 w-32 rounded-sm" />
-                    <Skeleton className="h-12 w-full rounded-xl" />
+                    <Skeleton className="h-12 w-full rounded-sm" />
                   </div>
                 ))}
               </div>
@@ -262,7 +262,7 @@ function ArmarPartido({ embedded = false }) {
       {/* Modal flotante de aviso al cambiar condiciones clave */}
       {confirmDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6 shadow-2xl shadow-[var(--shadow-color)]">
+          <div className="w-full max-w-sm rounded-md border border-border bg-surface p-6 shadow-2xl shadow-[var(--shadow-color)]">
             <h3 className="font-display text-2xl font-extrabold uppercase tracking-wider text-text-primary">
               Aviso importante
             </h3>
