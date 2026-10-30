@@ -28,9 +28,50 @@ function etiquetaDia(date) {
   return null;
 }
 
+const MAX_FALTAN_URGENTE = 2;
+
+function EstadoCupos({ faltan, urgente }) {
+  if (faltan === 0) {
+    return (
+      <p className="inline-flex items-center gap-1.5 rounded-sm border border-status/40 bg-status/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-status">
+        <GoPeople aria-hidden="true" />
+        Cancha llena
+      </p>
+    );
+  }
+
+  const tono = urgente
+    ? "border-primary-text/50 bg-primary-text/10 text-primary-text"
+    : "border-border bg-background text-text-primary";
+
+  return (
+    <p
+      className={`inline-flex items-center gap-2 rounded-sm border px-2.5 py-1 ${tono}`}
+    >
+      {urgente && (
+        <span aria-hidden="true" className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-text opacity-75 motion-reduce:animate-none" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-text" />
+        </span>
+      )}
+      <span className="text-xs font-bold uppercase tracking-wider">
+        {faltan === 1 ? "Falta" : "Faltan"}
+      </span>
+      <span className="font-display text-2xl font-extrabold leading-none tabular-nums">
+        {faltan}
+      </span>
+      <span className="sr-only">{faltan === 1 ? "jugador" : "jugadores"}</span>
+    </p>
+  );
+}
+
 function MatchCard({ match, onSelect }) {
   const { semana, numero, mes } = partesFecha(match.date);
   const etiqueta = etiquetaDia(match.date);
+  const urgente =
+    etiqueta === "Hoy" &&
+    match.missingPlayers > 0 &&
+    match.missingPlayers <= MAX_FALTAN_URGENTE;
 
   return (
     <button
@@ -64,19 +105,12 @@ function MatchCard({ match, onSelect }) {
           {match.startTime.slice(0, 5)} hs
         </p>
 
-        <div className="mt-3 flex items-end justify-between gap-3">
-          <p className="font-display text-xl font-extrabold tabular-nums text-primary-text">
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <p className="font-display text-xl font-extrabold tabular-nums text-text-primary">
             {currencyFormatter.format(match.pricePerPlayer)}
           </p>
           {match.missingPlayers !== undefined && (
-            <p
-              className={`flex items-center gap-1.5 text-sm tabular-nums font-semibold ${match.missingPlayers === 0 ? "text-status" : "text-text-secondary"}`}
-            >
-              <GoPeople aria-hidden="true" />
-              {match.missingPlayers > 0
-                ? `Faltan ${match.missingPlayers}`
-                : "Cancha llena"}
-            </p>
+            <EstadoCupos faltan={match.missingPlayers} urgente={urgente} />
           )}
         </div>
       </div>
