@@ -114,7 +114,7 @@ function PartidoPublicado() {
       ) : error ? (
         <section className="mx-auto w-full max-w-3xl rounded-sm border border-border bg-surface p-5 sm:p-8">
           <div role="alert" className="space-y-5">
-            <p className="text-red-300">{error}</p>
+            <p className="text-danger">{error}</p>
             <Link
               to="/partidos"
               className="font-semibold text-text-primary underline"

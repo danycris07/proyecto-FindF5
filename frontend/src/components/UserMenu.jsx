@@ -82,7 +82,7 @@ function UserMenu() {
         aria-expanded={open}
         aria-controls="user-menu-panel"
         onClick={() => setOpen((current) => !current)}
-        className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface font-bold text-primary shadow-lg shadow-[var(--shadow-color)] transition-colors hover:border-status focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
+        className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface font-bold text-primary-text shadow-lg shadow-[var(--shadow-color)] transition-colors hover:border-status focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
       >
         {initials || "U"}
       </button>
@@ -167,7 +167,7 @@ function UserMenu() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-red-400/60 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-300 transition-colors hover:border-red-300 hover:bg-red-500/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-danger/60 bg-danger/10 px-4 py-2 text-sm font-bold text-danger transition-colors hover:border-danger hover:bg-danger/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
               >
                 <LuLogOut aria-hidden="true" className="h-4 w-4" />
                 Cerrar sesión

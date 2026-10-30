@@ -7,6 +7,8 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-status: var(--status);
+  --color-primary-text: var(--primary-text);
+  --color-danger: var(--danger);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --font-display: "Barlow Semi Condensed", sans-serif;
@@ -20,6 +22,8 @@
   --primary: #CCFF00;
   --primary-foreground: #0B0F19;
   --status: #00E5FF;
+  --primary-text: #CCFF00;
+  --danger: #FCA5A5;
   --text-primary: #F1F5F9;
   --text-secondary: #94A3B8;
   --glow: rgba(204, 255, 0, 0.08);
@@ -55,6 +59,8 @@
   --primary: #CCFF00;
   --primary-foreground: #0B0F19;
   --status: #0E7490;
+  --primary-text: #3F6212;
+  --danger: #B91C1C;
   --text-primary: #0B0F19;
   --text-secondary: #334155;
   --glow: rgba(14, 116, 144, 0.08);

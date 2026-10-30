@@ -20,10 +20,10 @@ function CocaOptionField({
 }) {
   return (
     <div className="sm:col-span-2">
-      <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
         <label
           htmlFor="jugarPorLaCoca"
-          className="flex min-h-12 cursor-pointer items-center gap-3 text-sm font-semibold text-white"
+          className="flex min-h-12 cursor-pointer items-center gap-3 text-sm font-semibold text-text-primary"
         >
           <input
             id="jugarPorLaCoca"
@@ -34,15 +34,15 @@ function CocaOptionField({
           />
           <span
             aria-hidden="true"
-            className="relative h-7 w-12 rounded-full border border-slate-600 bg-slate-800 transition after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-slate-400 after:transition peer-checked:border-[#CCFF00] peer-checked:bg-[#CCFF00]/20 peer-checked:after:translate-x-5 peer-checked:after:bg-[#CCFF00] peer-focus-visible:ring-2 peer-focus-visible:ring-[#CCFF00] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-slate-950"
+            className="relative h-7 w-12 rounded-full border border-border bg-surface transition after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-text-secondary after:transition peer-checked:border-[#CCFF00] peer-checked:bg-[#CCFF00]/20 peer-checked:after:translate-x-5 peer-checked:after:bg-[#CCFF00] peer-focus-visible:ring-2 peer-focus-visible:ring-status peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-surface"
           />
           Jugar por la coca
         </label>
         <span
           className={`rounded-sm px-2 py-1 text-xs font-bold uppercase tracking-wider ${
             enabled
-              ? "bg-[#CCFF00]/15 text-[#CCFF00]"
-              : "bg-slate-800 text-slate-400"
+              ? "bg-primary/15 text-primary-text"
+              : "bg-surface text-text-secondary"
           }`}
         >
           {enabled ? "Activado" : "Desactivado"}
@@ -76,17 +76,17 @@ function CocaOptionField({
             </MatchFormField>
           </div>
 
-          <dl className="mt-4 grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 rounded-xl border border-slate-800 bg-slate-950/70 p-4 text-sm tabular-nums sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto]">
-            <dt className="text-slate-400">Cuota</dt>
-            <dd className="text-right text-white">
+          <dl className="mt-4 grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 rounded-xl border border-border bg-background p-4 text-sm tabular-nums sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto]">
+            <dt className="text-text-secondary">Cuota</dt>
+            <dd className="text-right text-text-primary">
               {formatAmount(baseAmount)}
             </dd>
-            <dt className="text-slate-400 sm:text-right">Extra por jugador</dt>
-            <dd className="text-right text-white">
+            <dt className="text-text-secondary sm:text-right">Extra por jugador</dt>
+            <dd className="text-right text-text-primary">
               {formatAmount(extraAmount)}
             </dd>
-            <dt className="font-semibold text-slate-300">Total por jugador</dt>
-            <dd className="text-right font-bold text-[#CCFF00]">
+            <dt className="font-semibold text-text-primary">Total por jugador</dt>
+            <dd className="text-right font-bold text-primary-text">
               {formatAmount(totalAmount)}
             </dd>
           </dl>

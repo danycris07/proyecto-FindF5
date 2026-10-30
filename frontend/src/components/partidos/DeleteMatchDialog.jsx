@@ -49,38 +49,38 @@ function DeleteMatchDialog({ match, userId, onClose, onDeleted }) {
       labelledBy="eliminar-partido-titulo"
     >
       {match && (
-        <section className="rounded-2xl border border-slate-800 bg-[#111827] p-5 shadow-2xl shadow-black/40 sm:p-6">
+        <section className="rounded-2xl border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] sm:p-6">
           <h2
             id="eliminar-partido-titulo"
-            className="font-display text-2xl font-extrabold uppercase tracking-wider text-white"
+            className="font-display text-2xl font-extrabold uppercase tracking-wider text-text-primary"
           >
             ¿Eliminar este partido?
           </h2>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm text-text-secondary">
             Va a desaparecer de las convocatorias.
           </p>
 
-          <dl className="mt-5 space-y-2 rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-sm">
+          <dl className="mt-5 space-y-2 rounded-xl border border-border bg-background p-4 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-slate-400">Cancha</dt>
-              <dd className="font-semibold text-white">{match.fieldName}</dd>
+              <dt className="text-text-secondary">Cancha</dt>
+              <dd className="font-semibold text-text-primary">{match.fieldName}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-slate-400">Día</dt>
-              <dd className="font-semibold capitalize text-white">
+              <dt className="text-text-secondary">Día</dt>
+              <dd className="font-semibold capitalize text-text-primary">
                 {formatoFecha(match.date)}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-slate-400">Hora</dt>
-              <dd className="font-semibold tabular-nums text-white">
+              <dt className="text-text-secondary">Hora</dt>
+              <dd className="font-semibold tabular-nums text-text-primary">
                 {match.startTime.slice(0, 5)} hs
               </dd>
             </div>
           </dl>
 
           {error && (
-            <p role="alert" className="mt-4 text-sm text-red-300">
+            <p role="alert" className="mt-4 text-sm text-danger">
               {error}
             </p>
           )}
@@ -91,7 +91,7 @@ function DeleteMatchDialog({ match, userId, onClose, onDeleted }) {
               type="button"
               onClick={cerrar}
               disabled={eliminando}
-              className={`${BTN} border-slate-700 text-white hover:border-white`}
+              className={`${BTN} border-border text-text-primary hover:border-text-primary`}
             >
               Cancelar
             </button>
@@ -99,7 +99,7 @@ function DeleteMatchDialog({ match, userId, onClose, onDeleted }) {
               type="button"
               onClick={confirmar}
               disabled={eliminando}
-              className={`${BTN} border-red-400/60 bg-red-500/10 text-red-300 hover:bg-red-500/20`}
+              className={`${BTN} border-danger/60 bg-danger/10 text-danger hover:bg-danger/20`}
             >
               {eliminando ? "Eliminando..." : "Eliminar"}
             </button>
