@@ -52,6 +52,7 @@ function ArmarPartido({ embedded = false }) {
     control,
     clearErrors,
     setError,
+    setValue,
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -198,6 +199,7 @@ function ArmarPartido({ embedded = false }) {
       totalPorJugador={totalPorJugador}
       isEditMode={isEditMode}
       jugadoresEsperadosValue={jugadoresEsperadosValue}
+      setValue={setValue}
     />
   );
 

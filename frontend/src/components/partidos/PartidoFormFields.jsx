@@ -1,6 +1,9 @@
 import CocaOptionField from "./CocaOptionField.jsx";
 import MatchFormField, { inputClassName } from "./MatchFormField.jsx";
 
+// Total de jugadores del partido: 10 = 5 contra 5, 12 = 6 contra 6, etc.
+const PRESETS_JUGADORES = [8, 10, 12, 14];
+
 function PartidoFormFields({
   register,
   errors,
@@ -18,6 +21,7 @@ function PartidoFormFields({
   totalPorJugador,
   isEditMode,
   jugadoresEsperadosValue,
+  setValue,
 }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2">
@@ -109,6 +113,35 @@ function PartidoFormFields({
         label="Jugadores esperados"
         error={errors.jugadoresEsperados?.message}
       >
+        <div
+          role="group"
+          aria-label="Cantidades habituales de jugadores"
+          className="mt-2 flex flex-wrap gap-2"
+        >
+          {PRESETS_JUGADORES.map((cantidad) => {
+            const seleccionado = Number(jugadoresEsperadosValue) === cantidad;
+            return (
+              <button
+                key={cantidad}
+                type="button"
+                aria-pressed={seleccionado}
+                onClick={() =>
+                  setValue("jugadoresEsperados", cantidad, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+                className={`min-h-10 min-w-12 rounded-sm border px-3 font-display text-lg font-extrabold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status motion-reduce:transition-none ${
+                  seleccionado
+                    ? "border-primary-foreground bg-primary text-primary-foreground"
+                    : "border-border bg-surface text-text-primary hover:border-status"
+                }`}
+              >
+                {cantidad}
+              </button>
+            );
+          })}
+        </div>
         <input
           id="jugadoresEsperados"
           type="number"
@@ -128,6 +161,9 @@ function PartidoFormFields({
               "Ingresá un número entero mayor que 0.",
           })}
         />
+        <p className="mt-2 text-xs text-text-secondary">
+          Total de jugadores: 10 es un 5 contra 5. Elegí uno o escribí otro número.
+        </p>
       </MatchFormField>
 
       {isEditMode && (
