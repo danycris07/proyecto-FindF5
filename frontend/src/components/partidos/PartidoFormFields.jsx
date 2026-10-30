@@ -52,18 +52,18 @@ function PartidoFormFields({
             ))}
           </datalist>
           {canchasError ? (
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-red-400">
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-danger">
               <p role="alert">{canchasError}</p>
               <button
                 type="button"
                 onClick={onRetryCanchas}
-                className="font-semibold text-[#CCFF00] underline underline-offset-4"
+                className="font-semibold text-primary-text underline underline-offset-4"
               >
                 Reintentar
               </button>
             </div>
           ) : canchas.length === 0 && !canchasLoading ? (
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-text-secondary">
               No hay canchas sugeridas; podés escribir el nombre.
             </p>
           ) : null}

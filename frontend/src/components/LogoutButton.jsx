@@ -13,7 +13,7 @@ function LogoutButton() {
     <button
       type="button"
       onClick={handleLogout}
-      className="inline-flex min-h-10 items-center justify-center rounded-sm border border-red-400/60 bg-red-500/10 px-4 py-2 text-xs font-extrabold uppercase tracking-wider text-red-300 transition-colors hover:border-red-300 hover:bg-red-500/20 cursor-alias"
+      className="inline-flex min-h-10 items-center justify-center rounded-sm border border-danger/60 bg-danger/10 px-4 py-2 text-xs font-extrabold uppercase tracking-wider text-danger transition-colors hover:border-danger hover:bg-danger/20 cursor-alias"
     >
       Cerrar sesión
     </button>

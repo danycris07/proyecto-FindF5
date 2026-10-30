@@ -238,17 +238,17 @@ function ArmarPartido({ embedded = false }) {
             <div
               role="status"
               aria-label="Cargando formulario"
-              className="w-full max-w-3xl space-y-8 overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#111827] to-[#0B0F19] p-5 shadow-2xl shadow-black/40 sm:p-8"
+              className="w-full max-w-3xl space-y-8 overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] sm:p-8"
             >
               <div className="space-y-2">
-                <Skeleton className="mt-4 h-10 w-3/4 rounded-sm bg-slate-700 sm:h-12" />
-                <Skeleton className="h-4 w-full max-w-xl rounded-sm bg-slate-800" />
+                <Skeleton className="mt-4 h-10 w-3/4 rounded-sm sm:h-12" />
+                <Skeleton className="h-4 w-full max-w-xl rounded-sm" />
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
                 {Array.from({ length: 5 }, (_, index) => (
                   <div key={index} className="space-y-2">
-                    <Skeleton className="h-4 w-32 rounded-sm bg-slate-700" />
-                    <Skeleton className="h-12 w-full rounded-xl bg-slate-800" />
+                    <Skeleton className="h-4 w-32 rounded-sm" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
                   </div>
                 ))}
               </div>
@@ -262,11 +262,11 @@ function ArmarPartido({ embedded = false }) {
       {/* Modal flotante de aviso al cambiar condiciones clave */}
       {confirmDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-[#111827] p-6 shadow-2xl">
-            <h3 className="font-display text-2xl font-extrabold uppercase tracking-wider text-white">
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6 shadow-2xl shadow-[var(--shadow-color)]">
+            <h3 className="font-display text-2xl font-extrabold uppercase tracking-wider text-text-primary">
               Aviso importante
             </h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-300">
+            <p className="mt-2 text-sm leading-relaxed text-text-secondary">
               Estás por modificar datos clave (cancha, fecha, hora o cuota) en
               un partido que ya tiene jugadores anotados. Se les notificará el
               cambio de condiciones.
@@ -275,14 +275,14 @@ function ArmarPartido({ embedded = false }) {
               <button
                 type="button"
                 onClick={() => setConfirmDialog(false)}
-                className="px-4 py-2 text-sm font-semibold text-slate-300 hover:text-white"
+                className="px-4 py-2 text-sm font-semibold text-text-primary hover:text-text-primary"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={() => executeSave(pendingData)}
-                className="rounded-sm bg-primary px-4 py-2 text-sm font-extrabold uppercase tracking-wider text-black transition-transform hover:-translate-y-0.5"
+                className="rounded-sm bg-primary px-4 py-2 text-sm font-extrabold uppercase tracking-wider text-primary-foreground transition-transform hover:-translate-y-0.5"
               >
                 Confirmar y guardar
               </button>

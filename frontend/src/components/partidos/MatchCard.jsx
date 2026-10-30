@@ -65,7 +65,7 @@ function MatchCard({ match, onSelect }) {
         </p>
 
         <div className="mt-3 flex items-end justify-between gap-3">
-          <p className="font-display text-xl font-extrabold tabular-nums text-primary">
+          <p className="font-display text-xl font-extrabold tabular-nums text-primary-text">
             {currencyFormatter.format(match.pricePerPlayer)}
           </p>
           {match.missingPlayers !== undefined && (

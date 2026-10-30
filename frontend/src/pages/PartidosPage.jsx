@@ -164,7 +164,7 @@ function PartidosPage() {
           )}
 
           {estado.status === "error" && (
-            <p role="alert" className="text-red-300">
+            <p role="alert" className="text-danger">
               {estado.error}
             </p>
           )}
@@ -175,7 +175,7 @@ function PartidosPage() {
                 type="button"
                 onClick={handleOpenForm}
                 disabled={openingForm}
-                className="flex min-h-32 w-full flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-border text-text-secondary transition-colors hover:border-primary hover:text-primary disabled:cursor-wait disabled:opacity-60"
+                className="flex min-h-32 w-full flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-border text-text-secondary transition-colors hover:border-primary hover:text-primary-text disabled:cursor-wait disabled:opacity-60"
               >
                 <GoPlus aria-hidden="true" className="text-2xl" />
                 <span className="font-display text-lg font-bold uppercase tracking-wider">
@@ -198,7 +198,7 @@ function PartidosPage() {
                 type="button"
                 onClick={handleOpenForm}
                 disabled={openingForm}
-                className="flex min-h-32 w-full flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-border text-text-secondary transition-colors hover:border-primary hover:text-primary disabled:cursor-wait disabled:opacity-60"
+                className="flex min-h-32 w-full flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-border text-text-secondary transition-colors hover:border-primary hover:text-primary-text disabled:cursor-wait disabled:opacity-60"
               >
                 <GoPlus aria-hidden="true" className="text-2xl" />
                 <span className="font-display text-lg font-bold uppercase tracking-wider">
