@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import DeleteMatchDialog from "./DeleteMatchDialog.jsx";
 
 function MatchModal({
   open,
@@ -10,7 +9,6 @@ function MatchModal({
   labelledBy,
 }) {
   const dialogRef = useRef(null);
-  const animationDuration = 300; // Duración de la animación en milisegundos
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -31,14 +29,7 @@ function MatchModal({
       onClick={(event) => {
         if (dismissible && event.target === dialogRef.current) onClose();
       }}
-      className={
-        animationDuration
-          ? `fixed inset-0 m-auto w-full ${size} bg-transparent p-4 ...resto igual... ${open ? "opacity-100" : "opacity-0"}`
-          : "...igual..."
-      }
-      style={{
-        animationDuration: `${animationDuration}ms`,
-      }}
+      className={`fixed inset-0 m-auto max-h-dvh w-full ${size} overflow-y-auto bg-transparent p-4 text-text-primary opacity-100 transition-opacity duration-300 backdrop:bg-black/60 backdrop:backdrop-blur-sm starting:open:opacity-0 motion-reduce:transition-none`}
     >
       {open && children}
     </dialog>
