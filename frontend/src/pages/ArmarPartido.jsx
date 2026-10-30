@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import ConfirmEditDialog from "../components/partidos/ConfirmEditDialog.jsx";
 import MatchFormCard from "../components/partidos/MatchFormCard.jsx";
 import PartidoFormFields from "../components/partidos/PartidoFormFields.jsx";
 import {
@@ -212,6 +213,7 @@ function ArmarPartido({ embedded = false }) {
       fields={fields}
       error={errorEnvio}
       isEditMode={isEditMode}
+      matchName={originalMatch?.fieldName}
     />
   );
 
@@ -261,37 +263,15 @@ function ArmarPartido({ embedded = false }) {
         </div>
       </div>
 
-      {/* Modal flotante de aviso al cambiar condiciones clave */}
-      {confirmDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-md border border-border bg-surface p-6 shadow-2xl shadow-[var(--shadow-color)]">
-            <h3 className="font-display text-2xl font-extrabold uppercase tracking-wider text-text-primary">
-              Aviso importante
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-              Estás por modificar datos clave (cancha, fecha, hora o cuota) en
-              un partido que ya tiene jugadores anotados. Se les notificará el
-              cambio de condiciones.
-            </p>
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setConfirmDialog(false)}
-                className="px-4 py-2 text-sm font-semibold text-text-primary hover:text-text-primary"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={() => executeSave(pendingData)}
-                className="rounded-sm bg-primary px-4 py-2 text-sm font-extrabold uppercase tracking-wider text-primary-foreground transition-transform hover:-translate-y-0.5"
-              >
-                Confirmar y guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
+      {/* Aviso al cambiar condiciones clave de un partido con jugadores */}
+      <ConfirmEditDialog
+        open={confirmDialog}
+        original={originalMatch}
+        data={pendingData}
+        onCancel={() => setConfirmDialog(false)}
+        onConfirm={() => executeSave(pendingData)}
+      />
     </main>
   );
 }

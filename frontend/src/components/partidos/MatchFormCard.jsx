@@ -6,10 +6,11 @@ function MatchFormCard({
   fields,
   error,
   isEditMode,
+  matchName,
 }) {
   const title = isEditMode ? "Editar partido" : "Armar partido";
   const desc = isEditMode
-    ? "Actualizá los datos o corregí imprevistos."
+    ? `${matchName ? `Estás editando tu partido en ${matchName}. ` : ""}Actualizá los datos o corregí imprevistos.`
     : "Dejá la cancha, el horario y la cuota listos para que el equipo se sume.";
   const btnText = isSubmitting
     ? "Guardando..."
@@ -37,9 +38,7 @@ function MatchFormCard({
             {title}
           </h1>
         )}
-        <p className="mt-3 max-w-xl text-sm leading-6 text-text-secondary">
-          {desc}
-        </p>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-text-secondary">{desc}</p>
 
         <form
           className="mt-8 space-y-6"
