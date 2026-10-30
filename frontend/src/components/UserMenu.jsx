@@ -82,7 +82,7 @@ function UserMenu() {
         aria-expanded={open}
         aria-controls="user-menu-panel"
         onClick={() => setOpen((current) => !current)}
-        className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface font-bold text-primary-text shadow-lg shadow-[var(--shadow-color)] transition-colors hover:border-status focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
+        className="flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-surface font-bold text-primary-text shadow-lg shadow-[var(--shadow-color)] transition-colors hover:border-status focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
       >
         {initials || "U"}
       </button>

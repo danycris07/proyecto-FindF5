@@ -9,12 +9,10 @@ function CardNav({ items, ease = "power3.out" }) {
   const navigate = useNavigate();
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [loadingPath, setLoadingPath] = useState(null);
   const navRef = useRef(null);
   const containerRef = useRef(null);
   const cardsRef = useRef([]);
   const timelineRef = useRef(null);
-  const navigationTimeoutRef = useRef(null);
   const isExpandedRef = useRef(false);
 
   const calculateHeight = () => {
@@ -55,7 +53,6 @@ function CardNav({ items, ease = "power3.out" }) {
     timelineRef.current = timeline;
     return () => {
       timeline?.kill();
-      if (navigationTimeoutRef.current) window.clearTimeout(navigationTimeoutRef.current);
     };
   }, [ease, items]);
 
@@ -110,14 +107,8 @@ function CardNav({ items, ease = "power3.out" }) {
   };
 
   const handleNavigate = (path) => {
-    if (loadingPath || navigationTimeoutRef.current) return;
-    setLoadingPath(path);
     closeMenu();
-    navigationTimeoutRef.current = window.setTimeout(() => {
-      navigate(path);
-      setLoadingPath(null);
-      navigationTimeoutRef.current = null;
-    }, 800);
+    navigate(path);
   };
 
   return (
@@ -130,17 +121,15 @@ function CardNav({ items, ease = "power3.out" }) {
               type="button"
               className="card-nav-cta-button"
               onClick={() => handleNavigate("/registro")}
-              disabled={loadingPath !== null}
             >
-              {loadingPath === "/registro" ? "Cargando..." : "Registrarme"}
+              Registrarme
             </button>
             <button
               type="button"
               className="card-nav-login-button"
               onClick={() => handleNavigate("/login")}
-              disabled={loadingPath !== null}
             >
-              {loadingPath === "/login" ? "Cargando..." : "Iniciar Sesion"}
+              Iniciar sesión
             </button>
             <button
               type="button"
@@ -195,17 +184,15 @@ function CardNav({ items, ease = "power3.out" }) {
               type="button"
               className="card-nav-mobile-action card-nav-mobile-action-primary"
               onClick={() => handleNavigate("/registro")}
-              disabled={loadingPath !== null}
             >
-              {loadingPath === "/registro" ? "Cargando..." : "Registrarme"}
+              Registrarme
             </button>
             <button
               type="button"
               className="card-nav-mobile-action"
               onClick={() => handleNavigate("/login")}
-              disabled={loadingPath !== null}
             >
-              {loadingPath === "/login" ? "Cargando..." : "Iniciar Sesion"}
+              Iniciar sesión
             </button>
           </div>
         </div>
