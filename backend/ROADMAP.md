@@ -75,13 +75,14 @@ Verificación real de MySQL confirmada por el usuario con su configuración loca
 - [x] Proteger la cuenta propia y asegurar que quede un administrador activo.
 - [x] Probar operaciones, roles y cambios principales contra MySQL local.
 
-### 6. Integración con el frontend
+### 6. Integración con el frontend — completada
 
-- Adaptar los servicios existentes para usar `import.meta.env.VITE_API_URL`.
-- Mantener mocks como fallback de consultas cuando falle la API.
-- En las escrituras, mostrar errores reales sin reportar éxito local no
-  sincronizado con el backend.
-- Verificar estados de carga, error y vacío en las pantallas afectadas.
+- [x] Adaptar los servicios de sesión, partidos y canchas para usar la URL de
+  `import.meta.env.VITE_API_URL`.
+- [x] Mantener mocks como fallback solo para consultas cuando falle la API.
+- [x] En las escrituras, informar errores reales sin simular éxito local.
+- [x] Conectar el panel administrador al CRUD de usuarios, canchas y partidos.
+- [x] Verificar estados de carga, error y vacío en las pantallas afectadas.
 
 ### 7. Validación y cierre del recorrido
 
@@ -104,5 +105,5 @@ que se acuerde incorporarlas expresamente.
 - [x] Etapa 3: usuarios y autenticación.
 - [x] Etapa 4: partidos y participación.
 - [x] Etapa 5: administración.
-- [ ] Etapa 6: integración con el frontend.
+- [x] Etapa 6: integración con el frontend.
 - [ ] Etapa 7: validación y cierre.
