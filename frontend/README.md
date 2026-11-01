@@ -51,3 +51,8 @@ En el formulario administrativo de canchas, el botón de mapa abre un selector
 OpenStreetMap para marcar o arrastrar el pin; las coordenadas y la dirección se
 completan automáticamente y siguen siendo editables. El mapa requiere conexión
 a internet.
+
+Los formularios públicos validan datos de registro e inicio de sesión. Para
+publicar o editar partidos se exigen cuotas enteras positivas y un total de
+entre 5 y 24 jugadores; una nueva convocatoria debe conservar al menos un cupo
+abierto.

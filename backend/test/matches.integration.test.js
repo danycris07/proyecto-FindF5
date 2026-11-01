@@ -101,12 +101,12 @@ test(
         date: futureDateInArgentina(),
         startTime: "23:59",
         endTime: "23:59:30",
-        expectedPlayers: 2,
+        expectedPlayers: 5,
         playingForCoca: true,
         basePricePerPlayer: 1500,
         cocaAmountPerPlayer: 200,
         organizerPlays: true,
-        outsideSlots: 0,
+        outsideSlots: 3,
       };
 
       const anonymous = await request("/");
@@ -139,6 +139,48 @@ test(
         body: validMatch,
       });
       assert.equal(ownerCreate.response.status, 403);
+
+      const tooFewPlayers = await request("/", {
+        actor: "organizer",
+        method: "POST",
+        body: { ...validMatch, expectedPlayers: 4 },
+      });
+      assert.equal(tooFewPlayers.response.status, 400);
+
+      const tooManyPlayers = await request("/", {
+        actor: "organizer",
+        method: "POST",
+        body: { ...validMatch, expectedPlayers: 25 },
+      });
+      assert.equal(tooManyPlayers.response.status, 400);
+
+      const zeroPrice = await request("/", {
+        actor: "organizer",
+        method: "POST",
+        body: { ...validMatch, basePricePerPlayer: 0 },
+      });
+      assert.equal(zeroPrice.response.status, 400);
+
+      const decimalPrice = await request("/", {
+        actor: "organizer",
+        method: "POST",
+        body: { ...validMatch, basePricePerPlayer: 1500.5 },
+      });
+      assert.equal(decimalPrice.response.status, 400);
+
+      const decimalCocaAmount = await request("/", {
+        actor: "organizer",
+        method: "POST",
+        body: { ...validMatch, cocaAmountPerPlayer: 200.5 },
+      });
+      assert.equal(decimalCocaAmount.response.status, 400);
+
+      const noOpenSlots = await request("/", {
+        actor: "organizer",
+        method: "POST",
+        body: { ...validMatch, outsideSlots: 4 },
+      });
+      assert.equal(noOpenSlots.response.status, 422);
 
       const created = await request("/", {
         actor: "organizer",
@@ -233,29 +275,22 @@ test(
           ...validMatch,
           fieldName: "Cancha actualizada",
           date: futureDateInArgentina(6),
-          expectedPlayers: 3,
+          expectedPlayers: 5,
+          outsideSlots: 3,
         },
       });
       assert.equal(updated.response.status, 200);
       assert.equal(updated.payload.match.fieldName, "Cancha actualizada");
-      assert.equal(updated.payload.match.missingPlayers, 2);
+      assert.equal(updated.payload.match.missingPlayers, 1);
 
       const outsideSlot = await request(`/${matchId}/outside-slots`, {
         actor: "organizer",
         method: "POST",
       });
       assert.equal(outsideSlot.response.status, 200);
-      assert.equal(outsideSlot.payload.match.outsideSlots, 1);
-      assert.equal(outsideSlot.payload.match.missingPlayers, 1);
-      assert.equal(outsideSlot.payload.match.status, "OPEN");
-
-      const lastOutsideSlot = await request(`/${matchId}/outside-slots`, {
-        actor: "organizer",
-        method: "POST",
-      });
-      assert.equal(lastOutsideSlot.response.status, 200);
-      assert.equal(lastOutsideSlot.payload.match.missingPlayers, 0);
-      assert.equal(lastOutsideSlot.payload.match.status, "COMPLETE");
+      assert.equal(outsideSlot.payload.match.outsideSlots, 4);
+      assert.equal(outsideSlot.payload.match.missingPlayers, 0);
+      assert.equal(outsideSlot.payload.match.status, "COMPLETE");
 
       const extraOutsideSlot = await request(`/${matchId}/outside-slots`, {
         actor: "organizer",

@@ -1,4 +1,6 @@
 const ARGENTINA_TIME_ZONE = "America/Argentina/Buenos_Aires";
+export const MIN_EXPECTED_PLAYERS = 5;
+export const MAX_EXPECTED_PLAYERS = 24;
 
 export function isFutureMatch(date, time, now = new Date()) {
   const argentinaDate = new Intl.DateTimeFormat("en-CA", {
@@ -126,4 +128,35 @@ export function normalizeMatchInput(body) {
     cocaAmountPerPlayer,
     pricePerPlayer,
   };
+}
+
+export function normalizePublicMatchInput(body, { requireOpenSlot = false } = {}) {
+  const values = normalizeMatchInput(body);
+  if (
+    values.expectedPlayers < MIN_EXPECTED_PLAYERS ||
+    values.expectedPlayers > MAX_EXPECTED_PLAYERS
+  ) {
+    throw new Error(
+      `El partido debe tener entre ${MIN_EXPECTED_PLAYERS} y ${MAX_EXPECTED_PLAYERS} jugadores esperados.`,
+    );
+  }
+  if (values.basePricePerPlayer <= 0) {
+    throw new Error("La cuota por jugador debe ser mayor que 0.");
+  }
+  if (!Number.isInteger(values.basePricePerPlayer)) {
+    throw new Error("La cuota por jugador debe ser un importe entero.");
+  }
+  if (
+    values.playingForCoca &&
+    !Number.isInteger(values.cocaAmountPerPlayer)
+  ) {
+    throw new Error("El monto extra debe ser un importe entero.");
+  }
+  if (requireOpenSlot && getMissingPlayers(values, 0) < 1) {
+    throw new Error(
+      "Dejá al menos un cupo disponible para que otros jugadores puedan sumarse.",
+    );
+  }
+
+  return values;
 }

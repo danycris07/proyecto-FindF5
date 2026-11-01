@@ -6,7 +6,9 @@ import {
   getMatchResponse,
   getMatchStatus,
   isFutureMatch,
-  normalizeMatchInput,
+  MAX_EXPECTED_PLAYERS,
+  MIN_EXPECTED_PLAYERS,
+  normalizePublicMatchInput,
 } from "../services/match-rules.js";
 
 function validationErrors(request, response, next) {
@@ -110,6 +112,22 @@ export const matchInputValidation = [
     }
     return true;
   }),
+];
+
+const publicMatchInputValidation = [
+  ...matchInputValidation,
+  body("expectedPlayers")
+    .isInt({ min: MIN_EXPECTED_PLAYERS, max: MAX_EXPECTED_PLAYERS })
+    .withMessage(
+      `El partido debe tener entre ${MIN_EXPECTED_PLAYERS} y ${MAX_EXPECTED_PLAYERS} jugadores esperados.`,
+    ),
+  body("basePricePerPlayer")
+    .isInt({ min: 1, max: 99999999 })
+    .withMessage("La cuota por jugador debe ser un importe entero mayor que 0."),
+  body("cocaAmountPerPlayer")
+    .if((value, { req }) => req.body.playingForCoca === true)
+    .isInt({ min: 1, max: 99999999 })
+    .withMessage("El monto extra debe ser un importe entero mayor que 0."),
 ];
 
 function isValidTime(value) {
@@ -264,12 +282,14 @@ export function createMatchesRouter({ models, sequelize }) {
   router.post(
     "/",
     requirePlayer,
-    matchInputValidation,
+    publicMatchInputValidation,
     validationErrors,
     async (request, response) => {
       let values;
       try {
-        values = normalizeMatchInput(request.body);
+        values = normalizePublicMatchInput(request.body, {
+          requireOpenSlot: true,
+        });
         requireFutureMatch(values);
       } catch (error) {
         return response
@@ -342,11 +362,11 @@ export function createMatchesRouter({ models, sequelize }) {
     "/:matchId",
     requirePlayer,
     matchIdValidation,
-    matchInputValidation,
+    publicMatchInputValidation,
     validationErrors,
     async (request, response) => {
       try {
-        const values = normalizeMatchInput(request.body);
+        const values = normalizePublicMatchInput(request.body);
         requireFutureMatch(values);
         const updated = await sequelize.transaction(async (transaction) => {
           const match = await findMatchForUpdate(

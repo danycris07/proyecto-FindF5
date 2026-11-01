@@ -55,6 +55,7 @@ function ArmarPartido({ embedded = false }) {
     clearErrors,
     setError,
     setValue,
+    trigger,
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -235,6 +236,7 @@ function ArmarPartido({ embedded = false }) {
   const fields = (
     <PartidoFormFields
       register={register}
+      trigger={trigger}
       errors={errors}
       canchas={canchas}
       canchasLoading={canchasLoading}
@@ -249,10 +251,12 @@ function ArmarPartido({ embedded = false }) {
       montoExtraCoca={montoExtraCoca}
       totalPorJugador={totalPorJugador}
       jugadoresEsperadosValue={jugadoresEsperadosValue}
+      cubiertosPorFueraValue={cubiertosValue}
       setValue={setValue}
       organizerPlays={organizerPlaysValue}
       anotados={anotados}
       cuposAbiertos={cuposAbiertos}
+      isEditMode={isEditMode}
     />
   );
 

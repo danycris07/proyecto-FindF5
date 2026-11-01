@@ -3,6 +3,8 @@ import MatchFormField, { inputClassName } from "./MatchFormField.jsx";
 
 // Total de jugadores del partido: 10 = 5 contra 5, 12 = 6 contra 6, etc.
 const PRESETS_JUGADORES = [8, 10, 12, 14];
+const MIN_JUGADORES = 5;
+const MAX_JUGADORES = 24;
 
 function PartidoFormFields({
   register,
@@ -20,10 +22,13 @@ function PartidoFormFields({
   montoExtraCoca,
   totalPorJugador,
   jugadoresEsperadosValue,
+  cubiertosPorFueraValue,
   setValue,
   organizerPlays,
   anotados,
   cuposAbiertos,
+  isEditMode,
+  trigger,
 }) {
   const canchaRegistration = register("cancha", {
     required: "Indicá la cancha del partido.",
@@ -34,6 +39,9 @@ function PartidoFormFields({
     Number.isInteger(esperados) && esperados > 0
       ? esperados - (organizerPlays ? 1 : 0) - anotados
       : Infinity;
+  const maxConfirmadosPorFuera = Number.isFinite(lugaresLibres)
+    ? Math.max(0, lugaresLibres - (isEditMode ? 0 : 1))
+    : Infinity;
 
   return (
     <div className="grid gap-5 sm:grid-cols-2">
@@ -145,12 +153,13 @@ function PartidoFormFields({
                 key={cantidad}
                 type="button"
                 aria-pressed={seleccionado}
-                onClick={() =>
+                onClick={() => {
                   setValue("jugadoresEsperados", cantidad, {
                     shouldValidate: true,
                     shouldDirty: true,
-                  })
-                }
+                  });
+                  void trigger(["jugadoresEsperados", "cubiertosPorFuera"]);
+                }}
                 className={`min-h-10 min-w-12 rounded-sm border px-3 font-display text-lg font-extrabold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status motion-reduce:transition-none ${
                   seleccionado
                     ? "border-primary-foreground bg-primary text-primary-foreground"
@@ -165,7 +174,8 @@ function PartidoFormFields({
         <input
           id="jugadoresEsperados"
           type="number"
-          min="1"
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
           step="1"
           inputMode="numeric"
           aria-invalid={Boolean(errors.jugadoresEsperados)}
@@ -176,13 +186,35 @@ function PartidoFormFields({
           {...register("jugadoresEsperados", {
             required: "Indicá cuántos jugadores se esperan.",
             setValueAs: (value) => (value === "" ? "" : Number(value)),
-            validate: (value) =>
-              (Number.isInteger(value) && value > 0) ||
-              "Ingresá un número entero mayor que 0.",
+            validate: (value) => {
+              if (!Number.isInteger(value)) {
+                return "Ingresá una cantidad entera de jugadores.";
+              }
+              if (value < MIN_JUGADORES) {
+                return `El partido debe tener al menos ${MIN_JUGADORES} jugadores.`;
+              }
+              if (value > MAX_JUGADORES) {
+                return `El máximo permitido es ${MAX_JUGADORES} jugadores.`;
+              }
+              const ocupados =
+                (organizerPlays ? 1 : 0) +
+                Number(cubiertosPorFueraValue || 0) +
+                anotados;
+              if (ocupados > value) {
+                return "La cantidad esperada no puede ser menor que los jugadores ya confirmados.";
+              }
+              if (!isEditMode && value - ocupados < 1) {
+                return "Dejá al menos un cupo disponible para que otros jugadores puedan sumarse.";
+              }
+              return true;
+            },
+            onChange: () =>
+              void trigger(["jugadoresEsperados", "cubiertosPorFuera"]),
           })}
         />
         <p className="mt-2 text-xs text-text-secondary">
-          Total de jugadores: 10 es un 5 contra 5. Elegí uno o escribí otro número.
+          El partido debe tener entre {MIN_JUGADORES} y {MAX_JUGADORES} jugadores.
+          10 es un 5 contra 5.
         </p>
       </MatchFormField>
 
@@ -195,6 +227,7 @@ function PartidoFormFields({
           id="cubiertosPorFuera"
           type="number"
           min="0"
+          max={Number.isFinite(maxConfirmadosPorFuera) ? maxConfirmadosPorFuera : undefined}
           step="1"
           inputMode="numeric"
           aria-invalid={Boolean(errors.cubiertosPorFuera)}
@@ -208,11 +241,18 @@ function PartidoFormFields({
               if (!Number.isInteger(value) || value < 0) {
                 return "Ingresá un número entero, 0 o más.";
               }
-              if (Number.isFinite(lugaresLibres) && value > lugaresLibres) {
-                return `Solo podés cubrir ${Math.max(0, lugaresLibres)} por fuera con los jugadores que ya hay.`;
+              if (
+                Number.isFinite(maxConfirmadosPorFuera) &&
+                value > maxConfirmadosPorFuera
+              ) {
+                if (!isEditMode && maxConfirmadosPorFuera === 0) {
+                  return "Dejá al menos un cupo abierto para que otros jugadores puedan sumarse.";
+                }
+                return `Podés confirmar hasta ${maxConfirmadosPorFuera} jugadores por fuera.`;
               }
               return true;
             },
+            onChange: () => void trigger("jugadoresEsperados"),
           })}
         />
         <p className="mt-2 text-xs text-text-secondary">
@@ -231,7 +271,10 @@ function PartidoFormFields({
               type="checkbox"
               role="switch"
               className="peer sr-only"
-              {...register("organizerPlays")}
+              {...register("organizerPlays", {
+                onChange: () =>
+                  void trigger(["jugadoresEsperados", "cubiertosPorFuera"]),
+              })}
             />
             <span
               aria-hidden="true"
@@ -269,18 +312,29 @@ function PartidoFormFields({
         <input
           id="cuota"
           type="number"
-          min="0"
-          step="0.01"
-          inputMode="decimal"
+          min="1"
+          max="99999999"
+          step="1"
+          inputMode="numeric"
           aria-invalid={Boolean(errors.cuota)}
           aria-describedby={errors.cuota ? "cuota-error" : undefined}
           className={`${inputClassName} tabular-nums`}
           {...register("cuota", {
             required: "Indicá cuánto lleva cada jugador.",
             setValueAs: (value) => (value === "" ? "" : Number(value)),
-            validate: (value) =>
-              (Number.isFinite(value) && value >= 0) ||
-              "La cuota debe ser un número igual o mayor que 0.",
+            max: {
+              value: 99999999,
+              message: "La cuota supera el máximo permitido.",
+            },
+            validate: (value) => {
+              if (!Number.isInteger(value)) {
+                return "La cuota debe ser un importe entero.";
+              }
+              return (
+                (Number.isFinite(value) && value > 0) ||
+                "La cuota por jugador debe ser mayor que 0."
+              );
+            },
           })}
         />
       </MatchFormField>

@@ -92,7 +92,21 @@ export function createAuthRouter({ models, sequelize }) {
         .bail()
         .trim()
         .isLength({ max: 30 })
-        .withMessage("El teléfono no puede superar los 30 caracteres."),
+        .withMessage("El teléfono no puede superar los 30 caracteres.")
+        .bail()
+        .custom((phone) => {
+          const digitCount = phone.replace(/\D/g, "").length;
+          return (
+            phone === "" ||
+            (/^[+\d][\d\s()-]*$/.test(phone) &&
+              digitCount >= 7 &&
+              digitCount <= 15)
+          );
+        })
+        .withMessage("Ingresá un teléfono válido con entre 7 y 15 dígitos."),
+      body("email")
+        .isLength({ max: 254 })
+        .withMessage("El correo no puede superar los 254 caracteres."),
       body("role")
         .optional()
         .isIn(REGISTERABLE_ROLES)
@@ -161,6 +175,9 @@ export function createAuthRouter({ models, sequelize }) {
         .withMessage("Credenciales inválidas.")
         .bail()
         .trim()
+        .isLength({ max: 254 })
+        .withMessage("Credenciales inválidas.")
+        .bail()
         .isEmail()
         .withMessage("Credenciales inválidas.")
         .normalizeEmail(),

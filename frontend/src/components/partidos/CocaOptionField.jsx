@@ -3,7 +3,7 @@ import MatchFormField, { inputClassName } from "./MatchFormField.jsx";
 const currencyFormatter = new Intl.NumberFormat("es-AR", {
   style: "currency",
   currency: "ARS",
-  maximumFractionDigits: 2,
+  maximumFractionDigits: 0,
 });
 
 function formatAmount(value) {
@@ -60,17 +60,27 @@ function CocaOptionField({
               <input
                 id="montoExtraCoca"
                 type="number"
-                min="0.01"
-                step="0.01"
-                inputMode="decimal"
+                min="1"
+                max="99999999"
+                step="1"
+                inputMode="numeric"
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? "montoExtraCoca-error" : undefined}
                 className={`${inputClassName} tabular-nums`}
                 {...register("montoExtraCoca", {
                   setValueAs: (value) => (value === "" ? "" : Number(value)),
-                  validate: (value) =>
-                    (Number.isFinite(value) && value > 0) ||
-                    "Ingresá un monto mayor que 0.",
+                  validate: (value) => {
+                    if (!Number.isInteger(value)) {
+                      return "El monto extra debe ser un importe entero.";
+                    }
+                    if (!Number.isFinite(value) || value <= 0) {
+                      return "Ingresá un monto mayor que 0.";
+                    }
+                    if (baseAmount + value > 99999999) {
+                      return "El total por jugador supera el máximo permitido.";
+                    }
+                    return true;
+                  },
                 })}
               />
             </MatchFormField>
