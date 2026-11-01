@@ -67,6 +67,7 @@ test("los modelos reflejan perfiles, canchas, reservas y partidos", async () => 
       "FieldReservation",
       "Match",
       "MatchParticipant",
+      "Session",
     ]);
     assert.deepEqual(userAttributes.role.values, [
       "PLAYER",
@@ -92,7 +93,16 @@ test("los modelos reflejan perfiles, canchas, reservas y partidos", async () => 
       passwordHash: "hashed-password",
       role: "PLAYER",
     });
-    await assert.rejects(playerWithoutPosition.validate(), /elegir campo o arquero/);
+    await playerWithoutPosition.validate();
+
+    const ownerWithPosition = models.User.build({
+      name: "Dueño",
+      email: "owner@example.com",
+      passwordHash: "hashed-password",
+      role: "FIELD_OWNER",
+      position: "GOALKEEPER",
+    });
+    await assert.rejects(ownerWithPosition.validate(), /Solo los jugadores/);
 
     const invalidMatch = models.Match.build({
       fieldName: "Templo de Cracks",

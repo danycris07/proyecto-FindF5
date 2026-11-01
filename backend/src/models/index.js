@@ -1,5 +1,6 @@
 import { defineField, defineFieldReservation } from "./field.model.js";
 import { defineMatch, defineMatchParticipant } from "./match.model.js";
+import { defineSession } from "./session.model.js";
 import { defineTeam, defineTeamMember } from "./team.model.js";
 import { defineUser } from "./user.model.js";
 
@@ -11,6 +12,7 @@ export function defineModels(sequelize) {
   const FieldReservation = defineFieldReservation(sequelize);
   const Match = defineMatch(sequelize);
   const MatchParticipant = defineMatchParticipant(sequelize);
+  const Session = defineSession(sequelize);
 
   User.hasMany(Team, { as: "captainedTeams", foreignKey: "captainId" });
   Team.belongsTo(User, { as: "captain", foreignKey: "captainId" });
@@ -58,6 +60,8 @@ export function defineModels(sequelize) {
     foreignKey: "userId",
     otherKey: "matchId",
   });
+  User.hasMany(Session, { as: "sessions", foreignKey: "userId" });
+  Session.belongsTo(User, { as: "user", foreignKey: "userId" });
 
   return {
     User,
@@ -67,5 +71,6 @@ export function defineModels(sequelize) {
     FieldReservation,
     Match,
     MatchParticipant,
+    Session,
   };
 }

@@ -39,9 +39,6 @@ export function defineUser(sequelize) {
         allowNull: true,
         validate: {
           matchesRole() {
-            if (this.role === "PLAYER" && !this.position) {
-              throw new Error("El jugador debe elegir campo o arquero.");
-            }
             if (this.role !== "PLAYER" && this.position) {
               throw new Error("Solo los jugadores pueden tener una posición.");
             }

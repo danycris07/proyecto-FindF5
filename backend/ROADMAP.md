@@ -34,25 +34,29 @@ backend de FindF5 sin perder el contexto entre sesiones.
 
 Commit: `13ef9ef feat: se creó la base del backend`.
 
-### 2. MySQL y modelos — en curso
+### 2. MySQL y modelos — completada
 
 - [x] Documentar las variables de entorno necesarias para MySQL.
 - [x] Implementar la conexión Sequelize sin exponer secretos.
 - [x] Definir modelos y relaciones a partir de los mocks.
 - [x] Crear sincronización manual de desarrollo que no altera ni elimina tablas.
 - [x] Probar configuración, asociaciones y validaciones de modelos sin conexión.
-- [ ] Configurar y probar la conexión real y el esquema con MySQL local.
+- [x] Configurar y probar la conexión real y el esquema con MySQL local.
 
-### 3. Usuarios y autenticación
+Verificación real de MySQL confirmada por el usuario con su configuración local.
 
-- Implementar registro, inicio y cierre de sesión.
-- Guardar contraseñas con hash; nunca almacenar contraseñas en texto plano.
-- Aplicar cookie `HttpOnly` y proteger las rutas autenticadas por rol.
-- Crear el comando local para inicializar el primer administrador usando
+### 3. Usuarios y autenticación — completada
+
+- [x] Implementar registro, inicio y cierre de sesión.
+- [x] Guardar contraseñas con hash; nunca almacenar contraseñas en texto plano.
+- [x] Aplicar cookie `HttpOnly` con sesión persistida en MySQL.
+- [x] Evitar que el registro público permita crear administradores.
+- [x] Crear el comando local para inicializar el primer administrador usando
   variables de entorno.
-- Probar email duplicado, credenciales inválidas, sesión y permisos.
+- [x] Agregar validación de sesión y middleware de roles para rutas protegidas.
+- [x] Probar hashing, cookies, validación y flujos de autenticación con MySQL.
 
-### 4. Partidos y participación
+### 4. Partidos y participación — siguiente
 
 - Implementar consulta, creación, edición y eliminación de partidos.
 - Implementar sumarse, bajarse y ver participantes.
@@ -94,8 +98,8 @@ que se acuerde incorporarlas expresamente.
 ## Registro de avance
 
 - [x] Etapa 1: base del backend.
-- [ ] Etapa 2: MySQL y modelos.
-- [ ] Etapa 3: usuarios y autenticación.
+- [x] Etapa 2: MySQL y modelos.
+- [x] Etapa 3: usuarios y autenticación.
 - [ ] Etapa 4: partidos y participación.
 - [ ] Etapa 5: administración.
 - [ ] Etapa 6: integración con el frontend.

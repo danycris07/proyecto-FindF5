@@ -7,9 +7,12 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "db:sync": "node scripts/sync-database.js",
+    "db:bootstrap-admin": "node scripts/bootstrap-admin.js",
     "test": "node --test"
   },
   "dependencies": {
+    "cookie": "^2.0.1",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
