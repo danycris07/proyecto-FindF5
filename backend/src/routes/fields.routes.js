@@ -7,12 +7,17 @@ export function createFieldsRouter({ models }) {
 
   router.get("/", async (_request, response) => {
     const fields = await models.Field.findAll({
-      attributes: ["id", "name", "address"],
+      attributes: ["id", "name", "address", "imageUrl"],
       order: [["name", "ASC"]],
     });
 
     return response.json(
-      fields.map(({ id, name, address }) => ({ id, name, address })),
+      fields.map(({ id, name, address, imageUrl }) => ({
+        id,
+        name,
+        address,
+        imageUrl,
+      })),
     );
   });
 

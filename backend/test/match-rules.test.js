@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   getMatchStatus,
   getMissingPlayers,
+  getMatchResponse,
   isFutureMatch,
   normalizeMatchInput,
 } from "../src/services/match-rules.js";
@@ -29,6 +30,22 @@ test("el estado se deriva de los cupos sin reabrir partidos cancelados", () => {
   assert.equal(getMatchStatus(match, 0), "OPEN");
   assert.equal(getMatchStatus(match, 1), "COMPLETE");
   assert.equal(getMatchStatus({ ...match, status: "CANCELLED" }, 0), "CANCELLED");
+});
+
+test("la respuesta del partido incluye la imagen de su cancha asociada", () => {
+  const response = getMatchResponse({
+    id: 1,
+    fieldId: 2,
+    field: { name: "Cancha de prueba", imageUrl: "https://example.com/field.jpg" },
+    expectedPlayers: 10,
+    organizerPlays: true,
+    outsideSlots: 0,
+    participants: [],
+    status: "OPEN",
+  });
+
+  assert.equal(response.fieldName, "Cancha de prueba");
+  assert.equal(response.fieldImageUrl, "https://example.com/field.jpg");
 });
 
 test("la fecha del partido se interpreta en la zona horaria de Argentina", () => {

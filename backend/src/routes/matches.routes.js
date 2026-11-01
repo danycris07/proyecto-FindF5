@@ -130,7 +130,11 @@ function isValidTime(value) {
 function matchIncludes(models) {
   return [
     { model: models.User, as: "organizer", attributes: ["id", "name"] },
-    { model: models.Field, as: "field", attributes: ["id", "name"] },
+    {
+      model: models.Field,
+      as: "field",
+      attributes: ["id", "name", "imageUrl"],
+    },
     {
       model: models.User,
       as: "participants",

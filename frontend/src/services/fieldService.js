@@ -11,6 +11,11 @@ export async function getAvailableFields() {
   } catch (error) {
     if (!shouldUseMockFallback(error)) throw error;
     reportMockFallback("canchas", error);
-    return mockFields.map(({ id, name, address }) => ({ id, name, address }));
+    return mockFields.map(({ id, name, address, imagen }) => ({
+      id,
+      name,
+      address,
+      imageUrl: imagen || null,
+    }));
   }
 }

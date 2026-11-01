@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { GoClock, GoPeople } from "react-icons/go";
+import fieldPlaceholder from "../../assets/cancha-placeholder.svg";
 
 const currencyFormatter = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -29,6 +31,19 @@ function etiquetaDia(date) {
 }
 
 const MAX_FALTAN_URGENTE = 2;
+
+function FieldImage({ src, alt }) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <img
+      src={!failed && src ? src : fieldPlaceholder}
+      alt={alt}
+      className="h-full w-full object-cover"
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 function EstadoCupos({ faltan, urgente }) {
   if (faltan === 0) {
@@ -77,41 +92,51 @@ function MatchCard({ match, onSelect }) {
     <button
       type="button"
       onClick={() => onSelect(match)}
-      className="flex w-full gap-4 rounded-sm border border-border bg-surface p-4 text-left transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status motion-reduce:transition-none"
+      className="flex w-full flex-col overflow-hidden rounded-sm border border-border bg-surface text-left transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status motion-reduce:transition-none"
     >
-      <div className="flex w-16 shrink-0 flex-col items-center justify-center rounded-sm border border-border bg-background py-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-          {semana}
-        </span>
-        <span className="font-display text-3xl font-extrabold leading-none text-text-primary">
-          {numero}
-        </span>
-        <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-          {mes}
-        </span>
+      <div className="h-32 w-full overflow-hidden bg-background sm:h-36">
+        <FieldImage
+          key={match.fieldImageUrl || "field-placeholder"}
+          src={match.fieldImageUrl}
+          alt={`Cancha: ${match.fieldName}`}
+        />
       </div>
 
-      <div className="min-w-0 flex-1">
-        {etiqueta && (
-          <span className="mb-1 inline-block rounded-sm border border-status/40 bg-status/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-status">
-            {etiqueta}
+      <div className="flex w-full gap-4 p-4">
+        <div className="flex w-16 shrink-0 flex-col items-center justify-center rounded-sm border border-border bg-background py-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            {semana}
           </span>
-        )}
-        <h2 className="truncate font-display text-xl font-extrabold uppercase tracking-wider text-text-primary">
-          {match.fieldName}
-        </h2>
-        <p className="mt-1 flex items-center gap-1.5 text-sm tabular-nums text-text-secondary">
-          <GoClock aria-hidden="true" />
-          {match.startTime.slice(0, 5)} hs
-        </p>
+          <span className="font-display text-3xl font-extrabold leading-none text-text-primary">
+            {numero}
+          </span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            {mes}
+          </span>
+        </div>
 
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="font-display text-xl font-extrabold tabular-nums text-text-primary">
-            {currencyFormatter.format(match.pricePerPlayer)}
-          </p>
-          {match.missingPlayers !== undefined && (
-            <EstadoCupos faltan={match.missingPlayers} urgente={urgente} />
+        <div className="min-w-0 flex-1">
+          {etiqueta && (
+            <span className="mb-1 inline-block rounded-sm border border-status/40 bg-status/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-status">
+              {etiqueta}
+            </span>
           )}
+          <h2 className="truncate font-display text-xl font-extrabold uppercase tracking-wider text-text-primary">
+            {match.fieldName}
+          </h2>
+          <p className="mt-1 flex items-center gap-1.5 text-sm tabular-nums text-text-secondary">
+            <GoClock aria-hidden="true" />
+            {match.startTime.slice(0, 5)} hs
+          </p>
+
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <p className="font-display text-xl font-extrabold tabular-nums text-text-primary">
+              {currencyFormatter.format(match.pricePerPlayer)}
+            </p>
+            {match.missingPlayers !== undefined && (
+              <EstadoCupos faltan={match.missingPlayers} urgente={urgente} />
+            )}
+          </div>
         </div>
       </div>
     </button>

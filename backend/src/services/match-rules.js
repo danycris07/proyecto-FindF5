@@ -49,6 +49,7 @@ export function getMatchResponse(match) {
     teamId: match.teamId,
     fieldId: match.fieldId,
     fieldName: match.field?.name ?? match.fieldName,
+    fieldImageUrl: match.field?.imageUrl ?? null,
     date: match.date,
     startTime: match.startTime,
     endTime: match.endTime,

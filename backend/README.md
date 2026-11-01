@@ -48,7 +48,8 @@ no puede asignarse desde el registro.
 
 Los endpoints de partidos requieren una sesión:
 
-- `GET /api/fields`: lista las canchas disponibles para el formulario.
+- `GET /api/fields`: lista las canchas disponibles para el formulario,
+  incluyendo la URL de imagen cuando está configurada.
 - `GET /api/matches`: lista convocatorias abiertas y ordenadas por fecha/hora.
 - `GET /api/matches/mine`: lista los partidos que organiza o donde participa el
   usuario autenticado.
@@ -67,6 +68,7 @@ Los endpoints de partidos requieren una sesión:
 La respuesta del partido calcula `missingPlayers` a partir de jugadores
 esperados, participación del organizador, confirmados por fuera y participantes
 anotados. La hora se interpreta en la zona `America/Argentina/Buenos_Aires`.
+También incluye `fieldImageUrl` cuando el partido tiene una cancha asociada.
 
 Los endpoints administrativos requieren una sesión con rol `ADMIN`:
 

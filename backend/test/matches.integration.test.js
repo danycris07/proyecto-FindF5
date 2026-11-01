@@ -69,6 +69,7 @@ test(
       const field = await models.Field.create({
         name: `Cancha de prueba ${randomUUID()}`,
         address: "Dirección de prueba",
+        imageUrl: "https://example.com/cancha-prueba.jpg",
         ownerId: credentials.get("field-owner").user.id,
       });
       createdFieldIds.push(field.id);
@@ -118,7 +119,10 @@ test(
       assert.equal(fieldsResponse.status, 200);
       assert.ok(
         (await fieldsResponse.json()).some(
-          (item) => item.id === field.id && item.name === field.name,
+          (item) =>
+            item.id === field.id &&
+            item.name === field.name &&
+            item.imageUrl === field.imageUrl,
         ),
       );
 
@@ -139,11 +143,12 @@ test(
       const created = await request("/", {
         actor: "organizer",
         method: "POST",
-        body: validMatch,
+        body: { ...validMatch, fieldId: field.id },
       });
       assert.equal(created.response.status, 201);
       const matchId = created.payload.match.id;
       createdMatchIds.push(matchId);
+      assert.equal(created.payload.match.fieldImageUrl, field.imageUrl);
       assert.equal(created.payload.match.missingPlayers, 1);
       assert.equal(created.payload.match.pricePerPlayer, 1700);
       assert.equal(created.payload.match.participants.length, 0);

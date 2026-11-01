@@ -45,3 +45,5 @@ guarda ni simula cambios.
 Las cuentas con rol administrador acceden a `/admin` desde el menú de usuario
 para gestionar usuarios, canchas y partidos. El panel usa exclusivamente los
 endpoints administrativos y no sustituye sus errores por datos de prueba.
+Las tarjetas de partidos muestran la imagen configurada en la cancha asociada;
+si no hay una imagen disponible, usan una ilustración local de respaldo.

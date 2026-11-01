@@ -30,6 +30,7 @@ function normalizeMockMatch(match) {
         participants.length,
     ),
     fieldName: match.fieldName ?? field?.name ?? "Cancha a confirmar",
+    fieldImageUrl: match.fieldImageUrl ?? field?.imagen ?? null,
   };
 }
 
