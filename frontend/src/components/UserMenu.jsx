@@ -34,6 +34,63 @@ const ROLE_LABELS = {
   ADMIN: "Admin",
 };
 
+const POSICIONES = {
+  GOALKEEPER: "Arquero",
+  FIELD_PLAYER: "Jugador de campo",
+};
+
+/** Perfil que se muestra en la ficha: el dueño sale del rol, el resto de la posición. */
+function perfilDe(session) {
+  if (session?.role === "FIELD_OWNER") return "Dueño de cancha";
+  return POSICIONES[session?.position] || null;
+}
+
+const PIERNAS = { RIGHT: "Diestro", LEFT: "Zurdo" };
+
+function StatTile({ label, value, caption }) {
+  return (
+    <div className="rounded-sm border border-border bg-background px-3 py-2.5">
+      <p className="text-xs font-bold uppercase tracking-widest text-text-secondary">
+        {label}
+      </p>
+      <p className="mt-1 font-display text-2xl font-extrabold uppercase leading-tight tracking-wider">
+        {value}
+      </p>
+      {caption && <p className="mt-1 text-xs text-text-secondary">{caption}</p>}
+    </div>
+  );
+}
+
+function AttendanceMeter({ porcentaje }) {
+  const valor = Math.round(Math.min(100, Math.max(0, porcentaje)));
+
+  return (
+    <div className="mt-3">
+      <div className="flex items-baseline justify-between gap-3 text-sm">
+        <span className="font-medium">Asistencia</span>
+        <span className="font-semibold tabular-nums">{valor}%</span>
+      </div>
+      <div
+        role="meter"
+        aria-label="Asistencia"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={valor}
+        aria-valuetext={`${valor}% de asistencia`}
+        className="mt-1.5 h-1.5 w-full overflow-hidden rounded-sm bg-border"
+      >
+        <div
+          className="h-full rounded-sm bg-status"
+          style={{ width: `${valor}%` }}
+        />
+      </div>
+      <p className="mt-1.5 text-xs text-text-secondary">
+        Partidos que jugaste sobre los que confirmaste.
+      </p>
+    </div>
+  );
+}
+
 function ContactRow({ Icon, label, value }) {
   return (
     <li className="flex items-center gap-3">
@@ -52,6 +109,12 @@ function UserMenu() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const session = getMockSession();
+  const esJugador = (session?.role ?? "PLAYER") === "PLAYER";
+  const esDuenio = session?.role === "FIELD_OWNER";
+  const perfil = perfilDe(session);
+  const asistencia = Number.isFinite(session?.reputation?.attendance)
+    ? session.reputation.attendance
+    : null;
   const initials = session?.name
     ?.split(/\s+/)
     .slice(0, 2)
@@ -98,7 +161,7 @@ function UserMenu() {
           <aside
             id="user-menu-panel"
             aria-label="Menú de usuario"
-            className="absolute right-0 top-14 w-[min(22rem,calc(100vw-2.5rem))] overflow-hidden rounded-sm border border-border bg-surface text-text-primary shadow-2xl shadow-[var(--shadow-color)]"
+            className="absolute right-0 top-14 w-[min(22rem,calc(100vw-2.5rem))] max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-sm border border-border bg-surface text-text-primary shadow-2xl shadow-[var(--shadow-color)]"
           >
             {/* Ficha del jugador */}
             <div className="border-b border-border p-5">
@@ -115,6 +178,51 @@ function UserMenu() {
                   </span>
                 </div>
               </div>
+
+              {(esJugador || esDuenio) && (
+                <div
+                  className={`mt-4 grid gap-2 ${esJugador ? "grid-cols-2" : "grid-cols-1"}`}
+                >
+                  <StatTile
+                    label="Perfil"
+                    value={perfil || "—"}
+                    caption={perfil ? null : "Sin definir"}
+                  />
+                  {esJugador && (
+                    <StatTile
+                      label="Pierna hábil"
+                      value={PIERNAS[session?.dominantFoot] || "—"}
+                      caption={
+                        PIERNAS[session?.dominantFoot] ? null : "Sin definir"
+                      }
+                    />
+                  )}
+                </div>
+              )}
+
+              {esJugador && (
+                <>
+                  <section
+                    aria-labelledby="reputacion-titulo"
+                    className="mt-4 border-t border-border pt-4"
+                  >
+                    <h3
+                      id="reputacion-titulo"
+                      className="font-display text-sm font-bold uppercase tracking-[0.2em] text-text-secondary"
+                    >
+                      Reputación en cancha
+                    </h3>
+                    {asistencia !== null ? (
+                      <AttendanceMeter porcentaje={asistencia} />
+                    ) : (
+                      <p className="mt-2 text-sm text-text-secondary">
+                        Todavía no tenés reputación. Se arma con tus primeros
+                        partidos.
+                      </p>
+                    )}
+                  </section>
+                </>
+              )}
 
               <ul className="mt-4 grid gap-3 border-t border-border pt-4">
                 <ContactRow
@@ -167,7 +275,7 @@ function UserMenu() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-danger/60 bg-danger/10 px-4 py-2 text-sm font-bold text-danger transition-colors hover:border-danger hover:bg-danger/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-danger/60 bg-danger/10 px-4 py-2 text-sm font-bold text-danger transition-colors hover:border-danger hover:bg-danger/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
               >
                 <LuLogOut aria-hidden="true" className="h-4 w-4" />
                 Cerrar sesión
