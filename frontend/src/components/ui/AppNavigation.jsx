@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { GoCalendar, GoPlus, GoSearch } from "react-icons/go";
+import { GoCalendar, GoPlus, GoSearch, GoShield } from "react-icons/go";
 import UserMenu from "../UserMenu.jsx";
+import { getSessionUser } from "../../services/sessionService.js";
 
 const desktopLinkClass = ({ isActive }) =>
   `rounded-full px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
@@ -16,6 +17,7 @@ const mobileLinkClass = ({ isActive }) =>
 
 function AppNavigation({ showMobile = true }) {
   const navigate = useNavigate();
+  const isAdmin = getSessionUser()?.role === "ADMIN";
 
   return (
     <>
@@ -39,6 +41,11 @@ function AppNavigation({ showMobile = true }) {
             <NavLink to="/mis-partidos" end className={desktopLinkClass}>
               Mis Partidos
             </NavLink>
+            {isAdmin && (
+              <NavLink to="/admin" className={desktopLinkClass}>
+                Administración
+              </NavLink>
+            )}
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
@@ -61,11 +68,28 @@ function AppNavigation({ showMobile = true }) {
           aria-label="Navegación móvil"
           className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-center border-t border-border bg-surface/90 px-3 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg md:hidden"
         >
-          <div className="flex flex-1 justify-center">
-            <NavLink to="/partidos" end className={mobileLinkClass}>
+          <div className="flex min-w-0 flex-1 items-center justify-evenly">
+            <NavLink
+              to="/partidos"
+              end
+              className={({ isActive }) =>
+                `${mobileLinkClass({ isActive })} min-w-0 flex-1`
+              }
+            >
               <GoSearch aria-hidden="true" className="h-5 w-5" />
               <span>Buscar</span>
             </NavLink>
+            {isAdmin && (
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `${mobileLinkClass({ isActive })} min-w-0 flex-1`
+                }
+              >
+                <GoShield aria-hidden="true" className="h-5 w-5" />
+                <span>Admin</span>
+              </NavLink>
+            )}
           </div>
 
           <button
