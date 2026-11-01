@@ -34,7 +34,7 @@ function CocaOptionField({
           />
           <span
             aria-hidden="true"
-            className="relative h-7 w-12 rounded-full border border-border bg-surface transition after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-text-secondary after:transition peer-checked:border-[#CCFF00] peer-checked:bg-[#CCFF00]/20 peer-checked:after:translate-x-5 peer-checked:after:bg-[#CCFF00] peer-focus-visible:ring-2 peer-focus-visible:ring-status peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-surface"
+            className="relative h-7 w-12 rounded-full border border-border bg-surface transition after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-text-secondary after:transition peer-checked:border-primary peer-checked:bg-primary/20 peer-checked:after:translate-x-5 peer-checked:after:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-status peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-surface"
           />
           Jugar por la coca
         </label>
@@ -81,15 +81,11 @@ function CocaOptionField({
             <dd className="text-right text-text-primary">
               {formatAmount(baseAmount)}
             </dd>
-            <dt className="text-text-secondary sm:text-right">
-              Extra por jugador
-            </dt>
+            <dt className="text-text-secondary sm:text-right">Extra por jugador</dt>
             <dd className="text-right text-text-primary">
               {formatAmount(extraAmount)}
             </dd>
-            <dt className="font-semibold text-text-primary">
-              Total por jugador
-            </dt>
+            <dt className="font-semibold text-text-primary">Total por jugador</dt>
             <dd className="text-right font-bold text-primary-text">
               {formatAmount(totalAmount)}
             </dd>

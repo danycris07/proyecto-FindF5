@@ -19,10 +19,19 @@ function PartidoFormFields({
   cuotaBase,
   montoExtraCoca,
   totalPorJugador,
-  isEditMode,
   jugadoresEsperadosValue,
   setValue,
+  organizerPlays,
+  anotados,
+  cuposAbiertos,
 }) {
+  const esperados = Number(jugadoresEsperadosValue);
+  // Lugares que todavía se pueden cubrir por fuera (Infinity = aún no hay total).
+  const lugaresLibres =
+    Number.isInteger(esperados) && esperados > 0
+      ? esperados - (organizerPlays ? 1 : 0) - anotados
+      : Infinity;
+
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       <div className="sm:col-span-2">
@@ -166,33 +175,81 @@ function PartidoFormFields({
         </p>
       </MatchFormField>
 
-      {isEditMode && (
-        <MatchFormField
-          id="cuposFaltantes"
-          label="Cupos faltantes"
-          error={errors.cuposFaltantes?.message}
-        >
-          <input
-            id="cuposFaltantes"
-            type="number"
-            min="0"
-            max={jugadoresEsperadosValue || 1}
-            step="1"
-            inputMode="numeric"
-            aria-invalid={Boolean(errors.cuposFaltantes)}
-            className={`${inputClassName} tabular-nums`}
-            {...register("cuposFaltantes", {
-              required: "Indicá cuántos cupos faltan.",
-              setValueAs: (value) => (value === "" ? "" : Number(value)),
-              validate: (value) =>
-                (Number.isInteger(value) &&
-                  value >= 0 &&
-                  value <= Number(jugadoresEsperadosValue)) ||
-                "Los cupos faltantes no pueden superar a los esperados.",
-            })}
-          />
-        </MatchFormField>
-      )}
+      <MatchFormField
+        id="cubiertosPorFuera"
+        label="Ya confirmados por fuera"
+        error={errors.cubiertosPorFuera?.message}
+      >
+        <input
+          id="cubiertosPorFuera"
+          type="number"
+          min="0"
+          step="1"
+          inputMode="numeric"
+          aria-invalid={Boolean(errors.cubiertosPorFuera)}
+          aria-describedby={
+            errors.cubiertosPorFuera ? "cubiertosPorFuera-error" : undefined
+          }
+          className={`${inputClassName} tabular-nums`}
+          {...register("cubiertosPorFuera", {
+            setValueAs: (value) => (value === "" ? 0 : Number(value)),
+            validate: (value) => {
+              if (!Number.isInteger(value) || value < 0) {
+                return "Ingresá un número entero, 0 o más.";
+              }
+              if (Number.isFinite(lugaresLibres) && value > lugaresLibres) {
+                return `Solo podés cubrir ${Math.max(0, lugaresLibres)} por fuera con los jugadores que ya hay.`;
+              }
+              return true;
+            },
+          })}
+        />
+        <p className="mt-2 text-xs text-text-secondary">
+          Amigos que van pero no usan la app, sin contarte a vos.
+        </p>
+      </MatchFormField>
+
+      <div className="sm:col-span-2">
+        <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 rounded-sm border border-border bg-background p-4">
+          <label
+            htmlFor="organizerPlays"
+            className="flex min-h-12 cursor-pointer items-center gap-3 text-sm font-semibold text-text-primary"
+          >
+            <input
+              id="organizerPlays"
+              type="checkbox"
+              role="switch"
+              className="peer sr-only"
+              {...register("organizerPlays")}
+            />
+            <span
+              aria-hidden="true"
+              className="relative h-7 w-12 rounded-full border border-border bg-surface transition after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-text-secondary after:transition peer-checked:border-primary peer-checked:bg-primary/20 peer-checked:after:translate-x-5 peer-checked:after:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-status peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-surface"
+            />
+            Voy a jugar yo
+          </label>
+          <span
+            className={`rounded-sm px-2 py-1 text-xs font-bold uppercase tracking-wider ${
+              organizerPlays
+                ? "bg-primary/15 text-primary-text"
+                : "bg-surface text-text-secondary"
+            }`}
+          >
+            {organizerPlays ? "Cuento como jugador" : "Solo organizo"}
+          </span>
+        </div>
+        {cuposAbiertos !== null && (
+          <p aria-live="polite" className="mt-3 text-sm text-text-secondary">
+            Quedan{" "}
+            <span className="font-semibold tabular-nums text-text-primary">
+              {cuposAbiertos}
+            </span>{" "}
+            {cuposAbiertos === 1 ? "lugar" : "lugares"} para sumarse desde la
+            app.
+          </p>
+        )}
+      </div>
+
       <MatchFormField
         id="cuota"
         label="Cuota por jugador ($)"

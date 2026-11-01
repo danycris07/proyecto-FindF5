@@ -24,8 +24,17 @@ function MatchConfirmationCard({
   onDelete,
   onDecreaseSlot,
   decreaseError,
+  currentUserId,
+  isJoined = false,
+  onJoin,
+  onLeave,
+  pendingAction = null,
+  participationError = "",
 }) {
   const isFull = match.missingPlayers === 0;
+  const participants = match.participants ?? [];
+  const nobodyYet =
+    !match.organizerPlays && participants.length === 0 && !match.outsideSlots;
 
   return (
     <section
@@ -52,11 +61,18 @@ function MatchConfirmationCard({
           </div>
 
           {/* Criterio 3: Estado Cancha Llena */}
-          {isFull && (
-            <div className="mt-4 inline-flex items-center rounded-sm border border-status/40 bg-status/10 px-3 py-1.5 text-sm font-bold uppercase tracking-wider text-status">
-              Cancha llena
-            </div>
-          )}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {isJoined && (
+              <div className="inline-flex items-center rounded-sm border border-status/40 bg-status/10 px-3 py-1.5 text-sm font-bold uppercase tracking-wider text-status">
+                Estás anotado
+              </div>
+            )}
+            {isFull && (
+              <div className="inline-flex items-center rounded-sm border border-status/40 bg-status/10 px-3 py-1.5 text-sm font-bold uppercase tracking-wider text-status">
+                Cancha llena
+              </div>
+            )}
+          </div>
         </div>
 
         <dl className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -120,6 +136,45 @@ function MatchConfirmationCard({
 
           <div className="rounded-sm border border-border bg-background p-4 sm:col-span-2">
             <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              Anotados
+            </dt>
+            <dd className="mt-3">
+              {nobodyYet ? (
+                <p className="text-sm text-text-secondary">
+                  Todavía no se anotó nadie desde la app.
+                </p>
+              ) : (
+                <ul className="flex flex-wrap gap-2">
+                  {match.organizerPlays && (
+                    <li className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface px-2.5 py-1 text-sm">
+                      {match.organizerName}
+                      <span className="text-xs font-bold uppercase tracking-wider text-status">
+                        Organiza
+                      </span>
+                    </li>
+                  )}
+                  {participants.map((participant) => (
+                    <li
+                      key={participant.userId}
+                      className="inline-flex items-center rounded-sm border border-border bg-surface px-2.5 py-1 text-sm"
+                    >
+                      {participant.name}
+                      {String(participant.userId) === String(currentUserId) &&
+                        " (vos)"}
+                    </li>
+                  ))}
+                  {match.outsideSlots > 0 && (
+                    <li className="inline-flex items-center rounded-sm border border-dashed border-border px-2.5 py-1 text-sm text-text-secondary">
+                      +{match.outsideSlots} confirmados por fuera
+                    </li>
+                  )}
+                </ul>
+              )}
+            </dd>
+          </div>
+
+          <div className="rounded-sm border border-border bg-background p-4 sm:col-span-2">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
               {match.playingForCoca
                 ? "Cuota + monto extra"
                 : "Cuota por jugador"}
@@ -149,13 +204,25 @@ function MatchConfirmationCard({
         </dl>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          {/* Criterio 3: Deshabilita la opción de sumarse si la cancha está llena */}
-          {!isFull && !isOrganizer && (
+          {!isOrganizer && isJoined && (
             <button
               type="button"
-              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-primary bg-primary px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-primary-foreground transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_var(--primary-shadow-strong)]"
+              onClick={onLeave}
+              disabled={pendingAction !== null}
+              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-danger/60 px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-danger hover:border-danger hover:bg-danger/10 disabled:cursor-wait disabled:opacity-60"
             >
-              Sumarme
+              {pendingAction === "leave" ? "Bajándome..." : "Bajarme del partido"}
+            </button>
+          )}
+          {/* Se puede sumar quien no organiza, no está anotado y hay lugar */}
+          {!isOrganizer && !isJoined && !isFull && (
+            <button
+              type="button"
+              onClick={onJoin}
+              disabled={!onJoin || pendingAction !== null}
+              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-primary-foreground bg-primary px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-primary-foreground transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_var(--primary-shadow-strong)] disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0"
+            >
+              {pendingAction === "join" ? "Sumándome..." : "Sumarme"}
             </button>
           )}
           {onClose ? (
@@ -192,6 +259,11 @@ function MatchConfirmationCard({
             </button>
           )}
         </div>
+        {participationError && (
+          <p role="alert" className="mt-4 text-sm font-medium text-danger">
+            {participationError}
+          </p>
+        )}
       </div>
     </section>
   );

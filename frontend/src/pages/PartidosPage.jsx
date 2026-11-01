@@ -2,48 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import MatchCard from "../components/partidos/MatchCard.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
-import { getMatches, decreaseMatchSlot } from "../services/matchService.js";
+import { getMatches } from "../services/matchService.js";
+import { useParticipacion } from "../hooks/useParticipacion.js";
 import MatchConfirmationCard from "../components/partidos/MatchDetailCard.jsx";
 import MatchModal from "../components/partidos/MatchModal.jsx";
 import { getMockSession } from "../services/sessionService.js";
 import { waitForInitialLoading } from "../hooks/useInitialLoading.js";
 import DeleteMatchDialog from "../components/partidos/DeleteMatchDialog.jsx";
 import { GoPlus } from "react-icons/go";
-import MatchFilters from "../components/partidos/MatchFilters.jsx";
-import { useMatchFilters } from "../hooks/useMatchFilters.js";
 
 const CTA_CLASSES =
   "inline-flex min-h-11 items-center justify-center rounded-sm border border-primary bg-primary px-5 py-2 text-sm font-extrabold uppercase tracking-wider text-primary-foreground";
 
 function PartidosPage() {
-  const [decreaseError, setDecreaseError] = useState("");
-
-  const handleDecreaseSlot = async () => {
-    if (!partidoSeleccionado || partidoSeleccionado.missingPlayers <= 0) return;
-
-    setDecreaseError("");
-    const prevSlots = partidoSeleccionado.missingPlayers;
-
-    // Criterio 2: Actualización Optimista (Al instante)
-    setPartidoSeleccionado((p) => ({ ...p, missingPlayers: prevSlots - 1 }));
-
-    try {
-      const updated = await decreaseMatchSlot(
-        partidoSeleccionado.id,
-        session.id,
-      );
-      setPartidoSeleccionado(updated);
-      setEstado((prev) => ({
-        ...prev,
-        partidos: prev.partidos.map((p) => (p.id === updated.id ? updated : p)),
-      }));
-    } catch (err) {
-      // Criterio 5: Rollback visual con mensaje de error
-      setPartidoSeleccionado((p) => ({ ...p, missingPlayers: prevSlots }));
-      setDecreaseError(err.message);
-    }
-  };
-
   const navigate = useNavigate();
 
   const [openingForm, setOpeningForm] = useState(false);
@@ -58,15 +29,21 @@ function PartidosPage() {
   const [aviso, setAviso] = useState(location.state?.aviso ?? "");
   const [partidoAEliminar, setPartidoAEliminar] = useState(null);
   const session = getMockSession();
-  const {
-    filtros,
-    setFiltro,
-    limpiarFiltros,
-    visibles,
-    activos,
-    precioInvalido,
-  } = useMatchFilters(estado.partidos);
-  const canchas = [...new Set(estado.partidos.map((p) => p.fieldName))];
+
+  const handleMatchChange = (actualizado) => {
+    setPartidoSeleccionado((actual) =>
+      actual && String(actual.id) === String(actualizado.id)
+        ? actualizado
+        : actual,
+    );
+    setEstado((prev) => ({
+      ...prev,
+      partidos: prev.partidos.map((p) =>
+        String(p.id) === String(actualizado.id) ? actualizado : p,
+      ),
+    }));
+  };
+  const participacion = useParticipacion(partidoSeleccionado, handleMatchChange);
 
   const handleOpenForm = async () => {
     if (openingFormRef.current) return;
@@ -146,8 +123,8 @@ function PartidosPage() {
               </h1>
               {estado.status === "cargado" && (
                 <p className="mt-1 text-sm tabular-nums text-text-secondary">
-                  {visibles.length}{" "}
-                  {visibles.length === 1
+                  {estado.partidos.length}{" "}
+                  {estado.partidos.length === 1
                     ? "convocatoria abierta"
                     : "convocatorias abiertas"}
                 </p>
@@ -167,18 +144,6 @@ function PartidosPage() {
             >
               {aviso}
             </p>
-          )}
-          {(estado.status === "cargando" ||
-            (estado.status === "cargado" && estado.partidos.length > 0)) && (
-            <MatchFilters
-              filtros={filtros}
-              onChange={setFiltro}
-              onClear={limpiarFiltros}
-              activos={activos}
-              canchas={canchas}
-              precioInvalido={precioInvalido}
-              disabled={estado.status === "cargando"}
-            />
           )}
           {estado.status === "cargando" && (
             <p role="status" className="text-text-secondary">
@@ -208,32 +173,9 @@ function PartidosPage() {
             </div>
           )}
 
-          {estado.status === "cargado" &&
-            estado.partidos.length > 0 &&
-            visibles.length === 0 && (
-              <div
-                role="status"
-                className="space-y-4 rounded-sm border border-dashed border-border px-5 py-10 text-center"
-              >
-                <p className="font-display text-xl font-extrabold uppercase tracking-wider">
-                  No hay partidos con esos filtros
-                </p>
-                <p className="text-sm text-text-secondary">
-                  Probá con otro día u horario, o armá el tuyo.
-                </p>
-                <button
-                  type="button"
-                  onClick={limpiarFiltros}
-                  className={`${CTA_CLASSES} transition-opacity hover:opacity-90`}
-                >
-                  Limpiar filtros
-                </button>
-              </div>
-            )}
-
-          {estado.status === "cargado" && visibles.length > 0 && (
+          {estado.status === "cargado" && estado.partidos.length > 0 && (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {visibles.map((partido) => (
+              {estado.partidos.map((partido) => (
                 <MatchCard
                   key={partido.id}
                   match={partido}
@@ -268,8 +210,14 @@ function PartidosPage() {
                 }
                 onClose={() => setPartidoSeleccionado(null)}
                 onDelete={() => setPartidoAEliminar(partidoSeleccionado)}
-                onDecreaseSlot={handleDecreaseSlot}
-                decreaseError={decreaseError}
+                onDecreaseSlot={participacion.restarCupo}
+                decreaseError={participacion.errorCupo}
+                currentUserId={session?.id}
+                isJoined={participacion.estaAnotado}
+                onJoin={participacion.sumarme}
+                onLeave={participacion.bajarme}
+                pendingAction={participacion.accionPendiente}
+                participationError={participacion.errorParticipacion}
               />
             )}
           </MatchModal>

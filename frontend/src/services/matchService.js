@@ -1,4 +1,4 @@
-import { mockFields, mockMatches } from "../mocks/MockData.js";
+import { mockFields, mockMatches, mockUsers } from "../mocks/MockData.js";
 import {
   useInitialLoading,
   waitForInitialLoading,
@@ -6,23 +6,80 @@ import {
 
 const MATCHES_STORAGE_KEY = "findf5-published-matches";
 const DELETED_STORAGE_KEY = "findf5-deleted-matches";
-const SLOTS_STORAGE_KEY = "findf5-match-slots";
+const PARTICIPATION_STORAGE_KEY = "findf5-match-participation";
 
-function getMatchSlots() {
-  const stored = localStorage.getItem(SLOTS_STORAGE_KEY);
-  return stored ? JSON.parse(stored) : {};
+// Poné en true para que "Restar cupo" falle ~50% de las veces y probar el rollback.
+const SIMULAR_ERROR_DE_RED = false;
+
+/**
+ * Cupos derivados:
+ *   faltan = esperados - (organizador juega ? 1 : 0) - cubiertos por fuera - anotados
+ * Los anotados y los cubiertos por fuera se guardan aparte, por partido.
+ */
+function getParticipation() {
+  const stored = localStorage.getItem(PARTICIPATION_STORAGE_KEY);
+  if (!stored) return {};
+
+  const data = JSON.parse(stored);
+  if (data === null || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error(
+      "No se pudieron leer los jugadores anotados de esta sesión.",
+    );
+  }
+  return data;
+}
+
+function saveParticipation(matchId, changes) {
+  const all = getParticipation();
+  all[matchId] = { ...all[matchId], ...changes };
+  localStorage.setItem(PARTICIPATION_STORAGE_KEY, JSON.stringify(all));
+}
+
+function leerCupos(details, anotados = 0) {
+  const organizerPlays = details.organizerPlays !== false;
+  const outsideSlots = Number(details.cubiertosPorFuera ?? 0);
+  const expectedPlayers = Number(details.jugadoresEsperados);
+
+  if (!Number.isInteger(outsideSlots) || outsideSlots < 0) {
+    throw new Error("Los jugadores cubiertos por fuera deben ser 0 o más.");
+  }
+  if ((organizerPlays ? 1 : 0) + outsideSlots + anotados > expectedPlayers) {
+    throw new Error("Hay más jugadores confirmados que lugares en el partido.");
+  }
+
+  return { organizerPlays, outsideSlots };
 }
 
 function normalizeMatch(match) {
-  const slots = getMatchSlots();
-  // Si no se editó nunca, los jugadores faltantes son los esperados inicialmente
-  const missingPlayers =
-    slots[match.id] !== undefined
-      ? slots[match.id]
-      : (match.missingPlayers ?? match.expectedPlayers);
+  const record = getParticipation()[match.id] ?? {};
+  const participants = record.participants ?? [];
+  const expectedPlayers = Number(match.expectedPlayers);
+  // Por defecto el organizador juega (también aplica a los partidos mock).
+  const organizerSlots = match.organizerPlays === false ? 0 : 1;
+  // Los mock traían "faltantes" fijos: se toman como lo ya cubierto por fuera.
+  const outsideSlots =
+    record.outsideSlots ??
+    (match.missingPlayers === undefined
+      ? 0
+      : Math.max(
+          0,
+          expectedPlayers - organizerSlots - Number(match.missingPlayers),
+        ));
+  const missingPlayers = Math.max(
+    0,
+    expectedPlayers - organizerSlots - outsideSlots - participants.length,
+  );
 
   return {
     ...match,
+    organizerPlays: organizerSlots === 1,
+    organizerName:
+      match.organizerName ??
+      mockUsers.find((user) => String(user.id) === String(match.organizerId))
+        ?.name ??
+      "Organizador",
+    participants,
+    outsideSlots,
     missingPlayers,
     fieldName:
       match.fieldName ??
@@ -31,9 +88,9 @@ function normalizeMatch(match) {
   };
 }
 
+// El organizador marca un lugar como cubierto por fuera (amigos sin la app).
 export async function decreaseMatchSlot(matchId, userId) {
-  // Simulamos el tiempo de respuesta del servidor (400ms)
-  waitForInitialLoading();
+  await waitForInitialLoading();
 
   const match = await getMatchById(matchId);
   if (!match) throw new Error("No encontramos ese partido.");
@@ -46,15 +103,60 @@ export async function decreaseMatchSlot(matchId, userId) {
     throw new Error("La cancha ya está llena.");
   }
 
-  // Para testear el Criterio de Aceptación 5 (Rollback), podés descomentar la siguiente línea:
-  if (Math.random() > 0.5)
+  if (SIMULAR_ERROR_DE_RED && Math.random() > 0.5) {
     throw new Error("Error de conexión al servidor. Reintentá.");
+  }
 
-  const slots = getMatchSlots();
-  slots[matchId] = match.missingPlayers - 1;
-  localStorage.setItem(SLOTS_STORAGE_KEY, JSON.stringify(slots));
+  saveParticipation(matchId, { outsideSlots: match.outsideSlots + 1 });
 
-  return { ...match, missingPlayers: match.missingPlayers - 1 };
+  return getMatchById(matchId);
+}
+
+export async function joinMatch(matchId, user) {
+  await waitForInitialLoading();
+
+  if (!user?.id) throw new Error("Iniciá sesión para sumarte a un partido.");
+
+  const match = await getMatchById(matchId);
+  if (!match) throw new Error("No encontramos ese partido.");
+
+  if (String(match.organizerId) === String(user.id)) {
+    throw new Error("Sos el organizador de este partido.");
+  }
+  if (match.participants.some((p) => String(p.userId) === String(user.id))) {
+    throw new Error("Ya estás anotado en este partido.");
+  }
+  if (match.missingPlayers <= 0) {
+    throw new Error("La cancha ya está llena.");
+  }
+
+  saveParticipation(matchId, {
+    participants: [
+      ...match.participants,
+      { userId: user.id, name: user.name, joinedAt: new Date().toISOString() },
+    ],
+  });
+
+  return getMatchById(matchId);
+}
+
+export async function leaveMatch(matchId, userId) {
+  await waitForInitialLoading();
+
+  const match = await getMatchById(matchId);
+  if (!match) throw new Error("No encontramos ese partido.");
+
+  if (!match.participants.some((p) => String(p.userId) === String(userId))) {
+    throw new Error("No estabas anotado en este partido.");
+  }
+
+  saveParticipation(matchId, {
+    participants: match.participants.filter(
+      (p) => String(p.userId) !== String(userId),
+    ),
+  });
+
+  return getMatchById(matchId);
 }
 
 function getDeletedMatches() {
@@ -121,6 +223,8 @@ export async function createMatch(details, organizerId) {
     throw new Error("El monto extra por jugador debe ser mayor que 0.");
   }
 
+  const { organizerPlays, outsideSlots } = leerCupos(details);
+
   const field = mockFields.find(
     (availableField) => availableField.name === details.cancha,
   );
@@ -137,6 +241,7 @@ export async function createMatch(details, organizerId) {
     cocaAmountPerPlayer,
     pricePerPlayer: basePricePerPlayer + cocaAmountPerPlayer,
     organizerId,
+    organizerPlays,
     status: "OPEN",
     createdAt: now,
     updatedAt: now,
@@ -146,8 +251,9 @@ export async function createMatch(details, organizerId) {
     MATCHES_STORAGE_KEY,
     JSON.stringify([...getSavedMatches(), match]),
   );
+  saveParticipation(match.id, { participants: [], outsideSlots });
 
-  return match;
+  return normalizeMatch(match);
 }
 
 export async function getMatches() {
@@ -211,13 +317,22 @@ export async function updateMatch(matchId, userId, details) {
 
   const field = mockFields.find((f) => f.name === details.cancha);
 
+  const raw = getActiveMatches().find(
+    (item) => String(item.id) === String(matchId),
+  );
+  const { organizerPlays, outsideSlots } = leerCupos(
+    details,
+    match.participants.length,
+  );
+
   const updatedMatch = {
-    ...match,
+    ...raw,
     fieldId: field?.id ?? null,
     fieldName: details.cancha,
     date: details.fecha,
     startTime: details.hora,
     expectedPlayers: details.jugadoresEsperados,
+    organizerPlays,
     playingForCoca,
     basePricePerPlayer,
     cocaAmountPerPlayer,
@@ -225,13 +340,7 @@ export async function updateMatch(matchId, userId, details) {
     updatedAt: new Date().toISOString(),
   };
 
-  // Criterio 7: Actualizar cupos faltantes
-  const missing = Number(details.cuposFaltantes);
-  if (!Number.isNaN(missing)) {
-    const slots = getMatchSlots(); // Asume que getMatchSlots de BUS-8 ya existe
-    slots[matchId] = missing;
-    localStorage.setItem(SLOTS_STORAGE_KEY, JSON.stringify(slots));
-  }
+  saveParticipation(matchId, { outsideSlots });
 
   // Actualizar la lista de guardados
   const savedMatches = getSavedMatches();

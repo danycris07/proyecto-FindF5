@@ -5,6 +5,7 @@ import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { getMatchById } from "../services/matchService.js";
 import DeleteMatchDialog from "../components/partidos/DeleteMatchDialog.jsx";
 import { getMockSession } from "../services/sessionService.js";
+import { useParticipacion } from "../hooks/useParticipacion.js";
 
 function PartidoPublicado() {
   const { partidoId } = useParams();
@@ -31,6 +32,10 @@ function PartidoPublicado() {
 
   const isOrganizer =
     partido !== null && String(partido.organizerId) === String(session?.id);
+
+  const participacion = useParticipacion(partido, (actualizado) =>
+    setResultado((anterior) => ({ ...anterior, partido: actualizado })),
+  );
 
   const error = resultado.partidoId === partidoId ? resultado.error : "";
 
@@ -147,6 +152,14 @@ function PartidoPublicado() {
           justCreated={justCreated}
           isOrganizer={isOrganizer}
           onDelete={() => setPartidoAEliminar(partido)}
+          onDecreaseSlot={participacion.restarCupo}
+          decreaseError={participacion.errorCupo}
+          currentUserId={session?.id}
+          isJoined={participacion.estaAnotado}
+          onJoin={participacion.sumarme}
+          onLeave={participacion.bajarme}
+          pendingAction={participacion.accionPendiente}
+          participationError={participacion.errorParticipacion}
         />
       )}
       <DeleteMatchDialog

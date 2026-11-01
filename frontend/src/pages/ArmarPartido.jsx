@@ -58,7 +58,12 @@ function ArmarPartido({ embedded = false }) {
     formState: { errors, isSubmitting },
   } = useForm({
     shouldUnregister: true,
-    defaultValues: { jugarPorLaCoca: false, montoExtraCoca: "" },
+    defaultValues: {
+      jugarPorLaCoca: false,
+      montoExtraCoca: "",
+      organizerPlays: true,
+      cubiertosPorFuera: 0,
+    },
   });
 
   const now = new Date();
@@ -79,6 +84,30 @@ function ArmarPartido({ embedded = false }) {
     control,
     name: "jugadoresEsperados",
   });
+
+  const organizerPlaysValue = useWatch({
+    control,
+    name: "organizerPlays",
+    defaultValue: true,
+  });
+  const cubiertosValue = useWatch({
+    control,
+    name: "cubiertosPorFuera",
+    defaultValue: 0,
+  });
+
+  const anotados = originalMatch?.participants.length ?? 0;
+  const esperados = Number(jugadoresEsperadosValue);
+  const cuposAbiertos =
+    Number.isInteger(esperados) && esperados > 0
+      ? Math.max(
+          0,
+          esperados -
+            (organizerPlaysValue ? 1 : 0) -
+            (Number(cubiertosValue) || 0) -
+            anotados,
+        )
+      : null;
 
   const cuotaBase = cuotaBaseValue === "" ? 0 : Number(cuotaBaseValue);
   const montoExtraCoca =
@@ -112,7 +141,8 @@ function ArmarPartido({ embedded = false }) {
             fecha: match.date,
             hora: match.startTime.slice(0, 5),
             jugadoresEsperados: match.expectedPlayers,
-            cuposFaltantes: match.missingPlayers,
+            organizerPlays: match.organizerPlays,
+            cubiertosPorFuera: match.outsideSlots,
             cuota: match.basePricePerPlayer,
             jugarPorLaCoca: match.playingForCoca,
             montoExtraCoca: match.cocaAmountPerPlayer || "",
@@ -138,8 +168,7 @@ function ArmarPartido({ embedded = false }) {
     }
 
     if (isEditMode && originalMatch) {
-      const hasPlayers =
-        originalMatch.missingPlayers < originalMatch.expectedPlayers;
+      const hasPlayers = originalMatch.participants.length > 0;
       const hasCriticalChanges =
         data.cancha !== originalMatch.fieldName ||
         data.fecha !== originalMatch.date ||
@@ -198,9 +227,11 @@ function ArmarPartido({ embedded = false }) {
       cuotaBase={cuotaBase}
       montoExtraCoca={montoExtraCoca}
       totalPorJugador={totalPorJugador}
-      isEditMode={isEditMode}
       jugadoresEsperadosValue={jugadoresEsperadosValue}
       setValue={setValue}
+      organizerPlays={organizerPlaysValue}
+      anotados={anotados}
+      cuposAbiertos={cuposAbiertos}
     />
   );
 
