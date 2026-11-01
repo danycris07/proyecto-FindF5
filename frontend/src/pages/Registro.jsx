@@ -21,7 +21,12 @@ export function Registro({ isLoading: loadingProp }) {
   const onSubmit = async (data) => {
     setRegisterError("");
     try {
-      await registerUser(data);
+      await registerUser({
+        ...data,
+        name: data.name.trim(),
+        email: data.email.trim().toLowerCase(),
+        phone: data.phone?.trim() || null,
+      });
       reset();
       navigate("/partidos", { replace: true });
     } catch (error) {
@@ -71,9 +76,20 @@ export function Registro({ isLoading: loadingProp }) {
           type="text"
           autoComplete="name"
           placeholder="Juan Pérez"
+          maxLength={120}
           registration={register("name", {
             required: "Ingresá tu nombre.",
-            minLength: { value: 2, message: "Escribí al menos 2 letras." },
+            setValueAs: (value) => value.trim(),
+            validate: (value) => {
+              const normalized = value.trim();
+              if (normalized.length < 2) {
+                return "Escribí al menos 2 caracteres.";
+              }
+              if (normalized.length > 120) {
+                return "El nombre no puede superar los 120 caracteres.";
+              }
+              return true;
+            },
           })}
           error={errors.name?.message}
         />
@@ -84,10 +100,16 @@ export function Registro({ isLoading: loadingProp }) {
           type="email"
           autoComplete="email"
           placeholder="juan@email.com"
+          maxLength={254}
           registration={register("email", {
             required: "Ingresá tu email.",
+            setValueAs: (value) => value.trim(),
+            maxLength: {
+              value: 254,
+              message: "El email no puede superar los 254 caracteres.",
+            },
             pattern: {
-              value: /^\S+@\S+\.\S+$/,
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
               message: "Revisá el formato del email.",
             },
           })}
@@ -100,10 +122,19 @@ export function Registro({ isLoading: loadingProp }) {
           type="tel"
           autoComplete="tel"
           placeholder="+54 9 3704..."
+          maxLength={30}
           registration={register("phone", {
-            pattern: {
-              value: /^[+\d][\d\s()-]{6,}$/,
-              message: "Ingresá un teléfono válido.",
+            setValueAs: (value) => value.trim(),
+            validate: (value) => {
+              if (!value) return true;
+              if (!/^[+\d][\d\s()-]*$/.test(value)) {
+                return "Ingresá un teléfono válido.";
+              }
+              const digitCount = value.replace(/\D/g, "").length;
+              return (
+                (digitCount >= 7 && digitCount <= 15) ||
+                "El teléfono debe tener entre 7 y 15 dígitos."
+              );
             },
           })}
           error={errors.phone?.message}
@@ -114,9 +145,14 @@ export function Registro({ isLoading: loadingProp }) {
           label="Contraseña"
           type="password"
           autoComplete="new-password"
+          maxLength={128}
           registration={register("password", {
             required: "Elegí una contraseña.",
             minLength: { value: 6, message: "Mínimo 6 caracteres." },
+            maxLength: {
+              value: 128,
+              message: "La contraseña no puede superar los 128 caracteres.",
+            },
           })}
           error={errors.password?.message}
         />

@@ -13,7 +13,7 @@ function MatchFormField({ id, label, error, children }) {
       {children}
       {error && (
         <p id={`${id}-error`} role="alert" className="mt-2 text-sm text-danger">
-          {error}
+          <strong>{label}:</strong> {error}
         </p>
       )}
     </div>

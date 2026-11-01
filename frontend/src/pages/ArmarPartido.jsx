@@ -27,6 +27,17 @@ function horaLocal(date) {
   return `${hours}:${minutes}`;
 }
 
+const API_MATCH_FIELDS = {
+  fieldId: "cancha",
+  fieldName: "cancha",
+  date: "fecha",
+  startTime: "hora",
+  expectedPlayers: "jugadoresEsperados",
+  outsideSlots: "cubiertosPorFuera",
+  basePricePerPlayer: "cuota",
+  cocaAmountPerPlayer: "montoExtraCoca",
+};
+
 function ArmarPartido({ embedded = false }) {
   const { partidoId } = useParams();
   const isEditMode = Boolean(partidoId);
@@ -55,6 +66,7 @@ function ArmarPartido({ embedded = false }) {
     clearErrors,
     setError,
     setValue,
+    trigger,
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -228,6 +240,30 @@ function ArmarPartido({ embedded = false }) {
         });
       }
     } catch (error) {
+      const fieldErrors = error?.errors
+        ?.map(({ field, message }) => ({
+          field: API_MATCH_FIELDS[field],
+          message,
+        }))
+        .filter(({ field }) => field);
+
+      if (fieldErrors?.length) {
+        for (const { field, message } of fieldErrors) {
+          setError(field, { type: "server", message });
+        }
+        setErrorEnvio("");
+        return;
+      }
+
+      if (error?.field && API_MATCH_FIELDS[error.field]) {
+        setError(API_MATCH_FIELDS[error.field], {
+          type: "server",
+          message: error.message,
+        });
+        setErrorEnvio("");
+        return;
+      }
+
       setErrorEnvio(error.message || "No se pudo procesar tu solicitud.");
     }
   };
@@ -235,6 +271,7 @@ function ArmarPartido({ embedded = false }) {
   const fields = (
     <PartidoFormFields
       register={register}
+      trigger={trigger}
       errors={errors}
       canchas={canchas}
       canchasLoading={canchasLoading}
@@ -249,10 +286,12 @@ function ArmarPartido({ embedded = false }) {
       montoExtraCoca={montoExtraCoca}
       totalPorJugador={totalPorJugador}
       jugadoresEsperadosValue={jugadoresEsperadosValue}
+      cubiertosPorFueraValue={cubiertosValue}
       setValue={setValue}
       organizerPlays={organizerPlaysValue}
       anotados={anotados}
       cuposAbiertos={cuposAbiertos}
+      isEditMode={isEditMode}
     />
   );
 

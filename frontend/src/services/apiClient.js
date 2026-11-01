@@ -1,10 +1,12 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
 
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, errors = [], field) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.errors = errors;
+    this.field = field;
   }
 }
 
@@ -46,6 +48,8 @@ export async function apiRequest(path, { method = "GET", body } = {}) {
     throw new ApiError(
       payload?.message ?? `La solicitud falló (${response.status}).`,
       response.status,
+      payload?.errors ?? [],
+      payload?.field,
     );
   }
   return payload;

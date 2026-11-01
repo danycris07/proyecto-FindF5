@@ -71,6 +71,18 @@ test(
       });
       assert.equal(fieldOwnerPositionResponse.status, 400);
 
+      const invalidPhoneResponse = await fetch(`${baseUrl}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Teléfono inválido",
+          email: `phone-test-${randomUUID()}@example.com`,
+          password,
+          phone: "123",
+        }),
+      });
+      assert.equal(invalidPhoneResponse.status, 400);
+
       const registrationResponse = await fetch(`${baseUrl}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -5,6 +5,7 @@ import {
   getMissingPlayers,
   getMatchResponse,
   isFutureMatch,
+  normalizePublicMatchInput,
   normalizeMatchInput,
 } from "../src/services/match-rules.js";
 
@@ -128,5 +129,75 @@ test("la coca activa exige un importe positivo y los cupos no pueden exceder el 
         cocaAmountPerPlayer: 50000000,
       }),
     /importe total/,
+  );
+});
+
+test("los partidos públicos requieren entre 5 y 24 jugadores, cuota positiva y un cupo libre", () => {
+  const validMatch = {
+    fieldName: "Cancha",
+    date: "2999-01-01",
+    startTime: "21:00",
+    expectedPlayers: 5,
+    basePricePerPlayer: 1500,
+    organizerPlays: true,
+    outsideSlots: 3,
+  };
+
+  assert.equal(
+    normalizePublicMatchInput(validMatch, { requireOpenSlot: true })
+      .expectedPlayers,
+    5,
+  );
+  assert.throws(
+    () =>
+      normalizePublicMatchInput(
+        { ...validMatch, expectedPlayers: 4 },
+        { requireOpenSlot: true },
+      ),
+    /entre 5 y 24/,
+  );
+  assert.throws(
+    () =>
+      normalizePublicMatchInput(
+        { ...validMatch, expectedPlayers: 25 },
+        { requireOpenSlot: true },
+      ),
+    /entre 5 y 24/,
+  );
+  assert.throws(
+    () =>
+      normalizePublicMatchInput(
+        { ...validMatch, basePricePerPlayer: 0 },
+        { requireOpenSlot: true },
+      ),
+    /mayor que 0/,
+  );
+  assert.throws(
+    () =>
+      normalizePublicMatchInput(
+        { ...validMatch, basePricePerPlayer: 1500.5 },
+        { requireOpenSlot: true },
+      ),
+    /importe entero/,
+  );
+  assert.throws(
+    () =>
+      normalizePublicMatchInput(
+        {
+          ...validMatch,
+          playingForCoca: true,
+          cocaAmountPerPlayer: 200.5,
+        },
+        { requireOpenSlot: true },
+      ),
+    /importe entero/,
+  );
+  assert.throws(
+    () =>
+      normalizePublicMatchInput(
+        { ...validMatch, outsideSlots: 4 },
+        { requireOpenSlot: true },
+      ),
+    /al menos un cupo disponible/,
   );
 });

@@ -14,6 +14,8 @@ export function Login({ isLoading: loadingProp }) {
     register,
     handleSubmit,
     reset,
+    clearErrors,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm();
   const [loginError, setLoginError] = useState("");
@@ -22,10 +24,24 @@ export function Login({ isLoading: loadingProp }) {
   const onSubmit = async (data) => {
     setLoginError("");
     try {
-      await loginUser(data);
+      await loginUser({
+        ...data,
+        email: data.email.trim().toLowerCase(),
+      });
       reset();
       navigate(location.state?.from?.pathname || "/partidos", { replace: true });
     } catch (error) {
+      if (error?.status === 401) {
+        setError("email", {
+          type: "server",
+          message: "Verificá que este sea el correo con el que te registraste.",
+        });
+        setError("password", {
+          type: "server",
+          message: "Verificá que la contraseña corresponda a ese correo.",
+        });
+        return;
+      }
       setLoginError(
         error instanceof Error
           ? error.message
@@ -75,10 +91,20 @@ export function Login({ isLoading: loadingProp }) {
           type="email"
           autoComplete="email"
           placeholder="correo@ejemplo.com"
+          maxLength={254}
           registration={register("email", {
             required: "Ingresá tu correo.",
+            setValueAs: (value) => value.trim(),
+            onChange: () => {
+              clearErrors(["email", "password"]);
+              setLoginError("");
+            },
+            maxLength: {
+              value: 254,
+              message: "El correo no puede superar los 254 caracteres.",
+            },
             pattern: {
-              value: /^\S+@\S+\.\S+$/,
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
               message: "Revisá el formato del correo.",
             },
           })}
@@ -90,8 +116,17 @@ export function Login({ isLoading: loadingProp }) {
           label="Contraseña"
           type="password"
           autoComplete="current-password"
+          maxLength={128}
           registration={register("password", {
             required: "Ingresá tu contraseña.",
+            onChange: () => {
+              clearErrors(["email", "password"]);
+              setLoginError("");
+            },
+            maxLength: {
+              value: 128,
+              message: "La contraseña no puede superar los 128 caracteres.",
+            },
           })}
           error={errors.password?.message}
         />

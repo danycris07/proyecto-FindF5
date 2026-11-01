@@ -6,7 +6,9 @@ import {
   getMatchResponse,
   getMatchStatus,
   isFutureMatch,
-  normalizeMatchInput,
+  MAX_EXPECTED_PLAYERS,
+  MIN_EXPECTED_PLAYERS,
+  normalizePublicMatchInput,
 } from "../services/match-rules.js";
 
 function validationErrors(request, response, next) {
@@ -94,22 +96,38 @@ export const matchInputValidation = [
     .isInt({ min: 1 })
     .withMessage("El equipo indicado no es válido.")
     .toInt(),
-  body().custom((value) => {
+  body("endTime").custom((endTime, { req }) => {
     if (
-      typeof value.startTime === "string" &&
-      typeof value.endTime === "string" &&
-      value.endTime <= value.startTime
+      typeof req.body.startTime === "string" &&
+      typeof endTime === "string" &&
+      endTime <= req.body.startTime
     ) {
       throw new Error("La hora de finalización debe ser posterior al inicio.");
     }
     return true;
   }),
-  body().custom((value) => {
-    if (value.fieldId == null && typeof value.fieldName !== "string") {
+  body("fieldName").custom((fieldName, { req }) => {
+    if (req.body.fieldId == null && typeof fieldName !== "string") {
       throw new Error("Elegí una cancha o ingresá su nombre.");
     }
     return true;
   }),
+];
+
+const publicMatchInputValidation = [
+  ...matchInputValidation,
+  body("expectedPlayers")
+    .isInt({ min: MIN_EXPECTED_PLAYERS, max: MAX_EXPECTED_PLAYERS })
+    .withMessage(
+      `El partido debe tener entre ${MIN_EXPECTED_PLAYERS} y ${MAX_EXPECTED_PLAYERS} jugadores esperados.`,
+    ),
+  body("basePricePerPlayer")
+    .isInt({ min: 1, max: 99999999 })
+    .withMessage("La cuota por jugador debe ser un importe entero mayor que 0."),
+  body("cocaAmountPerPlayer")
+    .if((value, { req }) => req.body.playingForCoca === true)
+    .isInt({ min: 1, max: 99999999 })
+    .withMessage("El monto extra debe ser un importe entero mayor que 0."),
 ];
 
 function isValidTime(value) {
@@ -171,6 +189,7 @@ async function resolveField(models, values, transaction) {
   if (!field) {
     const error = new Error("No encontramos esa cancha.");
     error.status = 422;
+    error.field = "fieldId";
     throw error;
   }
 
@@ -188,6 +207,7 @@ async function resolveTeam(models, teamId, transaction) {
   if (!team) {
     const error = new Error("No encontramos ese equipo.");
     error.status = 422;
+    error.field = "teamId";
     throw error;
   }
   return team.id;
@@ -197,6 +217,7 @@ function requireFutureMatch(values) {
   if (!isFutureMatch(values.date, values.startTime)) {
     const error = new Error("Elegí una fecha y hora futuras.");
     error.status = 422;
+    error.field = "date";
     throw error;
   }
 }
@@ -264,17 +285,22 @@ export function createMatchesRouter({ models, sequelize }) {
   router.post(
     "/",
     requirePlayer,
-    matchInputValidation,
+    publicMatchInputValidation,
     validationErrors,
     async (request, response) => {
       let values;
       try {
-        values = normalizeMatchInput(request.body);
+        values = normalizePublicMatchInput(request.body, {
+          requireOpenSlot: true,
+        });
         requireFutureMatch(values);
       } catch (error) {
         return response
           .status(error.status ?? 422)
-          .json({ message: error.message });
+          .json({
+            message: error.message,
+            ...(error.field ? { field: error.field } : {}),
+          });
       }
 
       try {
@@ -311,7 +337,10 @@ export function createMatchesRouter({ models, sequelize }) {
         if (error.status) {
           return response
             .status(error.status)
-            .json({ message: error.message });
+            .json({
+              message: error.message,
+              ...(error.field ? { field: error.field } : {}),
+            });
         }
         if (error instanceof UniqueConstraintError) {
           return response
@@ -342,11 +371,11 @@ export function createMatchesRouter({ models, sequelize }) {
     "/:matchId",
     requirePlayer,
     matchIdValidation,
-    matchInputValidation,
+    publicMatchInputValidation,
     validationErrors,
     async (request, response) => {
       try {
-        const values = normalizeMatchInput(request.body);
+        const values = normalizePublicMatchInput(request.body);
         requireFutureMatch(values);
         const updated = await sequelize.transaction(async (transaction) => {
           const match = await findMatchForUpdate(
@@ -391,6 +420,7 @@ export function createMatchesRouter({ models, sequelize }) {
               "Hay más jugadores confirmados que lugares en el partido.",
             );
             error.status = 422;
+            error.field = "expectedPlayers";
             throw error;
           }
 
@@ -410,7 +440,10 @@ export function createMatchesRouter({ models, sequelize }) {
         return response.json({ match: getMatchResponse(updated) });
       } catch (error) {
         if (error.status) {
-          return response.status(error.status).json({ message: error.message });
+          return response.status(error.status).json({
+            message: error.message,
+            ...(error.field ? { field: error.field } : {}),
+          });
         }
         throw error;
       }

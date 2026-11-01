@@ -69,6 +69,10 @@ La respuesta del partido calcula `missingPlayers` a partir de jugadores
 esperados, participación del organizador, confirmados por fuera y participantes
 anotados. La hora se interpreta en la zona `America/Argentina/Buenos_Aires`.
 También incluye `fieldImageUrl` cuando el partido tiene una cancha asociada.
+La creación y edición desde jugadores requieren cuotas enteras mayores que cero
+y entre 5 y 24 jugadores esperados. Al publicar debe quedar al menos un cupo
+libre; ediciones de partidos ya completos se permiten mientras no se exceda el
+total.
 
 Los endpoints administrativos requieren una sesión con rol `ADMIN`:
 
