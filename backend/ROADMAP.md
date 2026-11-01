@@ -45,16 +45,18 @@ Commit: `13ef9ef feat: se creó la base del backend`.
 
 Verificación real de MySQL confirmada por el usuario con su configuración local.
 
-### 3. Usuarios y autenticación — siguiente
+### 3. Usuarios y autenticación — completada
 
-- Implementar registro, inicio y cierre de sesión.
-- Guardar contraseñas con hash; nunca almacenar contraseñas en texto plano.
-- Aplicar cookie `HttpOnly` y proteger las rutas autenticadas por rol.
-- Crear el comando local para inicializar el primer administrador usando
+- [x] Implementar registro, inicio y cierre de sesión.
+- [x] Guardar contraseñas con hash; nunca almacenar contraseñas en texto plano.
+- [x] Aplicar cookie `HttpOnly` con sesión persistida en MySQL.
+- [x] Evitar que el registro público permita crear administradores.
+- [x] Crear el comando local para inicializar el primer administrador usando
   variables de entorno.
-- Probar email duplicado, credenciales inválidas, sesión y permisos.
+- [x] Agregar validación de sesión y middleware de roles para rutas protegidas.
+- [x] Probar hashing, cookies, validación y flujos de autenticación con MySQL.
 
-### 4. Partidos y participación
+### 4. Partidos y participación — siguiente
 
 - Implementar consulta, creación, edición y eliminación de partidos.
 - Implementar sumarse, bajarse y ver participantes.
@@ -97,7 +99,7 @@ que se acuerde incorporarlas expresamente.
 
 - [x] Etapa 1: base del backend.
 - [x] Etapa 2: MySQL y modelos.
-- [ ] Etapa 3: usuarios y autenticación.
+- [x] Etapa 3: usuarios y autenticación.
 - [ ] Etapa 4: partidos y participación.
 - [ ] Etapa 5: administración.
 - [ ] Etapa 6: integración con el frontend.

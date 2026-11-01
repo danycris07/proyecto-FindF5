@@ -17,7 +17,8 @@ del frontend.
    ```
 
 2. Copiar `.env.example` como `.env` y completar los datos locales. Usar la
-   misma clave configurada para MySQL y no subir `.env` al repositorio.
+   misma clave configurada para MySQL, ajustar `FRONTEND_ORIGIN` si Vite usa
+   otro origen y no subir `.env` al repositorio.
 3. Instalar dependencias con `npm install`.
 4. Crear las tablas faltantes con `npm run db:sync`.
 5. Iniciar el servidor con `npm run dev`.
@@ -32,6 +33,25 @@ pero no altera ni elimina tablas existentes y se bloquea cuando
 `NODE_ENV=production`. Los cambios futuros de esquema requieren una estrategia
 de migraciones explícita; no se debe habilitar `alter` o `force` en producción.
 
-La API expone `GET /api/health` para comprobar que el servidor responde. La
-autenticación y las funcionalidades de negocio se incorporarán en etapas
-posteriores.
+La API expone `GET /api/health` y estos endpoints de autenticación:
+
+- `POST /api/auth/register`: crea una cuenta de jugador o dueño de cancha e
+  inicia su sesión. La posición y pierna hábil son opcionales para jugadores.
+- `POST /api/auth/login`: valida email y contraseña y crea una sesión.
+- `GET /api/auth/me`: devuelve el perfil público de la sesión activa.
+- `POST /api/auth/logout`: invalida la sesión actual.
+
+Las sesiones usan una cookie `HttpOnly`, `SameSite=Lax`, con duración de siete
+días. En producción se añade `Secure`. La base guarda únicamente el hash del
+token de sesión, y las contraseñas se derivan con `scrypt`. El rol administrador
+no puede asignarse desde el registro.
+
+Para crear el primer administrador, completar `ADMIN_NAME`, `ADMIN_EMAIL` y
+`ADMIN_PASSWORD` en `.env` (contraseña de al menos 12 caracteres) y ejecutar
+`npm run db:bootstrap-admin`. El comando no eleva cuentas existentes que no
+sean administradoras y es idempotente para una cuenta administradora ya creada.
+
+Las pruebas de autenticación contra MySQL crean y eliminan una cuenta temporal.
+Con la base de desarrollo configurada, ejecutarlas con
+`$env:RUN_DB_INTEGRATION_TESTS="1"; npm test` en PowerShell. No ejecutar pruebas
+de integración contra una base de producción.
