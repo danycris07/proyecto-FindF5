@@ -68,6 +68,23 @@ La respuesta del partido calcula `missingPlayers` a partir de jugadores
 esperados, participación del organizador, confirmados por fuera y participantes
 anotados. La hora se interpreta en la zona `America/Argentina/Buenos_Aires`.
 
+Los endpoints administrativos requieren una sesión con rol `ADMIN`:
+
+- `/api/admin/users`: listar, consultar, crear, editar y eliminar usuarios.
+  Las contraseñas nuevas o restablecidas se guardan con `scrypt`; los datos de
+  respuesta nunca incluyen el hash. Los cambios de rol y contraseña revocan
+  las sesiones existentes.
+- `/api/admin/fields`: CRUD de canchas, incluyendo propietario, dirección,
+  coordenadas, precio e información de imagen.
+- `/api/admin/matches`: CRUD de partidos, pudiendo asignar un jugador como
+  organizador. Las respuestas conservan el mismo formato y cálculo de cupos que
+  `/api/matches`.
+
+Las eliminaciones son lógicas. No se permite que el administrador se elimine o
+quite su propio rol, y debe quedar al menos un administrador activo. Los
+identificadores de propietarios, organizadores, canchas y equipos se validan
+antes de guardar.
+
 Para crear el primer administrador, completar `ADMIN_NAME`, `ADMIN_EMAIL` y
 `ADMIN_PASSWORD` en `.env` (contraseña de al menos 12 caracteres) y ejecutar
 `npm run db:bootstrap-admin`. El comando no eleva cuentas existentes que no

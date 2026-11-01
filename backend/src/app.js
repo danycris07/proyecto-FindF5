@@ -2,7 +2,12 @@ import express from "express";
 import cors from "cors";
 import healthRouter from "./routes/health.routes.js";
 
-export function createApp({ authRouter, matchesRouter, fieldsRouter } = {}) {
+export function createApp({
+  authRouter,
+  matchesRouter,
+  fieldsRouter,
+  adminRouter,
+} = {}) {
   const app = express();
   const allowedOrigin =
     process.env.FRONTEND_ORIGIN ?? "http://localhost:5173";
@@ -24,6 +29,9 @@ export function createApp({ authRouter, matchesRouter, fieldsRouter } = {}) {
   }
   if (fieldsRouter) {
     app.use("/api/fields", fieldsRouter);
+  }
+  if (adminRouter) {
+    app.use("/api/admin", adminRouter);
   }
   app.use((_request, response) =>
     response.status(404).json({ message: "No encontramos esa ruta." }),

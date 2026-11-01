@@ -68,11 +68,12 @@ Verificación real de MySQL confirmada por el usuario con su configuración loca
 - [x] Cubrir la opción “Jugar por la coca” y los datos de cancha disponibles.
 - [x] Probar operaciones, permisos, cupos y concurrencia contra MySQL local.
 
-### 5. Administración
+### 5. Administración — completada
 
-- Implementar rutas administrativas para usuarios, canchas y partidos.
-- Restringir esas rutas al rol administrador.
-- Probar las operaciones autorizadas y el rechazo de los demás roles.
+- [x] Implementar CRUD administrativo para usuarios, canchas y partidos.
+- [x] Restringir esas rutas al rol administrador.
+- [x] Proteger la cuenta propia y asegurar que quede un administrador activo.
+- [x] Probar operaciones, roles y cambios principales contra MySQL local.
 
 ### 6. Integración con el frontend
 
@@ -102,6 +103,6 @@ que se acuerde incorporarlas expresamente.
 - [x] Etapa 2: MySQL y modelos.
 - [x] Etapa 3: usuarios y autenticación.
 - [x] Etapa 4: partidos y participación.
-- [ ] Etapa 5: administración.
+- [x] Etapa 5: administración.
 - [ ] Etapa 6: integración con el frontend.
 - [ ] Etapa 7: validación y cierre.

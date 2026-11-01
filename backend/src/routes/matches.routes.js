@@ -28,7 +28,7 @@ const matchIdValidation = param("matchId")
   .withMessage("El identificador del partido no es válido.")
   .toInt();
 
-const matchInputValidation = [
+export const matchInputValidation = [
   body("fieldId")
     .optional({ values: "null" })
     .isInt({ min: 1 })
@@ -62,8 +62,8 @@ const matchInputValidation = [
     .custom(isValidTime)
     .withMessage("Ingresá una hora de finalización válida."),
   body("expectedPlayers")
-    .isInt({ min: 1 })
-    .withMessage("Los jugadores esperados deben ser un entero mayor que 0.")
+    .isInt({ min: 1, max: 4294967295 })
+    .withMessage("Los jugadores esperados deben ser un entero válido.")
     .toInt(),
   body("organizerPlays")
     .optional()
@@ -72,7 +72,7 @@ const matchInputValidation = [
     .toBoolean(),
   body("outsideSlots")
     .optional()
-    .isInt({ min: 0 })
+    .isInt({ min: 0, max: 4294967295 })
     .withMessage("Los confirmados por fuera deben ser un entero de 0 o más.")
     .toInt(),
   body("playingForCoca")
@@ -163,7 +163,6 @@ async function resolveField(models, values, transaction) {
   if (!values.fieldId) {
     return values;
   }
-
   const field = await models.Field.findByPk(values.fieldId, { transaction });
   if (!field) {
     const error = new Error("No encontramos esa cancha.");
@@ -175,6 +174,19 @@ async function resolveField(models, values, transaction) {
     ...values,
     fieldName: field.name,
   };
+}
+
+async function resolveTeam(models, teamId, transaction) {
+  if (teamId == null) {
+    return null;
+  }
+  const team = await models.Team.findByPk(teamId, { transaction });
+  if (!team) {
+    const error = new Error("No encontramos ese equipo.");
+    error.status = 422;
+    throw error;
+  }
+  return team.id;
 }
 
 function requireFutureMatch(values) {
@@ -268,10 +280,15 @@ export function createMatchesRouter({ models, sequelize }) {
             values,
             transaction,
           );
+          const teamId = await resolveTeam(
+            models,
+            request.body.teamId ?? null,
+            transaction,
+          );
           const record = await models.Match.create(
             {
               ...resolvedValues,
-              teamId: request.body.teamId ?? null,
+              teamId,
               organizerId: request.authUser.id,
               status:
                 (resolvedValues.organizerPlays ? 1 : 0) +
@@ -356,6 +373,11 @@ export function createMatchesRouter({ models, sequelize }) {
             values,
             transaction,
           );
+          const teamId = await resolveTeam(
+            models,
+            request.body.teamId ?? null,
+            transaction,
+          );
           const committedPlayers =
             match.participants.length +
             (resolvedValues.organizerPlays ? 1 : 0) +
@@ -371,7 +393,7 @@ export function createMatchesRouter({ models, sequelize }) {
           await match.update(
             {
               ...resolvedValues,
-              teamId: request.body.teamId ?? null,
+              teamId,
               status:
                 committedPlayers >= resolvedValues.expectedPlayers
                   ? "COMPLETE"

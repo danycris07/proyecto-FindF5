@@ -88,14 +88,27 @@ export function normalizeMatchInput(body) {
   ) {
     throw new Error("El monto extra por jugador debe ser mayor que 0.");
   }
-  if (!Number.isInteger(expectedPlayers) || expectedPlayers < 1) {
+  if (
+    !Number.isInteger(expectedPlayers) ||
+    expectedPlayers < 1 ||
+    expectedPlayers > 4294967295
+  ) {
     throw new Error("Los jugadores esperados deben ser un entero mayor que 0.");
   }
-  if (!Number.isInteger(outsideSlots) || outsideSlots < 0) {
+  if (
+    !Number.isInteger(outsideSlots) ||
+    outsideSlots < 0 ||
+    outsideSlots > 4294967295
+  ) {
     throw new Error("Los jugadores confirmados por fuera deben ser 0 o más.");
   }
   if ((organizerPlays ? 1 : 0) + outsideSlots > expectedPlayers) {
     throw new Error("Hay más jugadores confirmados que lugares en el partido.");
+  }
+
+  const pricePerPlayer = basePricePerPlayer + cocaAmountPerPlayer;
+  if (pricePerPlayer > 99999999.99) {
+    throw new Error("El importe total por jugador supera el máximo permitido.");
   }
 
   return {
@@ -110,6 +123,6 @@ export function normalizeMatchInput(body) {
     playingForCoca,
     basePricePerPlayer,
     cocaAmountPerPlayer,
-    pricePerPlayer: basePricePerPlayer + cocaAmountPerPlayer,
+    pricePerPlayer,
   };
 }

@@ -99,4 +99,17 @@ test("la coca activa exige un importe positivo y los cupos no pueden exceder el 
       }),
     /más jugadores confirmados/,
   );
+  assert.throws(
+    () =>
+      normalizeMatchInput({
+        fieldName: "Cancha",
+        date: "2999-01-01",
+        startTime: "21:00",
+        expectedPlayers: 10,
+        basePricePerPlayer: 60000000,
+        playingForCoca: true,
+        cocaAmountPerPlayer: 50000000,
+      }),
+    /importe total/,
+  );
 });
