@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-function ThemeToggle() {
+function ThemeToggle({ placement = "floating" }) {
+  const isMenuItem = placement === "menu";
   const [theme, setTheme] = useState(
     () => document.documentElement.dataset.theme === "light" ? "light" : "dark",
   );
@@ -25,7 +26,11 @@ function ThemeToggle() {
       aria-label={`Cambiar a tema ${theme === "dark" ? "claro" : "oscuro"}`}
       aria-pressed={theme === "light"}
       onClick={toggleTheme}
-      className="fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface text-text-primary shadow-lg shadow-[var(--shadow-color)] backdrop-blur transition-colors duration-200 hover:border-status motion-reduce:transition-none"
+      className={
+        isMenuItem
+          ? "flex min-h-11 w-full items-center gap-3 rounded-sm border border-border bg-background px-3 text-sm font-semibold text-text-primary transition-colors hover:border-status focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status motion-reduce:transition-none"
+          : "fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface text-text-primary shadow-lg shadow-[var(--shadow-color)] backdrop-blur transition-colors duration-200 hover:border-status motion-reduce:transition-none"
+      }
     >
       {theme === "dark" ? (
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
@@ -36,6 +41,11 @@ function ThemeToggle() {
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
           <path strokeLinecap="round" strokeLinejoin="round" d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z" />
         </svg>
+      )}
+      {isMenuItem && (
+        <span>
+          Cambiar a tema {theme === "dark" ? "claro" : "oscuro"}
+        </span>
       )}
     </button>
   );

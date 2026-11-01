@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import MatchConfirmationCard from "../components/partidos/MatchDetailCard.jsx";
-import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { getMatchById } from "../services/matchService.js";
 import DeleteMatchDialog from "../components/partidos/DeleteMatchDialog.jsx";
 import { getSessionUser } from "../services/sessionService.js";
 import { useParticipacion } from "../hooks/useParticipacion.js";
+import { waitForMinimumSkeleton } from "../hooks/useInitialLoading.js";
 
 function PartidoPublicado() {
   const { partidoId } = useParams();
@@ -56,8 +56,11 @@ function PartidoPublicado() {
     let primerFrameId;
     let segundoFrameId;
 
-    getMatchById(partidoId)
-      .then((match) => {
+    const cargarPartido = async () => {
+      const startedAt = Date.now();
+      try {
+        const match = await getMatchById(partidoId);
+        await waitForMinimumSkeleton(startedAt);
         if (activo) {
           setResultado({
             partidoId,
@@ -76,8 +79,8 @@ function PartidoPublicado() {
             });
           }
         }
-      })
-      .catch((loadError) => {
+      } catch (loadError) {
+        await waitForMinimumSkeleton(startedAt);
         if (activo) {
           setResultado({
             partidoId,
@@ -89,7 +92,9 @@ function PartidoPublicado() {
             estado: "error",
           });
         }
-      });
+      }
+    };
+    void cargarPartido();
 
     return () => {
       activo = false;
@@ -103,8 +108,7 @@ function PartidoPublicado() {
   }, [partidoId]);
 
   return (
-    <main className="min-h-screen bg-background px-4 py-10 font-sans text-text-primary sm:px-6 sm:py-14">
-      <ThemeToggle />
+    <main className="min-h-screen bg-background px-4 pt-20 pb-24 font-sans text-text-primary md:pt-24 md:pb-12 sm:px-6">
       {aviso && (
         <div className="mx-auto w-full max-w-3xl mb-6 rounded-sm border border-status/40 bg-status/10 px-4 py-3 text-sm font-bold text-status">
           {aviso}

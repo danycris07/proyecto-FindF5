@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import AdminFieldsPanel from "../components/admin/AdminFieldsPanel.jsx";
 import AdminMatchesPanel from "../components/admin/AdminMatchesPanel.jsx";
 import AdminUsersPanel from "../components/admin/AdminUsersPanel.jsx";
@@ -20,7 +19,6 @@ function AdminPage() {
         aria-hidden="true"
         className="landing-glow pointer-events-none absolute inset-x-0 top-0 -z-10 h-152"
       />
-      <ThemeToggle />
       <header className="border-b border-border bg-surface/70">
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-end justify-between gap-4 px-5 py-6 lg:px-8">
           <div>
