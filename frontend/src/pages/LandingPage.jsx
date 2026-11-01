@@ -1,4 +1,4 @@
-import Navbar from "../components/ui/Navbar.jsx";
+import AppNavigation from "../components/ui/AppNavigation.jsx";
 import Hero from "../components/ui/Hero.jsx";
 import ComoFunciona from "../components/ui/ComoFunciona.jsx";
 import Canchas from "../components/ui/Canchas.jsx";
@@ -31,7 +31,7 @@ function LandingPage({ isLoading: loadingProp }) {
         className="landing-glow pointer-events-none absolute inset-x-0 top-0 h-152"
       />
 
-      <Navbar />
+      <AppNavigation showMobile={false} />
 
       <main className="relative">
         <Hero btnPrimary={btnPrimary} btnSecondary={btnSecondary} />

@@ -1,4 +1,9 @@
 import { Link } from "react-router-dom";
+import {
+  AnimatePresence,
+  m as motion,
+  useReducedMotion,
+} from "framer-motion";
 import Skeleton from "../ui/Skeleton.jsx";
 import ThemeToggle from "../ui/ThemeToggle.jsx";
 
@@ -16,6 +21,7 @@ function AuthShell({
   skeletonFields = 2,
   children,
 }) {
+  const reduceMotion = useReducedMotion();
   return (
     <main
       className="flex min-h-screen items-center justify-center bg-background px-4 py-10 font-sans text-text-primary"
@@ -47,19 +53,38 @@ function AuthShell({
             </p>
           </header>
 
-          {loading ? (
-            <div role="status" aria-label={loadingLabel} className="space-y-5">
-              {Array.from({ length: skeletonFields }, (_, index) => (
-                <div key={index} className="space-y-2">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-12 w-full" />
-                </div>
-              ))}
-              <Skeleton className="h-12 w-full" />
-            </div>
-          ) : (
-            children
-          )}
+          <AnimatePresence mode="wait" initial={false}>
+            {loading ? (
+              <motion.div
+                key="form-skeleton"
+                role="status"
+                aria-label={loadingLabel}
+                className="space-y-5"
+                initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+                transition={{ duration: reduceMotion ? 0 : 0.18 }}
+              >
+                {Array.from({ length: skeletonFields }, (_, index) => (
+                  <div key={index} className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-12 w-full" />
+                  </div>
+                ))}
+                <Skeleton className="h-12 w-full" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="form-content"
+                initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+                transition={{ duration: reduceMotion ? 0 : 0.18 }}
+              >
+                {children}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <p className="mt-6 text-center text-sm text-text-secondary">
             {footer}

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import MatchCard from "../components/partidos/MatchCard.jsx";
-import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { getMatches } from "../services/matchService.js";
 import { useParticipacion } from "../hooks/useParticipacion.js";
 import MatchConfirmationCard from "../components/partidos/MatchDetailCard.jsx";
@@ -12,12 +11,17 @@ import DeleteMatchDialog from "../components/partidos/DeleteMatchDialog.jsx";
 import { GoPlus } from "react-icons/go";
 import MatchFilters from "../components/partidos/MatchFilters.jsx";
 import { useMatchFilters } from "../hooks/useMatchFilters.js";
-
-const CTA_CLASSES =
-  "inline-flex min-h-11 items-center justify-center rounded-sm border border-primary bg-primary px-5 py-2 text-sm font-extrabold uppercase tracking-wider text-primary-foreground";
+import ImpactButton from "../components/ui/ImpactButton.jsx";
+import { waitForMinimumSkeleton } from "../hooks/useInitialLoading.js";
+import {
+  AnimatePresence,
+  m as motion,
+  useReducedMotion,
+} from "framer-motion";
 
 function PartidosPage() {
   const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
 
   const [openingForm, setOpeningForm] = useState(false);
   const openingFormRef = useRef(false);
@@ -70,29 +74,16 @@ function PartidosPage() {
     setAviso(`Partido eliminado: ${partido.fieldName}.`);
   };
 
-  const armarPartidoButton = session?.role === "PLAYER" && (
-    <button
-      type="button"
-      onClick={handleOpenForm}
-      disabled={openingForm}
-      aria-busy={openingForm}
-      className={`${CTA_CLASSES} ${
-        openingForm
-          ? "cursor-wait opacity-60 disabled:cursor-wait"
-          : "transition-opacity hover:opacity-90"
-      }`}
-    >
-      {openingForm ? "Cargando..." : "Armar partido"}
-    </button>
-  );
-
   useEffect(() => {
     let activo = true;
-    getMatches()
-      .then((partidos) => {
+    const cargarPartidos = async () => {
+      const startedAt = Date.now();
+      try {
+        const partidos = await getMatches();
+        await waitForMinimumSkeleton(startedAt);
         if (activo) setEstado({ status: "cargado", partidos, error: "" });
-      })
-      .catch((error) => {
+      } catch (error) {
+        await waitForMinimumSkeleton(startedAt);
         if (activo) {
           setEstado({
             status: "error",
@@ -103,7 +94,9 @@ function PartidosPage() {
                 : "No se pudieron cargar las convocatorias.",
           });
         }
-      });
+      }
+    };
+    void cargarPartidos();
 
     return () => {
       activo = false;
@@ -117,32 +110,7 @@ function PartidosPage() {
           aria-hidden="true"
           className="landing-glow pointer-events-none absolute inset-x-0 top-0 -z-10 h-152"
         />
-        <ThemeToggle />
-        <header className="border-b border-border bg-surface/70">
-          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-end justify-between gap-4 px-5 py-6 lg:px-8">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.15em] text-status">
-                FindF5 · Convocatorias
-              </p>
-              <h1 className="mt-2 font-display text-3xl font-extrabold uppercase tracking-wider sm:text-4xl">
-                Partidos abiertos
-              </h1>
-              {estado.status === "cargado" && (
-                <p className="mt-1 text-sm tabular-nums text-text-secondary">
-                  {estado.partidos.length}{" "}
-                  {estado.partidos.length === 1
-                    ? "convocatoria abierta"
-                    : "convocatorias abiertas"}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col items-end gap-2">
-              {armarPartidoButton}
-            </div>
-          </div>
-        </header>
-
-        <main className="mx-auto w-full max-w-7xl px-5 py-8 lg:px-8">
+        <main className="mx-auto w-full max-w-7xl px-5 pt-20 pb-24 md:pt-24 md:pb-12 lg:px-8">
           {aviso && (
             <p
               role="status"
@@ -152,9 +120,29 @@ function PartidosPage() {
             </p>
           )}
           {estado.status === "cargando" && (
-            <p role="status" className="text-text-secondary">
-              Cargando convocatorias...
-            </p>
+            <motion.div
+              role="status"
+              aria-label="Cargando convocatorias"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: reduceMotion ? 0 : 0.2 }}
+              className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {Array.from({ length: 6 }, (_, index) => (
+                <div
+                  key={index}
+                  aria-hidden="true"
+                  className="overflow-hidden rounded-sm border border-border bg-surface"
+                >
+                  <div className="h-32 animate-pulse bg-border/70 sm:h-36 motion-reduce:animate-none" />
+                  <div className="space-y-3 p-4">
+                    <div className="h-5 w-3/4 animate-pulse rounded-sm bg-border/70 motion-reduce:animate-none" />
+                    <div className="h-4 w-1/2 animate-pulse rounded-sm bg-border/70 motion-reduce:animate-none" />
+                    <div className="h-7 w-1/3 animate-pulse rounded-sm bg-border/70 motion-reduce:animate-none" />
+                  </div>
+                </div>
+              ))}
+            </motion.div>
           )}
 
           {estado.status === "error" && (
@@ -176,7 +164,7 @@ function PartidosPage() {
 
           {estado.status === "cargado" && estado.partidos.length === 0 && (
             <div className="space-y-4">
-              <button
+              <ImpactButton
                 type="button"
                 onClick={handleOpenForm}
                 disabled={openingForm}
@@ -186,7 +174,7 @@ function PartidosPage() {
                 <span className="font-display text-lg font-bold uppercase tracking-wider">
                   ¿No hay fecha? Armá el tuyo
                 </span>
-              </button>
+              </ImpactButton>
             </div>
           )}
 
@@ -200,15 +188,55 @@ function PartidosPage() {
 
           {estado.status === "cargado" &&
             filtrosPartidos.visibles.length > 0 && (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filtrosPartidos.visibles.map((partido) => (
-                  <MatchCard
+              <motion.div
+                className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: {},
+                  visible: reduceMotion
+                    ? {}
+                    : {
+                        transition: {
+                          staggerChildren: 0.05,
+                          delayChildren: 0.04,
+                        },
+                      },
+                }}
+              >
+                <AnimatePresence mode="popLayout">
+                  {filtrosPartidos.visibles.map((partido) => (
+                    <motion.div
                     key={partido.id}
-                    match={partido}
-                    onSelect={setPartidoSeleccionado}
-                  />
-                ))}
-                <button
+                      variants={
+                        reduceMotion
+                          ? {
+                              hidden: { opacity: 1, y: 0 },
+                              visible: { opacity: 1, y: 0 },
+                            }
+                          : {
+                              hidden: { opacity: 0, y: 20 },
+                              visible: {
+                                opacity: 1,
+                                y: 0,
+                                transition: {
+                                  type: "spring",
+                                  stiffness: 320,
+                                  damping: 28,
+                                },
+                              },
+                            }
+                      }
+                      exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+                    >
+                      <MatchCard
+                        match={partido}
+                        onSelect={setPartidoSeleccionado}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                <ImpactButton
                   type="button"
                   onClick={handleOpenForm}
                   disabled={openingForm}
@@ -218,8 +246,8 @@ function PartidosPage() {
                   <span className="font-display text-lg font-bold uppercase tracking-wider">
                     ¿No hay fecha? Armá el tuyo
                   </span>
-                </button>
-              </div>
+                </ImpactButton>
+              </motion.div>
             )}
 
           <MatchModal

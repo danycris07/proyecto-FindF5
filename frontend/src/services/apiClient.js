@@ -1,3 +1,4 @@
+import axios from "axios";
 const API_BASE_URL = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
 
 export class ApiError extends Error {
@@ -9,6 +10,14 @@ export class ApiError extends Error {
     this.field = field;
   }
 }
+
+export const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "/api",
+  withCredentials: true, // 👈 OBLIGATORIO para enviar la cookie entre el celular y la PC
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 export async function apiRequest(path, { method = "GET", body } = {}) {
   if (!API_BASE_URL) {

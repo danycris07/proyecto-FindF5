@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { waitForMinimumSkeleton } from "./useInitialLoading.js";
 
 export function useAdminCollection(loadItems, resourceName) {
   const [items, setItems] = useState([]);
@@ -6,11 +7,15 @@ export function useAdminCollection(loadItems, resourceName) {
   const [error, setError] = useState("");
 
   const refresh = useCallback(async () => {
+    const startedAt = Date.now();
     setLoading(true);
     setError("");
     try {
-      setItems(await loadItems());
+      const loadedItems = await loadItems();
+      await waitForMinimumSkeleton(startedAt);
+      setItems(loadedItems);
     } catch (loadError) {
+      await waitForMinimumSkeleton(startedAt);
       setError(
         loadError instanceof Error
           ? `No se pudieron cargar ${resourceName}: ${loadError.message}`
@@ -23,11 +28,14 @@ export function useAdminCollection(loadItems, resourceName) {
 
   useEffect(() => {
     let active = true;
-    loadItems()
-      .then((loadedItems) => {
+    const cargarItems = async () => {
+      const startedAt = Date.now();
+      try {
+        const loadedItems = await loadItems();
+        await waitForMinimumSkeleton(startedAt);
         if (active) setItems(loadedItems);
-      })
-      .catch((loadError) => {
+      } catch (loadError) {
+        await waitForMinimumSkeleton(startedAt);
         if (active) {
           setError(
             loadError instanceof Error
@@ -35,10 +43,11 @@ export function useAdminCollection(loadItems, resourceName) {
               : `No se pudieron cargar ${resourceName}.`,
           );
         }
-      })
-      .finally(() => {
+      } finally {
         if (active) setLoading(false);
-      });
+      }
+    };
+    void cargarItems();
 
     return () => {
       active = false;

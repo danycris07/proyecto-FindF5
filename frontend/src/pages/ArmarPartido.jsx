@@ -13,6 +13,7 @@ import { getSessionUser } from "../services/sessionService.js";
 import { useAvailableFields } from "../hooks/useAvailableFields.js";
 import { useInitialLoading } from "../hooks/useInitialLoading.js";
 import Skeleton from "../components/ui/Skeleton.jsx";
+import { waitForMinimumSkeleton } from "../hooks/useInitialLoading.js";
 
 function fechaLocal(date) {
   const year = date.getFullYear();
@@ -148,8 +149,11 @@ function ArmarPartido({ embedded = false }) {
     if (!isEditMode || originalMatch) return undefined;
     let active = true;
 
-    getMatchById(partidoId)
-      .then((match) => {
+    const cargarPartido = async () => {
+      const startedAt = Date.now();
+      try {
+        const match = await getMatchById(partidoId);
+        await waitForMinimumSkeleton(startedAt);
         if (!active) return;
         if (!match) {
           navigate("/partidos", {
@@ -171,8 +175,8 @@ function ArmarPartido({ embedded = false }) {
           jugarPorLaCoca: match.playingForCoca,
           montoExtraCoca: match.cocaAmountPerPlayer || "",
         });
-      })
-      .catch((error) => {
+      } catch (error) {
+        await waitForMinimumSkeleton(startedAt);
         if (active) {
           setErrorEnvio(
             error instanceof Error
@@ -180,10 +184,11 @@ function ArmarPartido({ embedded = false }) {
               : "No se pudo cargar el partido.",
           );
         }
-      })
-      .finally(() => {
+      } finally {
         if (active) setEditLoading(false);
-      });
+      }
+    };
+    void cargarPartido();
 
     return () => {
       active = false;

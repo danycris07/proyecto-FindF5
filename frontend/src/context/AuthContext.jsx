@@ -5,6 +5,7 @@ import {
   getSessionUser,
   subscribeToSessionChanges,
 } from "../services/sessionService.js";
+import { waitForMinimumSkeleton } from "../hooks/useInitialLoading.js";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => getSessionUser());
@@ -15,14 +16,17 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let active = true;
-    getCurrentSession()
-      .then((currentUser) => {
+    const validarSesion = async () => {
+      const startedAt = Date.now();
+      try {
+        const currentUser = await getCurrentSession();
+        await waitForMinimumSkeleton(startedAt);
         if (active) {
           setUser(currentUser);
           setError("");
         }
-      })
-      .catch((sessionError) => {
+      } catch (sessionError) {
+        await waitForMinimumSkeleton(startedAt);
         if (active) {
           setError(
             sessionError instanceof Error
@@ -30,10 +34,11 @@ export function AuthProvider({ children }) {
               : "No se pudo validar la sesión.",
           );
         }
-      })
-      .finally(() => {
+      } finally {
         if (active) setLoading(false);
-      });
+      }
+    };
+    void validarSesion();
 
     return () => {
       active = false;

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { getAvailableFields } from "../services/fieldService.js";
+import { waitForMinimumSkeleton } from "./useInitialLoading.js";
 
 async function requestFields() {
   try {
@@ -23,19 +24,24 @@ export function useAvailableFields() {
   });
 
   const retry = useCallback(async () => {
+    const startedAt = Date.now();
     setState((current) => ({ ...current, loading: true, error: "" }));
     const result = await requestFields();
+    await waitForMinimumSkeleton(startedAt);
     setState({ ...result, loading: false });
   }, []);
 
   useEffect(() => {
     let active = true;
-
-    requestFields().then((result) => {
+    const cargarCanchas = async () => {
+      const startedAt = Date.now();
+      const result = await requestFields();
+      await waitForMinimumSkeleton(startedAt);
       if (active) {
         setState({ ...result, loading: false });
       }
-    });
+    };
+    void cargarCanchas();
 
     return () => {
       active = false;

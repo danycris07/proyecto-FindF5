@@ -1,3 +1,6 @@
+import { m as motion, useReducedMotion } from "framer-motion";
+import ImpactButton from "../ui/ImpactButton.jsx";
+
 function MatchFormCard({
   embedded,
   animated,
@@ -8,6 +11,7 @@ function MatchFormCard({
   isEditMode,
   matchName,
 }) {
+  const reduceMotion = useReducedMotion();
   const title = isEditMode ? "Editar partido" : "Armar partido";
   const desc = isEditMode
     ? `${matchName ? `Estás editando tu partido en ${matchName}. ` : ""}Actualizá los datos o corregí imprevistos.`
@@ -18,10 +22,15 @@ function MatchFormCard({
       ? "Guardar cambios"
       : "Armar partido";
   return (
-    <section
-      className={`relative isolate overflow-hidden rounded-md border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none sm:p-8 ${
-        animated ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-      }`}
+    <motion.section
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      animate={
+        reduceMotion || animated
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 24 }
+      }
+      transition={{ duration: reduceMotion ? 0 : 0.5, ease: "easeOut" }}
+      className="relative isolate overflow-hidden rounded-md border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] sm:p-8"
     >
       <div
         aria-hidden="true"
@@ -57,16 +66,16 @@ function MatchFormCard({
             </p>
           )}
 
-          <button
+          <ImpactButton
             type="submit"
             disabled={isSubmitting}
             className="inline-flex min-h-12 w-full items-center justify-center rounded-sm border border-primary bg-primary px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-primary-foreground shadow-[0_8px_30px_var(--primary-shadow)] transition-[transform,box-shadow,filter] duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_var(--primary-shadow-strong)] active:translate-y-0 disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none sm:w-auto"
           >
             {btnText}
-          </button>
+          </ImpactButton>
         </form>
       </div>
-    </section>
+    </motion.section>
   );
 }
 

@@ -1,5 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import {
+  AnimatePresence,
+  m as motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+} from "framer-motion";
 import {
   LuCalendarCheck,
   LuChevronRight,
@@ -10,6 +18,7 @@ import {
   LuSearch,
   LuShieldCheck,
 } from "react-icons/lu";
+import ThemeToggle from "./ui/ThemeToggle.jsx";
 import { getSessionUser, logoutUser } from "../services/sessionService.js";
 
 const links = [
@@ -110,10 +119,22 @@ function ContactRow({ Icon, label, value }) {
   );
 }
 
-function UserMenu() {
+function UserMenu({ placement = "desktop" }) {
   const [open, setOpen] = useState(false);
   const [logoutPending, setLogoutPending] = useState(false);
   const [logoutError, setLogoutError] = useState("");
+  const menuId = useId();
+  const menuPanelId = `user-menu-panel-${menuId}`;
+  const reputationTitleId = `reputacion-titulo-${menuId}`;
+  const isMobile = placement === "mobile";
+  const reduceMotion = useReducedMotion();
+  const pointerX = useMotionValue(0.5);
+  const pointerY = useMotionValue(0.5);
+  const rotateX = useTransform(pointerY, [0, 1], [2.5, -2.5]);
+  const rotateY = useTransform(pointerX, [0, 1], [-2.5, 2.5]);
+  const glareX = useTransform(pointerX, (value) => `${value * 100}%`);
+  const glareY = useTransform(pointerY, (value) => `${value * 100}%`);
+  const profileGlare = useMotionTemplate`radial-gradient(ellipse at ${glareX} ${glareY}, rgba(255, 255, 255, 0.18), transparent 56%)`;
   const navigate = useNavigate();
   const session = getSessionUser();
   const esJugador = (session?.role ?? "PLAYER") === "PLAYER";
@@ -128,6 +149,12 @@ function UserMenu() {
     .map((part) => part[0])
     .join("")
     .toUpperCase();
+  const trackProfilePointer = (event) => {
+    if (event.pointerType === "touch" || reduceMotion) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    pointerX.set((event.clientX - bounds.left) / bounds.width);
+    pointerY.set((event.clientY - bounds.top) / bounds.height);
+  };
   const menuLinks =
     session?.role === "ADMIN"
       ? [
@@ -168,76 +195,148 @@ function UserMenu() {
   };
 
   return (
-    <div className="fixed right-5 top-5 z-50">
+    <div className={isMobile ? "relative z-50" : "fixed right-5 top-5 z-50"}>
       <button
         type="button"
         aria-label={open ? "Cerrar menú de usuario" : "Abrir menú de usuario"}
         aria-expanded={open}
-        aria-controls="user-menu-panel"
+        aria-controls={menuPanelId}
         onClick={() => setOpen((current) => !current)}
-        className="flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-surface font-bold text-primary-text shadow-lg shadow-[var(--shadow-color)] transition-colors hover:border-status focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
+        className={
+          isMobile
+            ? "flex min-w-16 flex-col items-center justify-center gap-1 text-xs font-medium text-text-secondary transition-colors hover:text-primary-text focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
+            : "flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-surface font-bold text-primary-text shadow-lg shadow-[var(--shadow-color)] transition-colors hover:border-status focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
+        }
       >
-        {initials || "U"}
+        {isMobile ? (
+          <>
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background text-[10px] font-bold text-primary-text">
+              {initials || "U"}
+            </span>
+            <span>Perfil</span>
+          </>
+        ) : (
+          initials || "U"
+        )}
       </button>
 
-      {open && (
-        <>
-          <button
+      <AnimatePresence>
+        {open && (
+          <motion.button
+            key="user-menu-backdrop"
             type="button"
             aria-label="Cerrar menú"
             onClick={() => setOpen(false)}
             className="fixed inset-0 -z-10 cursor-default bg-black/20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.18 }}
           />
-          <aside
-            id="user-menu-panel"
+        )}
+        {open && (
+          <motion.aside
+            key="user-menu-panel"
+            id={menuPanelId}
             aria-label="Menú de usuario"
-            className="absolute right-0 top-14 w-[min(22rem,calc(100vw-2.5rem))] max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-sm border border-border bg-surface text-text-primary shadow-2xl shadow-[var(--shadow-color)]"
+            initial={
+              reduceMotion
+                ? { opacity: 0 }
+                : isMobile
+                  ? { opacity: 0, x: 24 }
+                  : { opacity: 0, y: -8, scale: 0.98 }
+            }
+            animate={
+              isMobile
+                ? { opacity: 1, x: 0 }
+                : { opacity: 1, y: 0, scale: 1 }
+            }
+            exit={
+              reduceMotion
+                ? { opacity: 0 }
+                : isMobile
+                  ? { opacity: 0, x: 24 }
+                  : { opacity: 0, y: -6, scale: 0.98 }
+            }
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { type: "spring", stiffness: 360, damping: 30 }
+            }
+            className={
+              isMobile
+                ? "fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] right-0 z-50 max-h-[calc(100dvh-5rem)] w-[min(22rem,100vw)] overflow-y-auto rounded-l-sm border border-border bg-surface text-text-primary shadow-2xl shadow-[var(--shadow-color)]"
+                : "absolute right-0 top-14 max-h-[calc(100dvh-5rem)] w-[min(22rem,calc(100vw-2.5rem))] overflow-y-auto rounded-sm border border-border bg-surface text-text-primary shadow-2xl shadow-[var(--shadow-color)]"
+            }
           >
             {/* Ficha del jugador */}
-            <div className="border-b border-border p-5">
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-sm border-2 border-status bg-background font-display text-2xl font-extrabold uppercase tracking-wider">
-                  {initials || "U"}
+            <motion.div
+              className="user-profile-card border-b border-border p-5"
+              onPointerMove={trackProfilePointer}
+              style={
+                reduceMotion
+                  ? undefined
+                  : { rotateX, rotateY, transformPerspective: 900 }
+              }
+              variants={{
+                rest: { scale: 1 },
+                hover: { scale: reduceMotion ? 1 : 1.005 },
+              }}
+              initial="rest"
+              whileHover="hover"
+              transition={{ type: "spring", stiffness: 300, damping: 24 }}
+            >
+                <motion.div
+                  aria-hidden="true"
+                  className="user-profile-glare"
+                  style={{ background: profileGlare }}
+                  variants={{
+                    rest: { opacity: 0 },
+                    hover: { opacity: reduceMotion ? 0 : 1 },
+                  }}
+                />
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-sm border-2 border-status bg-background font-display text-2xl font-extrabold uppercase tracking-wider">
+                    {initials || "U"}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate font-display text-xl font-bold uppercase tracking-wider">
+                      {session?.name || "Usuario"}
+                    </p>
+                    <span className="mt-1 inline-flex rounded-sm border border-border px-2 py-0.5 text-xs font-bold uppercase tracking-widest text-text-secondary">
+                      {ROLE_LABELS[session?.role] || "Jugador"}
+                    </span>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="truncate font-display text-xl font-bold uppercase tracking-wider">
-                    {session?.name || "Usuario"}
-                  </p>
-                  <span className="mt-1 inline-flex rounded-sm border border-border px-2 py-0.5 text-xs font-bold uppercase tracking-widest text-text-secondary">
-                    {ROLE_LABELS[session?.role] || "Jugador"}
-                  </span>
-                </div>
-              </div>
 
-              {(esJugador || esDuenio) && (
-                <div
-                  className={`mt-4 grid gap-2 ${esJugador ? "grid-cols-2" : "grid-cols-1"}`}
-                >
-                  <StatTile
-                    label="Perfil"
-                    value={perfil || "—"}
-                    caption={perfil ? null : "Sin definir"}
-                  />
-                  {esJugador && (
+                {(esJugador || esDuenio) && (
+                  <div
+                    className={`mt-4 grid gap-2 ${esJugador ? "grid-cols-2" : "grid-cols-1"}`}
+                  >
                     <StatTile
-                      label="Pierna hábil"
-                      value={PIERNAS[session?.dominantFoot] || "—"}
-                      caption={
-                        PIERNAS[session?.dominantFoot] ? null : "Sin definir"
-                      }
+                      label="Perfil"
+                      value={perfil || "—"}
+                      caption={perfil ? null : "Sin definir"}
                     />
-                  )}
-                </div>
-              )}
+                    {esJugador && (
+                      <StatTile
+                        label="Pierna hábil"
+                        value={PIERNAS[session?.dominantFoot] || "—"}
+                        caption={
+                          PIERNAS[session?.dominantFoot] ? null : "Sin definir"
+                        }
+                      />
+                    )}
+                  </div>
+                )}
 
-              {esJugador && (
-                <>
+                {esJugador && (
                   <section
-                    aria-labelledby="reputacion-titulo"
+                    aria-labelledby={reputationTitleId}
                     className="mt-4 border-t border-border pt-4"
                   >
                     <h3
-                      id="reputacion-titulo"
+                      id={reputationTitleId}
                       className="font-display text-sm font-bold uppercase tracking-[0.2em] text-text-secondary"
                     >
                       Reputación en cancha
@@ -251,75 +350,78 @@ function UserMenu() {
                       </p>
                     )}
                   </section>
-                </>
-              )}
+                )}
 
-              <ul className="mt-4 grid gap-3 border-t border-border pt-4">
-                <ContactRow
-                  Icon={LuPhone}
-                  label="Teléfono"
-                  value={session?.phone || "Sin teléfono cargado"}
-                />
-                <ContactRow
-                  Icon={LuMail}
-                  label="Email"
-                  value={session?.email || "Sin email"}
-                />
-              </ul>
-            </div>
-
-            {/* Navegación */}
-            <nav aria-label="Secciones" className="grid gap-1 p-3">
-              {menuLinks.map(({ label, to, description, Icon }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end
-                  onClick={() => setOpen(false)}
-                  className={({ isActive }) =>
-                    `group flex items-center gap-3 rounded-sm border-l-2 px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover-strong)] focus-visible:outline-2 focus-visible:outline-status ${
-                      isActive
-                        ? "border-primary bg-[var(--surface-hover-strong)]"
-                        : "border-transparent"
-                    }`
-                  }
-                >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-status">
-                    <Icon aria-hidden="true" className="h-4 w-4" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block font-semibold">{label}</span>
-                    <span className="block text-xs text-text-secondary">
-                      {description}
-                    </span>
-                  </span>
-                  <LuChevronRight
-                    aria-hidden="true"
-                    className="ml-auto h-4 w-4 shrink-0 text-text-secondary transition-transform group-hover:translate-x-0.5"
+                <ul className="mt-4 grid gap-3 border-t border-border pt-4">
+                  <ContactRow
+                    Icon={LuPhone}
+                    label="Teléfono"
+                    value={session?.phone || "Sin teléfono cargado"}
                   />
-                </NavLink>
-              ))}
-            </nav>
+                  <ContactRow
+                    Icon={LuMail}
+                    label="Email"
+                    value={session?.email || "Sin email"}
+                  />
+                </ul>
+            </motion.div>
 
-            <div className="border-t border-border p-3">
-              {logoutError && (
-                <p role="alert" className="mb-3 text-sm text-danger">
-                  {logoutError}
-                </p>
-              )}
-              <button
-                type="button"
-                onClick={handleLogout}
-                disabled={logoutPending}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-danger/60 bg-danger/10 px-4 py-2 text-sm font-bold text-danger transition-colors hover:border-danger hover:bg-danger/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
-              >
-                <LuLogOut aria-hidden="true" className="h-4 w-4" />
-                {logoutPending ? "Cerrando sesión..." : "Cerrar sesión"}
-              </button>
-            </div>
-          </aside>
-        </>
-      )}
+              {/* Navegación */}
+              <nav aria-label="Secciones" className="grid gap-1 p-3">
+                {menuLinks.map(({ label, to, description, Icon }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end
+                    onClick={() => setOpen(false)}
+                    className={({ isActive }) =>
+                      `group flex items-center gap-3 rounded-sm border-l-2 px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover-strong)] focus-visible:outline-2 focus-visible:outline-status ${
+                        isActive
+                          ? "border-primary bg-[var(--surface-hover-strong)]"
+                          : "border-transparent"
+                      }`
+                    }
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-status">
+                      <Icon aria-hidden="true" className="h-4 w-4" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block font-semibold">{label}</span>
+                      <span className="block text-xs text-text-secondary">
+                        {description}
+                      </span>
+                    </span>
+                    <LuChevronRight
+                      aria-hidden="true"
+                      className="ml-auto h-4 w-4 shrink-0 text-text-secondary transition-transform group-hover:translate-x-0.5"
+                    />
+                  </NavLink>
+                ))}
+              </nav>
+
+              <div className="border-t border-border p-3">
+                <ThemeToggle placement="menu" />
+              </div>
+
+              <div className="border-t border-border p-3">
+                {logoutError && (
+                  <p role="alert" className="mb-3 text-sm text-danger">
+                    {logoutError}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={logoutPending}
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-danger/60 bg-danger/10 px-4 py-2 text-sm font-bold text-danger transition-colors hover:border-danger hover:bg-danger/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
+                >
+                  <LuLogOut aria-hidden="true" className="h-4 w-4" />
+                  {logoutPending ? "Cerrando sesión..." : "Cerrar sesión"}
+                </button>
+              </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
