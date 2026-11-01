@@ -9,14 +9,20 @@ export function createApp({
   adminRouter,
 } = {}) {
   const app = express();
-  const allowedOrigin =
-    process.env.FRONTEND_ORIGIN ?? "http://localhost:5173";
+  const allowedOrigins = new Set([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://192.168.0.23:5173", // La IP exacta desde la que accede tu celular
+    process.env.FRONTEND_ORIGIN,
+  ].filter(Boolean));
 
   app.use(
     cors({
       origin: (origin, callback) =>
-        callback(null, !origin || origin === allowedOrigin),
+        callback(null, !origin || allowedOrigins.has(origin)),
       credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
     }),
   );
   app.use(express.json({ limit: "16kb" }));
@@ -38,7 +44,9 @@ export function createApp({
   );
   app.use((error, _request, response, _next) => {
     if (error?.type === "entity.parse.failed") {
-      return response.status(400).json({ message: "El cuerpo JSON no es válido." });
+      return response
+        .status(400)
+        .json({ message: "El cuerpo JSON no es válido." });
     }
 
     console.error(error);
