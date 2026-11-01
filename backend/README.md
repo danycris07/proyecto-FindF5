@@ -87,6 +87,14 @@ quite su propio rol, y debe quedar al menos un administrador activo. Los
 identificadores de propietarios, organizadores, canchas y equipos se validan
 antes de guardar.
 
+El formulario administrativo de canchas ofrece un selector de ubicación basado
+en OpenStreetMap. El administrador puede marcar o arrastrar el pin para guardar
+coordenadas y completar la dirección mediante geocodificación inversa; la
+dirección continúa siendo editable y debe verificarse antes de guardar. Las
+consultas se limitan a una por segundo por proceso y se cachean en memoria por
+24 horas. Los mosaicos del mapa se sirven desde OpenStreetMap y se atribuyen en
+la interfaz, de acuerdo con su política de uso.
+
 Para crear el primer administrador, completar `ADMIN_NAME`, `ADMIN_EMAIL` y
 `ADMIN_PASSWORD` en `.env` (contraseña de al menos 12 caracteres) y ejecutar
 `npm run db:bootstrap-admin`. El comando no eleva cuentas existentes que no

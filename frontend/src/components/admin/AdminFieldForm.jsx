@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useRef, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import AdminFormField, { adminInputClass } from "./AdminFormField.jsx";
+import AdminFieldLocationMap from "./AdminFieldLocationMap.jsx";
 import { adminButtonClass } from "./AdminResourceList.jsx";
+import { reverseGeocodeAdminField } from "../../services/adminService.js";
 
 const EMPTY_FIELD = {
   name: "",
@@ -16,9 +18,16 @@ const EMPTY_FIELD = {
 
 function AdminFieldForm({ field, owners, ownersError, onSave, onCancel }) {
   const [saving, setSaving] = useState(false);
+  const [addressLookup, setAddressLookup] = useState({
+    status: "idle",
+    message: "",
+  });
+  const addressLookupId = useRef(0);
   const {
     register,
     handleSubmit,
+    setValue,
+    control,
     formState: { errors },
   } = useForm({
     defaultValues: field
@@ -34,6 +43,55 @@ function AdminFieldForm({ field, owners, ownersError, onSave, onCancel }) {
         }
       : EMPTY_FIELD,
   });
+
+  const selectLocation = async ({ latitude, longitude }) => {
+    const lookupId = ++addressLookupId.current;
+    setValue("latitude", latitude, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("longitude", longitude, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("address", "", { shouldDirty: true, shouldValidate: true });
+    setAddressLookup({ status: "loading", message: "Buscando dirección..." });
+
+    try {
+      const { address } = await reverseGeocodeAdminField(latitude, longitude);
+      if (lookupId !== addressLookupId.current) return;
+      if (!address) {
+        setAddressLookup({
+          status: "error",
+          message:
+            "No se encontró una dirección para este punto. Podés ingresarla manualmente.",
+        });
+        return;
+      }
+      setValue("address", address, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setAddressLookup({
+        status: "success",
+        message: "Dirección completada. Podés corregirla manualmente.",
+      });
+    } catch (error) {
+      if (lookupId !== addressLookupId.current) return;
+      setAddressLookup({
+        status: "error",
+        message:
+          error instanceof Error
+            ? `${error.message} Podés completar la dirección manualmente.`
+            : "No se pudo buscar la dirección; ingresala manualmente.",
+      });
+    }
+  };
+  const addressRegistration = register("address", {
+    required: "Ingresá la dirección.",
+  });
+  const latitude = useWatch({ control, name: "latitude" });
+  const longitude = useWatch({ control, name: "longitude" });
 
   const submit = async (data) => {
     setSaving(true);
@@ -63,7 +121,14 @@ function AdminFieldForm({ field, owners, ownersError, onSave, onCancel }) {
       <AdminFormField
         id="admin-field-address"
         label="Dirección"
-        registration={register("address", { required: "Ingresá la dirección." })}
+        registration={{
+          ...addressRegistration,
+          onChange: (event) => {
+            addressLookupId.current += 1;
+            setAddressLookup({ status: "idle", message: "" });
+            return addressRegistration.onChange(event);
+          },
+        }}
       />
       {errors.address && <p role="alert" className="text-sm text-danger">{errors.address.message}</p>}
       <AdminFormField id="admin-field-owner" label="Dueño de cancha">
@@ -90,6 +155,12 @@ function AdminFieldForm({ field, owners, ownersError, onSave, onCancel }) {
           step="any"
         />
       </div>
+      <AdminFieldLocationMap
+        latitude={latitude}
+        longitude={longitude}
+        onSelectLocation={selectLocation}
+        addressLookup={addressLookup}
+      />
       <AdminFormField
         id="admin-field-price"
         label="Precio de referencia"

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, param, validationResult } from "express-validator";
+import { body, param, query, validationResult } from "express-validator";
 import { UniqueConstraintError } from "sequelize";
 import { hashPassword } from "../auth/password.js";
 import { createRequireAuth, requireRole } from "../middleware/require-auth.js";
@@ -13,6 +13,10 @@ import {
   isFutureMatch,
   normalizeMatchInput,
 } from "../services/match-rules.js";
+import {
+  createReverseGeocoder,
+  ReverseGeocodeError,
+} from "../services/reverse-geocode.js";
 import { matchInputValidation } from "./matches.routes.js";
 
 function validationErrors(request, response, next) {
@@ -253,7 +257,11 @@ function requireFutureMatch(values) {
   }
 }
 
-export function createAdminRouter({ models, sequelize }) {
+export function createAdminRouter({
+  models,
+  sequelize,
+  reverseGeocode = createReverseGeocoder(),
+}) {
   const router = Router();
   router.use(createRequireAuth(models), requireRole("ADMIN"));
 
@@ -451,6 +459,35 @@ export function createAdminRouter({ models, sequelize }) {
     });
     return response.json(fields);
   });
+
+  router.get(
+    "/fields/reverse-geocode",
+    [
+      query("lat")
+        .isFloat({ min: -90, max: 90 })
+        .withMessage("La latitud debe estar entre -90 y 90.")
+        .toFloat(),
+      query("lon")
+        .isFloat({ min: -180, max: 180 })
+        .withMessage("La longitud debe estar entre -180 y 180.")
+        .toFloat(),
+    ],
+    validationErrors,
+    async (request, response) => {
+      try {
+        const address = await reverseGeocode(
+          request.query.lat,
+          request.query.lon,
+        );
+        return response.json({ address });
+      } catch (error) {
+        if (error instanceof ReverseGeocodeError) {
+          return response.status(error.status).json({ message: error.message });
+        }
+        throw error;
+      }
+    },
+  );
 
   router.get(
     "/fields/:fieldId",

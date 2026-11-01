@@ -47,3 +47,7 @@ para gestionar usuarios, canchas y partidos. El panel usa exclusivamente los
 endpoints administrativos y no sustituye sus errores por datos de prueba.
 Las tarjetas de partidos muestran la imagen configurada en la cancha asociada;
 si no hay una imagen disponible, usan una ilustración local de respaldo.
+En el formulario administrativo de canchas, el botón de mapa abre un selector
+OpenStreetMap para marcar o arrastrar el pin; las coordenadas y la dirección se
+completan automáticamente y siguen siendo editables. El mapa requiere conexión
+a internet.

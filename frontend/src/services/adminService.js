@@ -25,6 +25,14 @@ export function getAdminFields() {
   return apiRequest("/admin/fields");
 }
 
+export function reverseGeocodeAdminField(latitude, longitude) {
+  const search = new URLSearchParams({
+    lat: String(latitude),
+    lon: String(longitude),
+  });
+  return apiRequest(`/admin/fields/reverse-geocode?${search}`);
+}
+
 export function createAdminField(values) {
   return apiRequest("/admin/fields", { method: "POST", body: values });
 }

@@ -68,7 +68,11 @@ test(
       ]);
 
       const app = createApp({
-        adminRouter: createAdminRouter({ models, sequelize }),
+        adminRouter: createAdminRouter({
+          models,
+          sequelize,
+          reverseGeocode: async () => "Dirección devuelta por el mapa",
+        }),
       });
       server = app.listen(0);
       await once(server, "listening");
@@ -92,6 +96,31 @@ test(
       };
 
       assert.equal((await request("/users")).response.status, 401);
+      const reverseGeocode = await request(
+        "/fields/reverse-geocode?lat=-26.18&lon=-58.17",
+        { actor: "admin" },
+      );
+      assert.equal(reverseGeocode.response.status, 200);
+      assert.equal(
+        reverseGeocode.payload.address,
+        "Dirección devuelta por el mapa",
+      );
+      assert.equal(
+        (
+          await request("/fields/reverse-geocode?lat=-26.18&lon=-58.17", {
+            actor: "player",
+          })
+        ).response.status,
+        403,
+      );
+      assert.equal(
+        (
+          await request("/fields/reverse-geocode?lat=91&lon=-58.17", {
+            actor: "admin",
+          })
+        ).response.status,
+        400,
+      );
       assert.equal(
         (await request("/users", { actor: "player" })).response.status,
         403,
