@@ -95,10 +95,13 @@ export function Login({ isLoading: loadingProp }) {
           registration={register("email", {
             required: "Ingresá tu correo.",
             setValueAs: (value) => value.trim(),
+<<<<<<< HEAD
             onChange: () => {
               clearErrors(["email", "password"]);
               setLoginError("");
             },
+=======
+>>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
             maxLength: {
               value: 254,
               message: "El correo no puede superar los 254 caracteres.",
@@ -119,10 +122,13 @@ export function Login({ isLoading: loadingProp }) {
           maxLength={128}
           registration={register("password", {
             required: "Ingresá tu contraseña.",
+<<<<<<< HEAD
             onChange: () => {
               clearErrors(["email", "password"]);
               setLoginError("");
             },
+=======
+>>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
             maxLength: {
               value: 128,
               message: "La contraseña no puede superar los 128 caracteres.",

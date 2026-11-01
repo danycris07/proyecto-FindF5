@@ -168,11 +168,14 @@ test(
         body: { ...validMatch, basePricePerPlayer: 1500.5 },
       });
       assert.equal(decimalPrice.response.status, 400);
+<<<<<<< HEAD
       assert.ok(
         decimalPrice.payload.errors.some(
           ({ field }) => field === "basePricePerPlayer",
         ),
       );
+=======
+>>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
 
       const decimalCocaAmount = await request("/", {
         actor: "organizer",
@@ -187,7 +190,10 @@ test(
         body: { ...validMatch, outsideSlots: 4 },
       });
       assert.equal(noOpenSlots.response.status, 422);
+<<<<<<< HEAD
       assert.equal(noOpenSlots.payload.field, "outsideSlots");
+=======
+>>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
 
       const created = await request("/", {
         actor: "organizer",

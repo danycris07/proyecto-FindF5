@@ -1,12 +1,15 @@
 const ARGENTINA_TIME_ZONE = "America/Argentina/Buenos_Aires";
 export const MIN_EXPECTED_PLAYERS = 5;
 export const MAX_EXPECTED_PLAYERS = 24;
+<<<<<<< HEAD
 
 function ruleError(message, field) {
   const error = new Error(message);
   error.field = field;
   return error;
 }
+=======
+>>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
 
 export function isFutureMatch(date, time, now = new Date()) {
   const argentinaDate = new Intl.DateTimeFormat("en-CA", {
@@ -160,6 +163,7 @@ export function normalizePublicMatchInput(body, { requireOpenSlot = false } = {}
     values.expectedPlayers < MIN_EXPECTED_PLAYERS ||
     values.expectedPlayers > MAX_EXPECTED_PLAYERS
   ) {
+<<<<<<< HEAD
     throw ruleError(
       `El partido debe tener entre ${MIN_EXPECTED_PLAYERS} y ${MAX_EXPECTED_PLAYERS} jugadores esperados.`,
       "expectedPlayers",
@@ -176,11 +180,23 @@ export function normalizePublicMatchInput(body, { requireOpenSlot = false } = {}
       "La cuota por jugador debe ser un importe entero.",
       "basePricePerPlayer",
     );
+=======
+    throw new Error(
+      `El partido debe tener entre ${MIN_EXPECTED_PLAYERS} y ${MAX_EXPECTED_PLAYERS} jugadores esperados.`,
+    );
+  }
+  if (values.basePricePerPlayer <= 0) {
+    throw new Error("La cuota por jugador debe ser mayor que 0.");
+  }
+  if (!Number.isInteger(values.basePricePerPlayer)) {
+    throw new Error("La cuota por jugador debe ser un importe entero.");
+>>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
   }
   if (
     values.playingForCoca &&
     !Number.isInteger(values.cocaAmountPerPlayer)
   ) {
+<<<<<<< HEAD
     throw ruleError(
       "El monto extra debe ser un importe entero.",
       "cocaAmountPerPlayer",
@@ -190,6 +206,13 @@ export function normalizePublicMatchInput(body, { requireOpenSlot = false } = {}
     throw ruleError(
       "Dejá al menos un cupo disponible para que otros jugadores puedan sumarse.",
       "outsideSlots",
+=======
+    throw new Error("El monto extra debe ser un importe entero.");
+  }
+  if (requireOpenSlot && getMissingPlayers(values, 0) < 1) {
+    throw new Error(
+      "Dejá al menos un cupo disponible para que otros jugadores puedan sumarse.",
+>>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
     );
   }
 
