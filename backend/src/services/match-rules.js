@@ -1,15 +1,6 @@
 const ARGENTINA_TIME_ZONE = "America/Argentina/Buenos_Aires";
 export const MIN_EXPECTED_PLAYERS = 5;
 export const MAX_EXPECTED_PLAYERS = 24;
-<<<<<<< HEAD
-
-function ruleError(message, field) {
-  const error = new Error(message);
-  error.field = field;
-  return error;
-}
-=======
->>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
 
 export function isFutureMatch(date, time, now = new Date()) {
   const argentinaDate = new Intl.DateTimeFormat("en-CA", {
@@ -26,7 +17,9 @@ export function isFutureMatch(date, time, now = new Date()) {
     hourCycle: "h23",
   }).format(now);
 
-  return date > argentinaDate || (date === argentinaDate && time > argentinaTime);
+  return (
+    date > argentinaDate || (date === argentinaDate && time > argentinaTime)
+  );
 }
 
 export function getMissingPlayers(match, participantCount) {
@@ -157,30 +150,15 @@ export function normalizeMatchInput(body) {
   };
 }
 
-export function normalizePublicMatchInput(body, { requireOpenSlot = false } = {}) {
+export function normalizePublicMatchInput(
+  body,
+  { requireOpenSlot = false } = {},
+) {
   const values = normalizeMatchInput(body);
   if (
     values.expectedPlayers < MIN_EXPECTED_PLAYERS ||
     values.expectedPlayers > MAX_EXPECTED_PLAYERS
   ) {
-<<<<<<< HEAD
-    throw ruleError(
-      `El partido debe tener entre ${MIN_EXPECTED_PLAYERS} y ${MAX_EXPECTED_PLAYERS} jugadores esperados.`,
-      "expectedPlayers",
-    );
-  }
-  if (values.basePricePerPlayer <= 0) {
-    throw ruleError(
-      "La cuota por jugador debe ser mayor que 0.",
-      "basePricePerPlayer",
-    );
-  }
-  if (!Number.isInteger(values.basePricePerPlayer)) {
-    throw ruleError(
-      "La cuota por jugador debe ser un importe entero.",
-      "basePricePerPlayer",
-    );
-=======
     throw new Error(
       `El partido debe tener entre ${MIN_EXPECTED_PLAYERS} y ${MAX_EXPECTED_PLAYERS} jugadores esperados.`,
     );
@@ -190,29 +168,13 @@ export function normalizePublicMatchInput(body, { requireOpenSlot = false } = {}
   }
   if (!Number.isInteger(values.basePricePerPlayer)) {
     throw new Error("La cuota por jugador debe ser un importe entero.");
->>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
   }
-  if (
-    values.playingForCoca &&
-    !Number.isInteger(values.cocaAmountPerPlayer)
-  ) {
-<<<<<<< HEAD
-    throw ruleError(
-      "El monto extra debe ser un importe entero.",
-      "cocaAmountPerPlayer",
-    );
-  }
-  if (requireOpenSlot && getMissingPlayers(values, 0) < 1) {
-    throw ruleError(
-      "Dejá al menos un cupo disponible para que otros jugadores puedan sumarse.",
-      "outsideSlots",
-=======
+  if (values.playingForCoca && !Number.isInteger(values.cocaAmountPerPlayer)) {
     throw new Error("El monto extra debe ser un importe entero.");
   }
   if (requireOpenSlot && getMissingPlayers(values, 0) < 1) {
     throw new Error(
       "Dejá al menos un cupo disponible para que otros jugadores puedan sumarse.",
->>>>>>> a72e124b55b1b26738f8d898caced749c4a0052b
     );
   }
 
