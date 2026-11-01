@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { m as motion, useReducedMotion } from "framer-motion";
+import ImpactButton from "../ui/ImpactButton.jsx";
 
 const currencyFormatter = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -32,16 +34,22 @@ function MatchConfirmationCard({
   participationError = "",
   canParticipate = true,
 }) {
+  const reduceMotion = useReducedMotion();
   const isFull = match.missingPlayers === 0;
   const participants = match.participants ?? [];
   const nobodyYet =
     !match.organizerPlays && participants.length === 0 && !match.outsideSlots;
 
   return (
-    <section
-      className={`relative isolate mx-auto w-full max-w-3xl overflow-hidden rounded-md border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none sm:p-8 ${
-        animated ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-      }`}
+    <motion.section
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      animate={
+        reduceMotion || animated
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 24 }
+      }
+      transition={{ duration: reduceMotion ? 0 : 0.5, ease: "easeOut" }}
+      className="relative isolate mx-auto w-full max-w-3xl overflow-hidden rounded-md border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] sm:p-8"
     >
       <div
         aria-hidden="true"
@@ -217,14 +225,14 @@ function MatchConfirmationCard({
           )}
           {/* Se puede sumar quien no organiza, no está anotado y hay lugar */}
           {canParticipate && !isOrganizer && !isJoined && !isFull && (
-            <button
+            <ImpactButton
               type="button"
               onClick={onJoin}
               disabled={!onJoin || pendingAction !== null}
               className="inline-flex min-h-12 items-center justify-center rounded-sm border border-primary-foreground bg-primary px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-primary-foreground transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_var(--primary-shadow-strong)] disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0"
             >
               {pendingAction === "join" ? "Sumándome..." : "Sumarme"}
-            </button>
+            </ImpactButton>
           )}
           {onClose ? (
             <button
@@ -266,7 +274,7 @@ function MatchConfirmationCard({
           </p>
         )}
       </div>
-    </section>
+    </motion.section>
   );
 }
 

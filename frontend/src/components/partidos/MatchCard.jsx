@@ -1,3 +1,9 @@
+import {
+  m as motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+} from "framer-motion";
 import { useState } from "react";
 import { GoClock, GoPeople } from "react-icons/go";
 import fieldPlaceholder from "../../assets/cancha-placeholder.svg";
@@ -46,6 +52,7 @@ function FieldImage({ src, alt }) {
 }
 
 function EstadoCupos({ faltan, urgente }) {
+  const reduceMotion = useReducedMotion();
   if (faltan === 0) {
     return (
       <p className="inline-flex items-center gap-1.5 rounded-sm border border-status/40 bg-status/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-status">
@@ -58,12 +65,34 @@ function EstadoCupos({ faltan, urgente }) {
   const tono = urgente
     ? "border-primary-text/50 bg-primary-text/10 text-primary-text"
     : "border-border bg-background text-text-primary";
+  const quedaUnCupo = faltan === 1;
+
+  const pulse = reduceMotion
+    ? {}
+    : {
+        scale: [1, 1.05, 1, 1.03, 1],
+        boxShadow: [
+          "0 0 0 rgba(0, 229, 255, 0)",
+          "0 0 16px rgba(0, 229, 255, 0.2)",
+          "0 0 0 rgba(0, 229, 255, 0)",
+          "0 0 10px rgba(0, 229, 255, 0.12)",
+          "0 0 0 rgba(0, 229, 255, 0)",
+        ],
+      };
 
   return (
-    <p
-      className={`inline-flex items-center gap-2 rounded-sm border px-2.5 py-1 ${tono}`}
+    <motion.p
+      animate={quedaUnCupo ? pulse : undefined}
+      transition={
+        quedaUnCupo && !reduceMotion
+          ? { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
+          : undefined
+      }
+      className={`inline-flex items-center gap-2 rounded-sm border px-2.5 py-1 ${
+        quedaUnCupo ? "border-status/60 bg-status/10 text-status" : tono
+      }`}
     >
-      {urgente && (
+      {urgente && !quedaUnCupo && (
         <span aria-hidden="true" className="relative flex h-2 w-2">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-text opacity-75 motion-reduce:animate-none" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-text" />
@@ -76,11 +105,15 @@ function EstadoCupos({ faltan, urgente }) {
         {faltan}
       </span>
       <span className="sr-only">{faltan === 1 ? "jugador" : "jugadores"}</span>
-    </p>
+    </motion.p>
   );
 }
 
 function MatchCard({ match, onSelect }) {
+  const reduceMotion = useReducedMotion();
+  const pointerX = useMotionValue("50%");
+  const pointerY = useMotionValue("50%");
+  const spotlight = useMotionTemplate`radial-gradient(280px circle at ${pointerX} ${pointerY}, rgba(204, 255, 0, 0.13), transparent 72%)`;
   const { semana, numero, mes } = partesFecha(match.date);
   const etiqueta = etiquetaDia(match.date);
   const urgente =
@@ -88,13 +121,36 @@ function MatchCard({ match, onSelect }) {
     match.missingPlayers > 0 &&
     match.missingPlayers <= MAX_FALTAN_URGENTE;
 
+  const trackPointer = (event) => {
+    if (event.pointerType === "touch" || reduceMotion) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    pointerX.set(`${event.clientX - bounds.left}px`);
+    pointerY.set(`${event.clientY - bounds.top}px`);
+  };
+
   return (
-    <button
+    <motion.button
       type="button"
       onClick={() => onSelect(match)}
-      className="flex w-full flex-col overflow-hidden rounded-sm border border-border bg-surface text-left transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status motion-reduce:transition-none"
+      onPointerMove={trackPointer}
+      variants={{
+        rest: { y: 0, borderColor: "var(--border)" },
+        hover: { y: -2, borderColor: "var(--primary)" },
+      }}
+      initial="rest"
+      whileHover={reduceMotion ? "rest" : "hover"}
+      whileFocus={reduceMotion ? "rest" : "hover"}
+      whileTap={reduceMotion ? undefined : { scale: 0.99 }}
+      transition={{ type: "spring", stiffness: 360, damping: 28 }}
+      className="relative isolate flex w-full flex-col overflow-hidden rounded-sm border border-border bg-surface text-left shadow-[0_0_0_rgba(0,0,0,0)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
     >
-      <div className="h-32 w-full overflow-hidden bg-background sm:h-36">
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-10"
+        style={{ background: spotlight }}
+        variants={{ rest: { opacity: 0 }, hover: { opacity: 1 } }}
+      />
+      <div className="relative z-20 h-32 w-full overflow-hidden bg-background sm:h-36">
         <FieldImage
           key={match.fieldImageUrl || "field-placeholder"}
           src={match.fieldImageUrl}
@@ -102,7 +158,7 @@ function MatchCard({ match, onSelect }) {
         />
       </div>
 
-      <div className="flex w-full gap-4 p-4">
+      <div className="relative z-20 flex w-full gap-4 p-4">
         <div className="flex w-16 shrink-0 flex-col items-center justify-center rounded-sm border border-border bg-background py-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
             {semana}
@@ -139,7 +195,7 @@ function MatchCard({ match, onSelect }) {
           </div>
         </div>
       </div>
-    </button>
+    </motion.button>
   );
 }
 
