@@ -140,19 +140,16 @@
 }
 
 .card-nav-content {
-  position: absolute;
-  inset: 60px 0 0;
-  z-index: 1;
+  position: relative;
   display: flex;
   align-items: stretch;
   gap: 0.75rem;
-  padding: 0.5rem;
-  visibility: hidden;
+  margin-top: 60px;
+  padding: 0 0.5rem 0.5rem;
   pointer-events: none;
 }
 
 .card-nav.open .card-nav-content {
-  visibility: visible;
   pointer-events: auto;
 }
 

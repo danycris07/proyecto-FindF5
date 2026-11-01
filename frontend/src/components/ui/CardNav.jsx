@@ -1,71 +1,21 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { m as motion, useReducedMotion } from "framer-motion";
 import { GoArrowUpRight } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import "./CardNav.css";
 
 /** Navegación expandible adaptada al navbar de FindF5. */
-function CardNav({ items, ease = "power3.out" }) {
+function CardNav({ items }) {
   const navigate = useNavigate();
-  const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const navRef = useRef(null);
   const containerRef = useRef(null);
-  const cardsRef = useRef([]);
-  const timelineRef = useRef(null);
   const isExpandedRef = useRef(false);
+  const reduceMotion = useReducedMotion();
 
-  const calculateHeight = () => {
-    const navElement = navRef.current;
-    if (!navElement) return 260;
-    if (window.matchMedia("(max-width: 768px)").matches) {
-      const content = navElement.querySelector(".card-nav-content");
-      if (content) {
-        const previousStyles = {
-          visibility: content.style.visibility,
-          pointerEvents: content.style.pointerEvents,
-          position: content.style.position,
-          height: content.style.height,
-        };
-        content.style.visibility = "visible";
-        content.style.pointerEvents = "auto";
-        content.style.position = "static";
-        content.style.height = "auto";
-        const contentHeight = content.scrollHeight;
-        Object.assign(content.style, previousStyles);
-        return 60 + contentHeight + 16;
-      }
-    }
-    return 260;
-  };
-
-  const createTimeline = () => {
-    if (!navRef.current) return null;
-    gsap.set(navRef.current, { height: 60, overflow: "hidden" });
-    gsap.set(cardsRef.current, { y: 24, opacity: 0 });
-    return gsap.timeline({ paused: true })
-      .to(navRef.current, { height: calculateHeight, duration: 0.4, ease })
-      .to(cardsRef.current, { y: 0, opacity: 1, duration: 0.35, ease, stagger: 0.07 }, "-=0.1");
-  };
-
-  useLayoutEffect(() => {
-    const timeline = createTimeline();
-    timelineRef.current = timeline;
-    return () => {
-      timeline?.kill();
-    };
-  }, [ease, items]);
-
-  useLayoutEffect(() => {
-    const handleResize = () => {
-      if (!timelineRef.current) return;
-      timelineRef.current.kill();
-      const timeline = createTimeline();
-      timelineRef.current = timeline;
-      if (isExpandedRef.current) timeline?.progress(1);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+  const closeMenu = useCallback(() => {
+    if (!isExpandedRef.current) return;
+    isExpandedRef.current = false;
+    setIsExpanded(false);
   }, []);
 
   useEffect(() => {
@@ -84,26 +34,10 @@ function CardNav({ items, ease = "power3.out" }) {
     };
   }, [closeMenu]);
 
-  function closeMenu() {
-    if (!isExpandedRef.current) return;
-    setIsHamburgerOpen(false);
-    const timeline = timelineRef.current;
-    timeline?.eventCallback("onReverseComplete", () => {
-      isExpandedRef.current = false;
-      setIsExpanded(false);
-    });
-    timeline?.reverse();
-  }
-
   const toggleMenu = () => {
-    if (isExpandedRef.current) {
-      closeMenu();
-      return;
-    }
-    isExpandedRef.current = true;
-    setIsExpanded(true);
-    setIsHamburgerOpen(true);
-    timelineRef.current?.play(0);
+    const nextExpanded = !isExpandedRef.current;
+    isExpandedRef.current = nextExpanded;
+    setIsExpanded(nextExpanded);
   };
 
   const handleNavigate = (path) => {
@@ -113,7 +47,16 @@ function CardNav({ items, ease = "power3.out" }) {
 
   return (
     <div ref={containerRef} className="card-nav-container">
-      <nav ref={navRef} className={`card-nav${isExpanded ? " open" : ""}`}>
+      <motion.nav
+        initial={false}
+        animate={{ height: isExpanded ? "auto" : 60 }}
+        transition={
+          reduceMotion
+            ? { duration: 0 }
+            : { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
+        }
+        className={`card-nav${isExpanded ? " open" : ""}`}
+      >
         <div className="card-nav-top">
           <a href="#" className="card-nav-brand" aria-label="FindF5, inicio">FindF5</a>
           <div className="card-nav-controls">
@@ -133,7 +76,7 @@ function CardNav({ items, ease = "power3.out" }) {
             </button>
             <button
               type="button"
-              className={`hamburger-menu${isHamburgerOpen ? " open" : ""}`}
+              className={`hamburger-menu${isExpanded ? " open" : ""}`}
               onClick={toggleMenu}
               aria-label={isExpanded ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={isExpanded}
@@ -144,13 +87,35 @@ function CardNav({ items, ease = "power3.out" }) {
             </button>
           </div>
         </div>
-        <div id="findf5-navigation-content" className="card-nav-content" aria-hidden={!isExpanded}>
+        <motion.div
+          id="findf5-navigation-content"
+          className="card-nav-content"
+          aria-hidden={!isExpanded}
+          inert={!isExpanded}
+          initial="closed"
+          animate={isExpanded ? "open" : "closed"}
+          variants={{
+            closed: {},
+            open: {
+              transition: reduceMotion
+                ? { staggerChildren: 0 }
+                : { delayChildren: 0.12, staggerChildren: 0.07 },
+            },
+          }}
+        >
           {(items || []).slice(0, 3).map((item, index) => (
-            <div
+            <motion.div
               key={`${item.label}-${index}`}
               className="nav-card"
-              ref={(element) => { if (element) cardsRef.current[index] = element; }}
               style={{ backgroundColor: item.bgColor, color: item.textColor }}
+              variants={{
+                closed: { opacity: 0, y: reduceMotion ? 0 : 24 },
+                open: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: reduceMotion ? 0 : 0.35 },
+                },
+              }}
             >
               <div className="nav-card-label">{item.label}</div>
               <div className="nav-card-links">
@@ -174,11 +139,18 @@ function CardNav({ items, ease = "power3.out" }) {
                   </a>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
-          <div
+          <motion.div
             className="card-nav-mobile-actions"
-            ref={(element) => { if (element) cardsRef.current[3] = element; }}
+            variants={{
+              closed: { opacity: 0, y: reduceMotion ? 0 : 24 },
+              open: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: reduceMotion ? 0 : 0.35 },
+              },
+            }}
           >
             <button
               type="button"
@@ -194,9 +166,9 @@ function CardNav({ items, ease = "power3.out" }) {
             >
               Iniciar sesión
             </button>
-          </div>
-        </div>
-      </nav>
+          </motion.div>
+        </motion.div>
+      </motion.nav>
     </div>
   );
 }
