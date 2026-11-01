@@ -8,6 +8,7 @@ import PartidoPublicado from "./pages/PartidoPublicado";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicLandingRoute from "./components/PublicLandingRoute";
 import ArmarPartido from "./pages/ArmarPartido";
+import MisPartidos from "./pages/MisPartidos";
 import UserMenu from "./components/UserMenu.jsx";
 
 function AuthenticatedLayout({ children }) {
@@ -47,6 +48,14 @@ function App() {
         element={
           <AuthenticatedLayout>
             <ArmarPartido />
+          </AuthenticatedLayout>
+        }
+      />
+      <Route
+        path="/mis-partidos"
+        element={
+          <AuthenticatedLayout>
+            <MisPartidos />
           </AuthenticatedLayout>
         }
       />

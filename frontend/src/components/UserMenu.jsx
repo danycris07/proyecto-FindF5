@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
+  LuCalendarCheck,
   LuChevronRight,
   LuLogOut,
   LuMail,
@@ -19,6 +20,12 @@ const links = [
     to: "/partidos",
     description: "Ver partidos abiertos",
     Icon: LuSearch,
+  },
+  {
+    label: "Mis partidos",
+    to: "/mis-partidos",
+    description: "Organizados y anotados",
+    Icon: LuCalendarCheck,
   },
   {
     label: "Armar partido",

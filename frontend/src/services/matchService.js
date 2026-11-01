@@ -265,6 +265,16 @@ export async function getMatches() {
     );
 }
 
+/** Partidos abiertos en los que el usuario organiza o está anotado. */
+export async function getMyMatches(userId) {
+  const matches = await getMatches();
+  return matches.filter(
+    (match) =>
+      String(match.organizerId) === String(userId) ||
+      match.participants.some((p) => String(p.userId) === String(userId)),
+  );
+}
+
 export async function getMatchById(matchId) {
   const match = getActiveMatches().find(
     (item) => String(item.id) === String(matchId),
