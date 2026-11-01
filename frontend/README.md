@@ -32,10 +32,15 @@ Los componentes visuales viven en `src/components/ui/`. Conserva los ids `como-f
 
 ## Conexión con el backend
 
-Copiá `.env.example` como `.env.local` y configurá `VITE_API_URL` con la URL
-base de la API, incluyendo `/api`. Luego iniciá el frontend con `npm run dev`.
-Las cookies de sesión se envían con `credentials: include`; el origen
-configurado en el backend debe coincidir con la dirección que usa Vite.
+Copiá `.env.example` como `.env.local`, iniciá el backend en el puerto indicado
+por `API_PROXY_TARGET` y luego iniciá el frontend con `npm run dev`. En
+desarrollo, `VITE_API_URL=/api` hace que Vite reenvíe las llamadas al backend.
+Esto mantiene la sesión en el mismo origen, también al compartir el puerto de
+Vite con un celular, y evita que el navegador bloquee la cookie de autenticación
+por diferencias entre el dominio compartido y la IP local.
+
+Para un despliegue, configurá `VITE_API_URL` con la URL base de la API,
+incluyendo `/api`.
 
 El inicio y cierre de sesión, registro y las escrituras de partidos usan el
 backend y muestran sus errores. Las consultas de partidos y canchas usan los
@@ -56,3 +61,10 @@ Los formularios públicos validan datos de registro e inicio de sesión. Para
 publicar o editar partidos se exigen cuotas enteras positivas y un total de
 entre 5 y 24 jugadores; una nueva convocatoria debe conservar al menos un cupo
 abierto.
+
+Las interacciones visuales usan Framer Motion: las tarjetas iluminan el área
+bajo el puntero y aparecen escalonadas, el último cupo late en cian, la ficha
+del usuario se inclina con brillo y los botones muestran una onda al activarse.
+Las cargas de recursos conservan el skeleton visible por al menos 400 ms sin
+retrasar las solicitudes. Las animaciones respetan la preferencia del sistema
+para reducir movimiento.
