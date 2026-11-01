@@ -29,3 +29,19 @@ If you are developing a production application, we recommend using TypeScript wi
 | `Footer` | Cierra la página con la marca y el aviso de derechos. | Sin props. |
 
 Los componentes visuales viven en `src/components/ui/`. Conserva los ids `como-funciona`, `canchas` y `preguntas-frecuentes`: el Navbar los utiliza para navegar dentro de la landing.
+
+## Conexión con el backend
+
+Copiá `.env.example` como `.env.local` y configurá `VITE_API_URL` con la URL
+base de la API, incluyendo `/api`. Luego iniciá el frontend con `npm run dev`.
+Las cookies de sesión se envían con `credentials: include`; el origen
+configurado en el backend debe coincidir con la dirección que usa Vite.
+
+El inicio y cierre de sesión, registro y las escrituras de partidos usan el
+backend y muestran sus errores. Las consultas de partidos y canchas usan los
+mocks como fallback cuando el servidor no está disponible; ese fallback no
+guarda ni simula cambios.
+
+Las cuentas con rol administrador acceden a `/admin` desde el menú de usuario
+para gestionar usuarios, canchas y partidos. El panel usa exclusivamente los
+endpoints administrativos y no sustituye sus errores por datos de prueba.

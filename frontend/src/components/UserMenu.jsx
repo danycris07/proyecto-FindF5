@@ -8,11 +8,9 @@ import {
   LuPhone,
   LuPlus,
   LuSearch,
+  LuShieldCheck,
 } from "react-icons/lu";
-import {
-  clearMockSession,
-  getMockSession,
-} from "../services/sessionService.js";
+import { getSessionUser, logoutUser } from "../services/sessionService.js";
 
 const links = [
   {
@@ -114,8 +112,10 @@ function ContactRow({ Icon, label, value }) {
 
 function UserMenu() {
   const [open, setOpen] = useState(false);
+  const [logoutPending, setLogoutPending] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
   const navigate = useNavigate();
-  const session = getMockSession();
+  const session = getSessionUser();
   const esJugador = (session?.role ?? "PLAYER") === "PLAYER";
   const esDuenio = session?.role === "FIELD_OWNER";
   const perfil = perfilDe(session);
@@ -128,6 +128,19 @@ function UserMenu() {
     .map((part) => part[0])
     .join("")
     .toUpperCase();
+  const menuLinks =
+    session?.role === "ADMIN"
+      ? [
+          {
+            label: "Administración",
+            to: "/admin",
+            description: "Usuarios, canchas y partidos",
+            Icon: LuShieldCheck,
+          },
+        ]
+      : session?.role === "FIELD_OWNER"
+        ? links.slice(0, 1)
+        : links;
 
   useEffect(() => {
     if (!open) return undefined;
@@ -139,9 +152,19 @@ function UserMenu() {
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [open]);
 
-  const handleLogout = () => {
-    clearMockSession();
-    navigate("/", { replace: true });
+  const handleLogout = async () => {
+    setLogoutPending(true);
+    setLogoutError("");
+    try {
+      await logoutUser();
+      navigate("/", { replace: true });
+    } catch (error) {
+      setLogoutError(
+        error instanceof Error ? error.message : "No se pudo cerrar sesión.",
+      );
+    } finally {
+      setLogoutPending(false);
+    }
   };
 
   return (
@@ -247,7 +270,7 @@ function UserMenu() {
 
             {/* Navegación */}
             <nav aria-label="Secciones" className="grid gap-1 p-3">
-              {links.map(({ label, to, description, Icon }) => (
+              {menuLinks.map(({ label, to, description, Icon }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -279,13 +302,19 @@ function UserMenu() {
             </nav>
 
             <div className="border-t border-border p-3">
+              {logoutError && (
+                <p role="alert" className="mb-3 text-sm text-danger">
+                  {logoutError}
+                </p>
+              )}
               <button
                 type="button"
                 onClick={handleLogout}
+                disabled={logoutPending}
                 className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-danger/60 bg-danger/10 px-4 py-2 text-sm font-bold text-danger transition-colors hover:border-danger hover:bg-danger/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
               >
                 <LuLogOut aria-hidden="true" className="h-4 w-4" />
-                Cerrar sesión
+                {logoutPending ? "Cerrando sesión..." : "Cerrar sesión"}
               </button>
             </div>
           </aside>

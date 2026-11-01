@@ -9,7 +9,7 @@ import {
   getMatchById,
   updateMatch,
 } from "../services/matchService.js";
-import { getMockSession } from "../services/sessionService.js";
+import { getSessionUser } from "../services/sessionService.js";
 import { useAvailableFields } from "../hooks/useAvailableFields.js";
 import { useInitialLoading } from "../hooks/useInitialLoading.js";
 import Skeleton from "../components/ui/Skeleton.jsx";
@@ -36,6 +36,7 @@ function ArmarPartido({ embedded = false }) {
   const [hasEntered, setHasEntered] = useState(false);
   const [errorEnvio, setErrorEnvio] = useState("");
   const [originalMatch, setOriginalMatch] = useState(null);
+  const [editLoading, setEditLoading] = useState(isEditMode);
 
   const [confirmDialog, setConfirmDialog] = useState(false);
   const [pendingData, setPendingData] = useState(null);
@@ -115,7 +116,7 @@ function ArmarPartido({ embedded = false }) {
   const totalPorJugador = cuotaBase + montoExtraCoca;
 
   const isLoading =
-    initialLoading || isSubmitting || (isEditMode && !originalMatch);
+    initialLoading || isSubmitting || editLoading;
 
   useEffect(() => {
     let enterFrameId;
@@ -132,29 +133,49 @@ function ArmarPartido({ embedded = false }) {
   }, []);
 
   useEffect(() => {
-    if (isEditMode && !originalMatch) {
-      getMatchById(partidoId).then((match) => {
-        if (match) {
-          setOriginalMatch(match);
-          reset({
-            cancha: match.fieldName,
-            fecha: match.date,
-            hora: match.startTime.slice(0, 5),
-            jugadoresEsperados: match.expectedPlayers,
-            organizerPlays: match.organizerPlays,
-            cubiertosPorFuera: match.outsideSlots,
-            cuota: match.basePricePerPlayer,
-            jugarPorLaCoca: match.playingForCoca,
-            montoExtraCoca: match.cocaAmountPerPlayer || "",
-          });
-        } else {
+    if (!isEditMode || originalMatch) return undefined;
+    let active = true;
+
+    getMatchById(partidoId)
+      .then((match) => {
+        if (!active) return;
+        if (!match) {
           navigate("/partidos", {
             replace: true,
             state: { aviso: "El partido no existe." },
           });
+          return;
         }
+        setOriginalMatch(match);
+        reset({
+          fieldId: match.fieldId,
+          cancha: match.fieldName,
+          fecha: match.date,
+          hora: match.startTime.slice(0, 5),
+          jugadoresEsperados: match.expectedPlayers,
+          organizerPlays: match.organizerPlays,
+          cubiertosPorFuera: match.outsideSlots,
+          cuota: match.basePricePerPlayer,
+          jugarPorLaCoca: match.playingForCoca,
+          montoExtraCoca: match.cocaAmountPerPlayer || "",
+        });
+      })
+      .catch((error) => {
+        if (active) {
+          setErrorEnvio(
+            error instanceof Error
+              ? `No se pudo cargar el partido: ${error.message}`
+              : "No se pudo cargar el partido.",
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setEditLoading(false);
       });
-    }
+
+    return () => {
+      active = false;
+    };
   }, [isEditMode, partidoId, originalMatch, reset, navigate]);
 
   const onSubmit = async (data) => {
@@ -189,7 +210,7 @@ function ArmarPartido({ embedded = false }) {
 
   const executeSave = async (data) => {
     setConfirmDialog(false);
-    const session = getMockSession();
+    const session = getSessionUser();
     if (!session) return setErrorEnvio("Tu sesión de prueba venció.");
 
     try {

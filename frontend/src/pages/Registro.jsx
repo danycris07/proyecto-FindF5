@@ -1,16 +1,15 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import AuthShell from "../components/auth/AuthShell.jsx";
 import { AuthField, AuthSubmitButton } from "../components/auth/AuthField.jsx";
-import { mockUsers } from "../mocks/MockData";
-import {
-  useInitialLoading,
-  waitForInitialLoading,
-} from "../hooks/useInitialLoading.js";
+import { useInitialLoading } from "../hooks/useInitialLoading.js";
+import { registerUser } from "../services/sessionService.js";
 
 export function Registro({ isLoading: loadingProp }) {
   const initialLoading = useInitialLoading();
   const navigate = useNavigate();
+  const [registerError, setRegisterError] = useState("");
   const {
     register,
     handleSubmit,
@@ -20,16 +19,16 @@ export function Registro({ isLoading: loadingProp }) {
   const isLoading = loadingProp ?? initialLoading;
 
   const onSubmit = async (data) => {
-    await waitForInitialLoading();
-    const nextId =
-      mockUsers.reduce(
-        (highestId, user) => Math.max(highestId, Number(user.id) || 0),
-        0,
-      ) + 1;
-    mockUsers.push({ ...data, id: nextId });
-    reset();
-
-    navigate("/login");
+    setRegisterError("");
+    try {
+      await registerUser(data);
+      reset();
+      navigate("/partidos", { replace: true });
+    } catch (error) {
+      setRegisterError(
+        error instanceof Error ? error.message : "No se pudo crear la cuenta.",
+      );
+    }
   };
 
   return (
@@ -58,6 +57,14 @@ export function Registro({ isLoading: loadingProp }) {
         aria-busy={isSubmitting}
         className="space-y-5"
       >
+        {registerError && (
+          <div
+            role="alert"
+            className="rounded-sm border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger"
+          >
+            {registerError}
+          </div>
+        )}
         <AuthField
           id="name"
           label="Nombre"

@@ -25,6 +25,9 @@ function PartidoFormFields({
   anotados,
   cuposAbiertos,
 }) {
+  const canchaRegistration = register("cancha", {
+    required: "Indicá la cancha del partido.",
+  });
   const esperados = Number(jugadoresEsperadosValue);
   // Lugares que todavía se pueden cubrir por fuera (Infinity = aún no hay total).
   const lugaresLibres =
@@ -53,10 +56,18 @@ function PartidoFormFields({
                 : "Elegí o escribí una cancha"
             }
             className={inputClassName}
-            {...register("cancha", {
-              required: "Indicá la cancha del partido.",
-            })}
+            {...canchaRegistration}
+            onChange={(event) => {
+              canchaRegistration.onChange(event);
+              const selectedField = canchas.find(
+                (field) => field.name === event.target.value,
+              );
+              setValue("fieldId", selectedField?.id ?? null, {
+                shouldDirty: true,
+              });
+            }}
           />
+          <input type="hidden" {...register("fieldId")} />
           <datalist id="lista-canchas">
             {canchas.map((cancha) => (
               <option key={cancha.id} value={cancha.name}>

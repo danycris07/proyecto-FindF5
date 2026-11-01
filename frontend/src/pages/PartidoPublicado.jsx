@@ -4,7 +4,7 @@ import MatchConfirmationCard from "../components/partidos/MatchDetailCard.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { getMatchById } from "../services/matchService.js";
 import DeleteMatchDialog from "../components/partidos/DeleteMatchDialog.jsx";
-import { getMockSession } from "../services/sessionService.js";
+import { getSessionUser } from "../services/sessionService.js";
 import { useParticipacion } from "../hooks/useParticipacion.js";
 
 function PartidoPublicado() {
@@ -26,7 +26,7 @@ function PartidoPublicado() {
 
   const navigate = useNavigate();
 
-  const session = getMockSession();
+  const session = getSessionUser();
 
   const [partidoAEliminar, setPartidoAEliminar] = useState(null);
 
@@ -160,6 +160,7 @@ function PartidoPublicado() {
           onLeave={participacion.bajarme}
           pendingAction={participacion.accionPendiente}
           participationError={participacion.errorParticipacion}
+          canParticipate={participacion.puedeParticipar}
         />
       )}
       <DeleteMatchDialog

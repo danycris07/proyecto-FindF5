@@ -3,12 +3,8 @@ import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthShell from "../components/auth/AuthShell.jsx";
 import { AuthField, AuthSubmitButton } from "../components/auth/AuthField.jsx";
-import { mockUsers } from "../mocks/MockData";
-import {
-  useInitialLoading,
-  waitForInitialLoading,
-} from "../hooks/useInitialLoading.js";
-import { setMockSession } from "../services/sessionService.js";
+import { useInitialLoading } from "../hooks/useInitialLoading.js";
+import { loginUser } from "../services/sessionService.js";
 
 export function Login({ isLoading: loadingProp }) {
   const initialLoading = useInitialLoading();
@@ -25,28 +21,17 @@ export function Login({ isLoading: loadingProp }) {
 
   const onSubmit = async (data) => {
     setLoginError("");
-    await waitForInitialLoading();
-    const usuario = mockUsers.find(
-      (user) => user.email === data.email && user.password === data.password,
-    );
-    if (!usuario) {
-      setLoginError("Correo o contraseña incorrectos.");
-      return;
-    }
-
     try {
-      setMockSession(usuario);
+      await loginUser(data);
+      reset();
+      navigate(location.state?.from?.pathname || "/partidos", { replace: true });
     } catch (error) {
       setLoginError(
         error instanceof Error
-          ? `No se pudo guardar la sesión en este navegador: ${error.message}`
-          : "No se pudo guardar la sesión en este navegador.",
+          ? error.message
+          : "No se pudo iniciar sesión.",
       );
-      return;
     }
-    reset();
-
-    navigate(location.state?.from?.pathname || "/partidos", { replace: true });
   };
 
   return (
