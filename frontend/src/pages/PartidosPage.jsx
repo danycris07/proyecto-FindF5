@@ -6,7 +6,7 @@ import { getMatches } from "../services/matchService.js";
 import { useParticipacion } from "../hooks/useParticipacion.js";
 import MatchConfirmationCard from "../components/partidos/MatchDetailCard.jsx";
 import MatchModal from "../components/partidos/MatchModal.jsx";
-import { getMockSession } from "../services/sessionService.js";
+import { getSessionUser } from "../services/sessionService.js";
 import { waitForInitialLoading } from "../hooks/useInitialLoading.js";
 import DeleteMatchDialog from "../components/partidos/DeleteMatchDialog.jsx";
 import { GoPlus } from "react-icons/go";
@@ -30,7 +30,7 @@ function PartidosPage() {
   const location = useLocation();
   const [aviso, setAviso] = useState(location.state?.aviso ?? "");
   const [partidoAEliminar, setPartidoAEliminar] = useState(null);
-  const session = getMockSession();
+  const session = getSessionUser();
   const filtrosPartidos = useMatchFilters(estado.partidos);
   const canchas = [
     ...new Set(estado.partidos.map((partido) => partido.fieldName)),
@@ -70,7 +70,7 @@ function PartidosPage() {
     setAviso(`Partido eliminado: ${partido.fieldName}.`);
   };
 
-  const armarPartidoButton = (
+  const armarPartidoButton = session?.role === "PLAYER" && (
     <button
       type="button"
       onClick={handleOpenForm}
@@ -244,6 +244,7 @@ function PartidosPage() {
                 onLeave={participacion.bajarme}
                 pendingAction={participacion.accionPendiente}
                 participationError={participacion.errorParticipacion}
+                canParticipate={participacion.puedeParticipar}
               />
             )}
           </MatchModal>

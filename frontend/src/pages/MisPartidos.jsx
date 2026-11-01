@@ -7,7 +7,7 @@ import MatchModal from "../components/partidos/MatchModal.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { useParticipacion } from "../hooks/useParticipacion.js";
 import { getMyMatches } from "../services/matchService.js";
-import { getMockSession } from "../services/sessionService.js";
+import { getSessionUser } from "../services/sessionService.js";
 
 const CTA_CLASSES =
   "inline-flex min-h-11 items-center justify-center rounded-sm border border-primary-foreground bg-primary px-5 py-2 text-sm font-extrabold uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90";
@@ -43,7 +43,7 @@ function Seccion({ id, titulo, partidos, vacio, onSelect }) {
 }
 
 function MisPartidos() {
-  const session = getMockSession();
+  const session = getSessionUser();
   const userId = session?.id;
 
   const [estado, setEstado] = useState({
@@ -222,6 +222,7 @@ function MisPartidos() {
               onLeave={participacion.bajarme}
               pendingAction={participacion.accionPendiente}
               participationError={participacion.errorParticipacion}
+              canParticipate={participacion.puedeParticipar}
             />
           )}
         </MatchModal>

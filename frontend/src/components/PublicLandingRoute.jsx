@@ -1,8 +1,18 @@
 import { Navigate } from "react-router-dom";
-import { getMockSession } from "../services/sessionService.js";
+import { useSession } from "../context/useSession.js";
 
 function PublicLandingRoute({ children }) {
-  if (getMockSession()) {
+  const { user, loading } = useSession();
+
+  if (loading) {
+    return (
+      <p role="status" className="p-8 text-center text-text-secondary">
+        Validando tu sesión...
+      </p>
+    );
+  }
+
+  if (user) {
     return <Navigate to="/partidos" replace />;
   }
 

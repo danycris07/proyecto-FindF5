@@ -4,7 +4,7 @@ import {
   joinMatch,
   leaveMatch,
 } from "../services/matchService.js";
-import { getMockSession } from "../services/sessionService.js";
+import { getSessionUser } from "../services/sessionService.js";
 
 const SIN_ACCION = { matchId: null, accion: null };
 const SIN_ERROR = { matchId: null, accion: null, mensaje: "" };
@@ -16,7 +16,7 @@ const SIN_ERROR = { matchId: null, accion: null, mensaje: "" };
  * `onChange` recibe el partido actualizado para que la pantalla lo refleje.
  */
 export function useParticipacion(match, onChange) {
-  const session = getMockSession();
+  const session = getSessionUser();
   const [pendiente, setPendiente] = useState(SIN_ACCION);
   const [fallo, setFallo] = useState(SIN_ERROR);
 
@@ -28,12 +28,13 @@ export function useParticipacion(match, onChange) {
       : "";
 
   const estaAnotado = Boolean(
-    match && session
+    match && session?.role === "PLAYER"
       ? match.participants?.some(
           (participante) => String(participante.userId) === String(session.id),
         )
       : false,
   );
+  const puedeParticipar = session?.role === "PLAYER";
 
   const ejecutar = async (accion, tarea, optimista) => {
     if (!match || accionPendiente) return;
@@ -61,6 +62,7 @@ export function useParticipacion(match, onChange) {
 
   return {
     estaAnotado,
+    puedeParticipar,
     accionPendiente,
     errorParticipacion: errorDe("join", "leave"),
     errorCupo: errorDe("decrease"),

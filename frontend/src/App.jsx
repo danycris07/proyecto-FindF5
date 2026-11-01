@@ -10,6 +10,9 @@ import PublicLandingRoute from "./components/PublicLandingRoute";
 import ArmarPartido from "./pages/ArmarPartido";
 import MisPartidos from "./pages/MisPartidos";
 import UserMenu from "./components/UserMenu.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
+import AdminRoute from "./components/AdminRoute.jsx";
+import PlayerRoute from "./components/PlayerRoute.jsx";
 
 function AuthenticatedLayout({ children }) {
   return (
@@ -47,7 +50,9 @@ function App() {
         path="/partidos/nuevo"
         element={
           <AuthenticatedLayout>
-            <ArmarPartido />
+            <PlayerRoute>
+              <ArmarPartido />
+            </PlayerRoute>
           </AuthenticatedLayout>
         }
       />
@@ -73,7 +78,19 @@ function App() {
         path="/partidos/:partidoId/editar"
         element={
           <AuthenticatedLayout>
-            <ArmarPartido />
+            <PlayerRoute>
+              <ArmarPartido />
+            </PlayerRoute>
+          </AuthenticatedLayout>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <AuthenticatedLayout>
+            <AdminRoute>
+              <AdminPage />
+            </AdminRoute>
           </AuthenticatedLayout>
         }
       />

@@ -30,6 +30,7 @@ function MatchConfirmationCard({
   onLeave,
   pendingAction = null,
   participationError = "",
+  canParticipate = true,
 }) {
   const isFull = match.missingPlayers === 0;
   const participants = match.participants ?? [];
@@ -204,7 +205,7 @@ function MatchConfirmationCard({
         </dl>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          {!isOrganizer && isJoined && (
+          {canParticipate && !isOrganizer && isJoined && (
             <button
               type="button"
               onClick={onLeave}
@@ -215,7 +216,7 @@ function MatchConfirmationCard({
             </button>
           )}
           {/* Se puede sumar quien no organiza, no está anotado y hay lugar */}
-          {!isOrganizer && !isJoined && !isFull && (
+          {canParticipate && !isOrganizer && !isJoined && !isFull && (
             <button
               type="button"
               onClick={onJoin}

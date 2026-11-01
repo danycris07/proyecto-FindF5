@@ -52,7 +52,7 @@ Todo componente que consuma datos asíncronos debe contemplar visualmente:
 ## 10. Mocks
 
 - Los datos hardcodeados deben extraerse hacia archivos de mock centralizados en `src/mocks/`.
-- **Fallback automático**: si la API del backend falla o no está desplegada, el servicio debe caer automáticamente a los datos de `src/mocks/` para que la UI nunca se rompa.
+- **Fallback de consultas**: si una consulta de lectura falla o el backend no está desplegado, el servicio puede recurrir a `src/mocks/`. Las escrituras (registro, login, participación, creación, edición o eliminación) deben informar el error real y nunca simular éxito ni guardar cambios localmente.
 
 ## 11. Integración de v0 (v0.dev → Proyecto)
 
