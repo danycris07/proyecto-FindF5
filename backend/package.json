@@ -1,15 +1,13 @@
 {
-  "name": "proyecto-futbol5",
+  "name": "findf5-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "dev": "node --watch app.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "private": true,
   "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
