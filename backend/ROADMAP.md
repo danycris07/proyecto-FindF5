@@ -56,22 +56,24 @@ Verificación real de MySQL confirmada por el usuario con su configuración loca
 - [x] Agregar validación de sesión y middleware de roles para rutas protegidas.
 - [x] Probar hashing, cookies, validación y flujos de autenticación con MySQL.
 
-### 4. Partidos y participación — siguiente
+### 4. Partidos y participación — completada
 
-- Implementar consulta, creación, edición y eliminación de partidos.
-- Implementar sumarse, bajarse y ver participantes.
-- Derivar los cupos con la regla acordada:
+- [x] Implementar consulta, creación, edición y eliminación de partidos.
+- [x] Implementar sumarse, bajarse y ver participantes.
+- [x] Derivar los cupos con la regla acordada:
   `faltan = esperados - (1 si el organizador juega) - confirmados por fuera - anotados en la app`.
-- Validar fechas pasadas, permisos del organizador y límites de cupos.
-- Hacer atómica la asignación del último lugar para evitar sobreinscripciones
+- [x] Validar fechas pasadas, permisos del organizador y límites de cupos.
+- [x] Hacer atómica la asignación del último lugar para evitar sobreinscripciones
   concurrentes.
-- Cubrir la opción “Jugar por la coca” y los datos de cancha disponibles.
+- [x] Cubrir la opción “Jugar por la coca” y los datos de cancha disponibles.
+- [x] Probar operaciones, permisos, cupos y concurrencia contra MySQL local.
 
-### 5. Administración
+### 5. Administración — completada
 
-- Implementar rutas administrativas para usuarios, canchas y partidos.
-- Restringir esas rutas al rol administrador.
-- Probar las operaciones autorizadas y el rechazo de los demás roles.
+- [x] Implementar CRUD administrativo para usuarios, canchas y partidos.
+- [x] Restringir esas rutas al rol administrador.
+- [x] Proteger la cuenta propia y asegurar que quede un administrador activo.
+- [x] Probar operaciones, roles y cambios principales contra MySQL local.
 
 ### 6. Integración con el frontend
 
@@ -100,7 +102,7 @@ que se acuerde incorporarlas expresamente.
 - [x] Etapa 1: base del backend.
 - [x] Etapa 2: MySQL y modelos.
 - [x] Etapa 3: usuarios y autenticación.
-- [ ] Etapa 4: partidos y participación.
-- [ ] Etapa 5: administración.
+- [x] Etapa 4: partidos y participación.
+- [x] Etapa 5: administración.
 - [ ] Etapa 6: integración con el frontend.
 - [ ] Etapa 7: validación y cierre.

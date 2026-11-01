@@ -46,12 +46,51 @@ días. En producción se añade `Secure`. La base guarda únicamente el hash del
 token de sesión, y las contraseñas se derivan con `scrypt`. El rol administrador
 no puede asignarse desde el registro.
 
+Los endpoints de partidos requieren una sesión:
+
+- `GET /api/fields`: lista las canchas disponibles para el formulario.
+- `GET /api/matches`: lista convocatorias abiertas y ordenadas por fecha/hora.
+- `GET /api/matches/mine`: lista los partidos que organiza o donde participa el
+  usuario autenticado.
+- `GET /api/matches/:matchId`: devuelve detalle, organizador, anotados y cupos.
+- `POST /api/matches`: crea un partido para el jugador autenticado.
+- `PUT /api/matches/:matchId`: edita el partido; solo puede hacerlo su
+  organizador.
+- `DELETE /api/matches/:matchId`: elimina lógicamente el partido; solo puede
+  hacerlo su organizador.
+- `POST /api/matches/:matchId/join` y `DELETE /api/matches/:matchId/join`:
+  permiten sumarse y bajarse. El último cupo se asigna dentro de una
+  transacción que bloquea la fila del partido.
+- `POST /api/matches/:matchId/outside-slots`: registra un jugador confirmado
+  por fuera; solo puede hacerlo el organizador.
+
+La respuesta del partido calcula `missingPlayers` a partir de jugadores
+esperados, participación del organizador, confirmados por fuera y participantes
+anotados. La hora se interpreta en la zona `America/Argentina/Buenos_Aires`.
+
+Los endpoints administrativos requieren una sesión con rol `ADMIN`:
+
+- `/api/admin/users`: listar, consultar, crear, editar y eliminar usuarios.
+  Las contraseñas nuevas o restablecidas se guardan con `scrypt`; los datos de
+  respuesta nunca incluyen el hash. Los cambios de rol y contraseña revocan
+  las sesiones existentes.
+- `/api/admin/fields`: CRUD de canchas, incluyendo propietario, dirección,
+  coordenadas, precio e información de imagen.
+- `/api/admin/matches`: CRUD de partidos, pudiendo asignar un jugador como
+  organizador. Las respuestas conservan el mismo formato y cálculo de cupos que
+  `/api/matches`.
+
+Las eliminaciones son lógicas. No se permite que el administrador se elimine o
+quite su propio rol, y debe quedar al menos un administrador activo. Los
+identificadores de propietarios, organizadores, canchas y equipos se validan
+antes de guardar.
+
 Para crear el primer administrador, completar `ADMIN_NAME`, `ADMIN_EMAIL` y
 `ADMIN_PASSWORD` en `.env` (contraseña de al menos 12 caracteres) y ejecutar
 `npm run db:bootstrap-admin`. El comando no eleva cuentas existentes que no
 sean administradoras y es idempotente para una cuenta administradora ya creada.
 
-Las pruebas de autenticación contra MySQL crean y eliminan una cuenta temporal.
+Las pruebas de integración contra MySQL crean y eliminan datos temporales.
 Con la base de desarrollo configurada, ejecutarlas con
 `$env:RUN_DB_INTEGRATION_TESTS="1"; npm test` en PowerShell. No ejecutar pruebas
 de integración contra una base de producción.
