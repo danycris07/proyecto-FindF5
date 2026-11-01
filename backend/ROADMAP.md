@@ -34,16 +34,18 @@ backend de FindF5 sin perder el contexto entre sesiones.
 
 Commit: `13ef9ef feat: se creó la base del backend`.
 
-### 2. MySQL y modelos — en curso
+### 2. MySQL y modelos — completada
 
 - [x] Documentar las variables de entorno necesarias para MySQL.
 - [x] Implementar la conexión Sequelize sin exponer secretos.
 - [x] Definir modelos y relaciones a partir de los mocks.
 - [x] Crear sincronización manual de desarrollo que no altera ni elimina tablas.
 - [x] Probar configuración, asociaciones y validaciones de modelos sin conexión.
-- [ ] Configurar y probar la conexión real y el esquema con MySQL local.
+- [x] Configurar y probar la conexión real y el esquema con MySQL local.
 
-### 3. Usuarios y autenticación
+Verificación real de MySQL confirmada por el usuario con su configuración local.
+
+### 3. Usuarios y autenticación — siguiente
 
 - Implementar registro, inicio y cierre de sesión.
 - Guardar contraseñas con hash; nunca almacenar contraseñas en texto plano.
@@ -94,7 +96,7 @@ que se acuerde incorporarlas expresamente.
 ## Registro de avance
 
 - [x] Etapa 1: base del backend.
-- [ ] Etapa 2: MySQL y modelos.
+- [x] Etapa 2: MySQL y modelos.
 - [ ] Etapa 3: usuarios y autenticación.
 - [ ] Etapa 4: partidos y participación.
 - [ ] Etapa 5: administración.
