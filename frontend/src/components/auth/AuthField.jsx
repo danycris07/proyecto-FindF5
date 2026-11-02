@@ -16,6 +16,8 @@ export function AuthField({
   registration,
   as: Control = "input",
   children,
+  labelClassName = "block text-xs font-semibold uppercase tracking-wider text-text-secondary",
+  descriptionId,
   ...controlProps
 }) {
   const errorId = `${id}-error`;
@@ -24,7 +26,7 @@ export function AuthField({
     <div>
       <label
         htmlFor={id}
-        className="block text-xs font-semibold uppercase tracking-wider text-text-secondary"
+        className={labelClassName}
       >
         {label}
       </label>
@@ -33,7 +35,9 @@ export function AuthField({
         {...registration}
         {...controlProps}
         aria-invalid={error ? "true" : "false"}
-        aria-describedby={error ? errorId : undefined}
+        aria-describedby={
+          [descriptionId, error ? errorId : null].filter(Boolean).join(" ") || undefined
+        }
         className={`${CONTROL} ${
           error
             ? "border-danger focus:border-danger focus:ring-danger/20"

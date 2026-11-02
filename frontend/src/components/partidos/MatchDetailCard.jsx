@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { m as motion, useReducedMotion } from "framer-motion";
 import ImpactButton from "../ui/ImpactButton.jsx";
+import PlayerProfilePopover from "./PlayerProfilePopover.jsx";
 
 const currencyFormatter = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -49,13 +50,8 @@ function MatchConfirmationCard({
           : { opacity: 0, y: 24 }
       }
       transition={{ duration: reduceMotion ? 0 : 0.5, ease: "easeOut" }}
-      className="relative isolate mx-auto w-full max-w-3xl overflow-hidden rounded-md border border-border bg-surface p-5 shadow-2xl shadow-[var(--shadow-color)] sm:p-8"
+      className="relative isolate mx-auto w-full max-w-3xl overflow-visible rounded-md border border-border bg-surface p-5 sm:p-8"
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-20 -top-24 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl"
-      />
-
       <div className="relative z-10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -86,7 +82,7 @@ function MatchConfirmationCard({
 
         <dl className="mt-8 grid gap-3 sm:grid-cols-2">
           <div className="rounded-sm border border-border bg-background p-4">
-            <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <dt className="text-sm font-medium text-text-secondary">
               Cancha
             </dt>
             <dd className="mt-2 font-semibold text-text-primary">
@@ -94,7 +90,7 @@ function MatchConfirmationCard({
             </dd>
           </div>
           <div className="rounded-sm border border-border bg-background p-4">
-            <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <dt className="text-sm font-medium text-text-secondary">
               Día
             </dt>
             <dd className="mt-2 font-semibold capitalize text-text-primary">
@@ -102,7 +98,7 @@ function MatchConfirmationCard({
             </dd>
           </div>
           <div className="rounded-sm border border-border bg-background p-4">
-            <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <dt className="text-sm font-medium text-text-secondary">
               Hora
             </dt>
             <dd className="mt-2 font-semibold tabular-nums text-text-primary">
@@ -113,7 +109,7 @@ function MatchConfirmationCard({
           {/* Criterio 1 y 4: Visor de Cupos y Botón Restar */}
           <div className="flex flex-col justify-between rounded-sm border border-border bg-background p-4">
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              <dt className="text-sm font-medium text-text-secondary">
                 Cupos faltantes
               </dt>
               <dd className="mt-2 font-display text-2xl font-extrabold tabular-nums text-text-primary">
@@ -130,7 +126,7 @@ function MatchConfirmationCard({
                   type="button"
                   onClick={onDecreaseSlot}
                   disabled={isFull}
-                  className="inline-flex items-center justify-center rounded-sm border border-primary/50 bg-primary/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-text transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex min-h-10 items-center justify-center rounded-sm border border-primary/50 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary-text transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Restar cupo
                 </button>
@@ -144,7 +140,7 @@ function MatchConfirmationCard({
           </div>
 
           <div className="rounded-sm border border-border bg-background p-4 sm:col-span-2">
-            <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <dt className="text-sm font-medium text-text-secondary">
               Anotados
             </dt>
             <dd className="mt-3">
@@ -155,22 +151,35 @@ function MatchConfirmationCard({
               ) : (
                 <ul className="flex flex-wrap gap-2">
                   {match.organizerPlays && (
-                    <li className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface px-2.5 py-1 text-sm">
-                      {match.organizerName}
-                      <span className="text-xs font-bold uppercase tracking-wider text-status">
-                        Organiza
-                      </span>
-                    </li>
+                    match.organizerId ? (
+                      <PlayerProfilePopover
+                        key={match.organizerId}
+                        userId={match.organizerId}
+                        name={match.organizerName}
+                        photoUrl={match.organizerPhotoUrl}
+                        matchName={match.fieldName ?? "el partido"}
+                        isCurrentUser={String(match.organizerId) === String(currentUserId)}
+                        badge="Organiza"
+                      />
+                    ) : (
+                      <li className="inline-flex min-h-11 items-center gap-2 px-1.5 text-sm">
+                        <span aria-hidden="true" className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-background text-xs font-bold text-text-secondary">
+                          {match.organizerName?.trim()?.charAt(0)?.toLocaleUpperCase() ?? "J"}
+                        </span>
+                        <span>{match.organizerName}</span>
+                        <span className="ml-1 text-xs font-semibold text-status">Organiza</span>
+                      </li>
+                    )
                   )}
                   {participants.map((participant) => (
-                    <li
+                    <PlayerProfilePopover
                       key={participant.userId}
-                      className="inline-flex items-center rounded-sm border border-border bg-surface px-2.5 py-1 text-sm"
-                    >
-                      {participant.name}
-                      {String(participant.userId) === String(currentUserId) &&
-                        " (vos)"}
-                    </li>
+                      userId={participant.userId}
+                      name={participant.name}
+                      photoUrl={participant.profilePhotoUrl}
+                      matchName={match.fieldName ?? "el partido"}
+                      isCurrentUser={String(participant.userId) === String(currentUserId)}
+                    />
                   ))}
                   {match.outsideSlots > 0 && (
                     <li className="inline-flex items-center rounded-sm border border-dashed border-border px-2.5 py-1 text-sm text-text-secondary">
@@ -183,7 +192,7 @@ function MatchConfirmationCard({
           </div>
 
           <div className="rounded-sm border border-border bg-background p-4 sm:col-span-2">
-            <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <dt className="text-sm font-medium text-text-secondary">
               {match.playingForCoca
                 ? "Cuota + monto extra"
                 : "Cuota por jugador"}
@@ -229,7 +238,7 @@ function MatchConfirmationCard({
               type="button"
               onClick={onJoin}
               disabled={!onJoin || pendingAction !== null}
-              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-primary-foreground bg-primary px-5 py-3 text-sm font-extrabold uppercase tracking-wider text-primary-foreground transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_var(--primary-shadow-strong)] disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0"
+              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-primary-foreground bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:brightness-95 disabled:cursor-wait disabled:opacity-60"
             >
               {pendingAction === "join" ? "Sumándome..." : "Sumarme"}
             </ImpactButton>

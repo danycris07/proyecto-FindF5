@@ -3,3 +3,6 @@ node_modules
 .codebase-memory/
 .claude
 .engram
+.codex
+.taste-skill
+anti-slop
