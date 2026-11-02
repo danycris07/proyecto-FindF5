@@ -3,7 +3,7 @@ import { GoChevronDown, GoX } from "react-icons/go";
 import { Chip, Grupo, Opciones } from "./FilterControls.jsx";
 
 const CAMPO =
-  "min-h-11 w-full rounded-sm border border-border bg-background px-3 text-sm tabular-nums text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status";
+  "min-h-11 w-full rounded border border-[#24324A] bg-[#0B0F19] px-3 text-sm tabular-nums text-white placeholder:text-slate-300 focus:border-[#CCFF00] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#CCFF00]";
 
 const DIAS = [
   ["", "Cualquier día"],
@@ -29,6 +29,7 @@ function MatchFilters({
   canchas,
   precioInvalido,
   disabled,
+  compact = false,
 }) {
   const [abierto, setAbierto] = useState(false);
   const panelId = useId();
@@ -38,7 +39,7 @@ function MatchFilters({
       : canchas;
 
   return (
-    <section aria-label="Filtros de partidos" className="mb-6">
+    <section aria-label="Filtros de partidos" className={compact ? "mb-0" : "mb-6"}>
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
@@ -46,15 +47,15 @@ function MatchFilters({
           aria-expanded={abierto}
           aria-controls={abierto ? panelId : undefined}
           onClick={() => setAbierto((v) => !v)}
-          className={`inline-flex min-h-11 items-center gap-2 rounded-sm border px-4 py-2 text-sm font-extrabold uppercase tracking-wider transition-colors disabled:cursor-wait disabled:opacity-60 ${
+          className={`inline-flex min-h-11 items-center gap-2 rounded-sm border px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-wait disabled:opacity-60 ${
             activos > 0
-              ? "border-primary bg-primary/10 text-primary-text"
-              : "border-border bg-surface text-text-primary hover:border-primary"
+              ? "border-[#CCFF00] bg-[#CCFF00] text-[#0B0F19]"
+              : "border-[#24324A] bg-[#0B0F19] text-slate-100 hover:border-[#94A3B8]"
           }`}
         >
           Filtrar partidos
           {activos > 0 && (
-            <span className="rounded-sm bg-primary px-1.5 text-xs tabular-nums text-primary-foreground">
+              <span className="rounded-sm bg-[#0B0F19] px-1.5 text-xs tabular-nums text-current">
               {activos}
               <span className="sr-only">
                 {activos === 1 ? " filtro activo" : " filtros activos"}
@@ -70,7 +71,7 @@ function MatchFilters({
           <button
             type="button"
             onClick={onClear}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-sm px-2 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-sm px-2 text-sm font-semibold text-slate-400 transition-colors hover:text-white"
           >
             <GoX aria-hidden="true" />
             Limpiar filtros
@@ -81,7 +82,7 @@ function MatchFilters({
       {abierto && (
         <div
           id={panelId}
-          className="mt-3 grid gap-5 rounded-sm border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="mt-3 grid gap-5 rounded-lg border border-[#24324A] bg-[#161F30] p-4 text-white sm:grid-cols-2 lg:grid-cols-3"
         >
           <Grupo titulo="Día">
             <Opciones
@@ -139,7 +140,7 @@ function MatchFilters({
               />
             </div>
             {precioInvalido && (
-              <p role="alert" className="text-xs text-danger">
+              <p role="alert" className="text-xs text-rose-300">
                 El mínimo no puede superar al máximo.
               </p>
             )}
