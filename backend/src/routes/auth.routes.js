@@ -27,6 +27,7 @@ function publicUser(user) {
     position: user.position,
     dominantFoot: user.dominantFoot,
     reputation: user.reputation,
+    isPhoneVisible: user.isPhoneVisible,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
@@ -61,6 +62,83 @@ async function createLoginSession(models, transaction, user) {
 export function createAuthRouter({ models, sequelize }) {
   const router = Router();
   const requireAuth = createRequireAuth(models);
+
+  router.patch(
+    "/me",
+    requireAuth,
+    (request, response, next) => {
+      const editableFields = [
+        "position",
+        "dominantFoot",
+        "phone",
+        "isPhoneVisible",
+      ];
+      if (
+        !request.body ||
+        typeof request.body !== "object" ||
+        Array.isArray(request.body) ||
+        Object.keys(request.body).some((field) => !editableFields.includes(field))
+      ) {
+        return response.status(400).json({
+          message: "Solo podés actualizar posición, pierna hábil y teléfono.",
+        });
+      }
+      return next();
+    },
+    [
+      body("position")
+        .optional({ values: "null" })
+        .isIn(PLAYER_POSITIONS)
+        .withMessage("Elegí jugador de campo o arquero."),
+      body("dominantFoot")
+        .optional({ values: "null" })
+        .isIn(DOMINANT_FOOTS)
+        .withMessage("Elegí una pierna hábil válida."),
+      body("phone")
+        .optional({ values: "null" })
+        .isString()
+        .bail()
+        .trim()
+        .isLength({ max: 30 })
+        .withMessage("El teléfono no puede superar los 30 caracteres.")
+        .bail()
+        .custom((phone) => {
+          const digitCount = phone.replace(/\D/g, "").length;
+          return (
+            phone === "" ||
+            (/^[+\d][\d\s()-]*$/.test(phone) &&
+              digitCount >= 7 &&
+              digitCount <= 15)
+          );
+        })
+        .withMessage("Ingresá un teléfono válido con entre 7 y 15 dígitos."),
+      body("isPhoneVisible")
+        .optional()
+        .isBoolean()
+        .withMessage("Indicá si querés mostrar tu teléfono."),
+      body().custom((_value, { req }) => {
+        if (
+          req.authUser.role !== "PLAYER" &&
+          (Object.hasOwn(req.body, "position") ||
+            Object.hasOwn(req.body, "dominantFoot"))
+        ) {
+          throw new Error("Solo los jugadores pueden editar su perfil deportivo.");
+        }
+        return true;
+      }),
+    ],
+    validationErrors,
+    async (request, response) => {
+      const changes = Object.fromEntries(
+        Object.entries(request.body).map(([field, value]) => [
+          field,
+          field === "phone" ? value?.trim() || null : value,
+        ]),
+      );
+      await request.authUser.update(changes);
+      return response.status(200).json({ user: publicUser(request.authUser) });
+    },
+  );
 
   router.post(
     "/register",
