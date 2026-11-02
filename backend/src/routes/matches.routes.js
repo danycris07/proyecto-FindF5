@@ -156,7 +156,8 @@ function matchIncludes(models) {
     {
       model: models.Field,
       as: "field",
-      attributes: ["id", "name", "imageUrl"],
+      attributes: ["id", "name", "address", "imageUrl"],
+      paranoid: false,
     },
     {
       model: models.User,

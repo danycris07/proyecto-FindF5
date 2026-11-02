@@ -38,6 +38,10 @@ function MatchConfirmationCard({
   const reduceMotion = useReducedMotion();
   const isFull = match.missingPlayers === 0;
   const participants = match.participants ?? [];
+  const occupiedSlots = Math.max(
+    0,
+    Number(match.expectedPlayers) - Number(match.missingPlayers ?? 0),
+  );
   const nobodyYet =
     !match.organizerPlays && participants.length === 0 && !match.outsideSlots;
 
@@ -105,23 +109,28 @@ function MatchConfirmationCard({
               {match.startTime}
             </dd>
           </div>
+          <div className="rounded-sm border border-border bg-background p-4">
+            <dt className="text-sm font-medium text-text-secondary">
+              Dirección de la cancha
+            </dt>
+            <dd className="mt-2 font-semibold text-text-primary">
+              {match.fieldAddress || "Dirección no disponible"}
+            </dd>
+          </div>
 
           {/* Criterio 1 y 4: Visor de Cupos y Botón Restar */}
-          <div className="flex flex-col justify-between rounded-sm border border-border bg-background p-4">
-            <div>
-              <dt className="text-sm font-medium text-text-secondary">
-                Cupos faltantes
-              </dt>
-              <dd className="mt-2 font-display text-2xl font-extrabold tabular-nums text-text-primary">
-                {match.missingPlayers}{" "}
-                <span className="text-sm font-medium text-text-secondary">
-                  / {match.expectedPlayers}
-                </span>
-              </dd>
-            </div>
-
+          <div className="rounded-sm border border-border bg-background p-4 sm:col-span-2">
+            <dt className="text-sm font-medium text-text-secondary">
+              Anotados
+            </dt>
+            <dd className="mt-2 font-display text-2xl font-extrabold tabular-nums text-text-primary">
+              {occupiedSlots}
+              <span className="text-base font-semibold text-text-secondary">
+                {` de ${match.expectedPlayers} cupos`}
+              </span>
+            </dd>
             {isOrganizer && (
-              <div className="mt-3">
+              <dd className="mt-3">
                 <button
                   type="button"
                   onClick={onDecreaseSlot}
@@ -135,15 +144,8 @@ function MatchConfirmationCard({
                     {decreaseError}
                   </p>
                 )}
-              </div>
-            )}
-          </div>
-
-          <div className="rounded-sm border border-border bg-background p-4 sm:col-span-2">
-            <dt className="text-sm font-medium text-text-secondary">
-              Anotados
-            </dt>
-            <dd className="mt-3">
+              </dd>
+            )}            <dd className="mt-3">
               {nobodyYet ? (
                 <p className="text-sm text-text-secondary">
                   Todavía no se anotó nadie desde la app.
