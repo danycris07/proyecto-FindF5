@@ -5,6 +5,7 @@ import { createAdminRouter } from "./routes/admin.routes.js";
 import { createAuthRouter } from "./routes/auth.routes.js";
 import { createFieldsRouter } from "./routes/fields.routes.js";
 import { createMatchesRouter } from "./routes/matches.routes.js";
+import { createUsersRouter } from "./routes/users.routes.js";
 
 const port = Number(process.env.PORT ?? 3000);
 
@@ -17,7 +18,14 @@ const authRouter = createAuthRouter({ models, sequelize });
 const adminRouter = createAdminRouter({ models, sequelize });
 const fieldsRouter = createFieldsRouter({ models });
 const matchesRouter = createMatchesRouter({ models, sequelize });
-const app = createApp({ authRouter, matchesRouter, fieldsRouter, adminRouter });
+const usersRouter = createUsersRouter({ models });
+const app = createApp({
+  authRouter,
+  usersRouter,
+  matchesRouter,
+  fieldsRouter,
+  adminRouter,
+});
 
 app.listen(port, () => {
   console.log(`FindF5 API escuchando en el puerto ${port}.`);

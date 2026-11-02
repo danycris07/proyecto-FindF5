@@ -45,7 +45,7 @@
 - No crees commits, no integres ramas ni hagas push salvo que el usuario lo solicite explícitamente.
 - Cuando el usuario solicite un commit, prepará únicamente los archivos relacionados con la tarea y usá un mensaje breve en español, en pasado y con formato Conventional Commits, por ejemplo: `feat: se extrajo el hero`.
 - Hacé merge únicamente cuando el usuario lo pida y las validaciones hayan pasado. No hagas push sin autorización explícita.
-
+  Excepción: Cuando el usuario invoque explícitamente el subagente /git:story, se autoriza la creación automática de la rama feature/BUS-X y el commit correspondiente tras pasar las validaciones.
 
 ## 8. Memoria (Engram MCP)
 
@@ -62,7 +62,6 @@
 - Consultá también Engram antes de tareas que dependan de un flujo o una convención recurrente del proyecto, como extracciones de componentes, commits o integración de ramas.
 - **Registro automático**: cada vez que resuelvas un bug crítico, crees un mock de datos reutilizable o cambies la estructura de un componente clave, invocá Engram para guardar la solución.
 - Si Engram no está disponible, continuá usando el código y los documentos del proyecto; no inventes decisiones previas ni declares que consultaste la memoria.
-
 
 ## 9. Validación y Cierre
 

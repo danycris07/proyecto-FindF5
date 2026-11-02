@@ -29,6 +29,11 @@ export function defineUser(sequelize) {
         type: DataTypes.STRING(30),
         allowNull: true,
       },
+      isPhoneVisible: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       role: {
         type: DataTypes.ENUM(...USER_ROLES),
         allowNull: false,

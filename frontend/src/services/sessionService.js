@@ -72,6 +72,15 @@ export async function getCurrentSession() {
   }
 }
 
+export async function updateCurrentUser(values) {
+  const result = await apiRequest("/auth/me", {
+    method: "PATCH",
+    body: values,
+  });
+  setSessionUser(result.user);
+  return result.user;
+}
+
 export async function logoutUser() {
   await apiRequest("/auth/logout", { method: "POST" });
   clearSessionUser();

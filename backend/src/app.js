@@ -4,6 +4,7 @@ import healthRouter from "./routes/health.routes.js";
 
 export function createApp({
   authRouter,
+  usersRouter,
   matchesRouter,
   fieldsRouter,
   adminRouter,
@@ -29,6 +30,9 @@ export function createApp({
   app.use("/api/health", healthRouter);
   if (authRouter) {
     app.use("/api/auth", authRouter);
+  }
+  if (usersRouter) {
+    app.use("/api/users", usersRouter);
   }
   if (matchesRouter) {
     app.use("/api/matches", matchesRouter);
