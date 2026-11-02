@@ -122,7 +122,20 @@ function MatchCard({ match, onSelect, featured = false }) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="truncate font-display text-xl font-extrabold tracking-wide text-white sm:text-2xl">{match.fieldName}</h2>
-            <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-300"><GoPin aria-hidden="true" className="text-slate-300" />{match.fieldAddress || "Ubicación no especificada"}</p>
+            <div className="mt-2 flex min-w-0 items-center gap-2 text-slate-300">
+              <GoPin aria-hidden="true" className="h-4 w-4 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-semibold leading-4 text-slate-400">
+                  Dirección
+                </p>
+                <p
+                  className="truncate text-xs leading-5"
+                  title={match.fieldAddress || "Ubicación no especificada"}
+                >
+                  {match.fieldAddress || "Ubicación no especificada"}
+                </p>
+              </div>
+            </div>
           </div>
           <span className="shrink-0 rounded border border-[#24324A] bg-[#0B0F19] px-2.5 py-1.5 text-right">
             <span className="block text-[9px] font-bold uppercase tracking-[0.12em] text-[#CBD5E1]">Entrada</span>
