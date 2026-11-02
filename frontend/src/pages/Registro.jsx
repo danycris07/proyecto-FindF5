@@ -23,7 +23,8 @@ export function Registro({ isLoading: loadingProp }) {
     try {
       await registerUser({
         ...data,
-        name: data.name.trim(),
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
         email: data.email.trim().toLowerCase(),
         phone: data.phone?.trim() || null,
       });
@@ -43,7 +44,7 @@ export function Registro({ isLoading: loadingProp }) {
       subtitle="Creá tu cuenta en FindF5 y empezá a sumarte a partidos de fútbol 5."
       loading={isLoading}
       loadingLabel="Cargando formulario de registro"
-      skeletonFields={5}
+      skeletonFields={6}
       footer={
         <>
           ¿Ya tenés cuenta?{" "}
@@ -71,27 +72,35 @@ export function Registro({ isLoading: loadingProp }) {
           </div>
         )}
         <AuthField
-          id="name"
+          id="firstName"
           label="Nombre"
           type="text"
-          autoComplete="name"
-          placeholder="Juan Pérez"
+          autoComplete="given-name"
+          placeholder="Juan"
           maxLength={120}
-          registration={register("name", {
+          registration={register("firstName", {
             required: "Ingresá tu nombre.",
             setValueAs: (value) => value.trim(),
-            validate: (value) => {
-              const normalized = value.trim();
-              if (normalized.length < 2) {
-                return "Escribí al menos 2 caracteres.";
-              }
-              if (normalized.length > 120) {
-                return "El nombre no puede superar los 120 caracteres.";
-              }
-              return true;
-            },
+            minLength: { value: 2, message: "Escribí al menos 2 caracteres." },
+            maxLength: { value: 120, message: "El nombre no puede superar los 120 caracteres." },
           })}
-          error={errors.name?.message}
+          error={errors.firstName?.message}
+        />
+
+        <AuthField
+          id="lastName"
+          label="Apellido"
+          type="text"
+          autoComplete="family-name"
+          placeholder="Pérez"
+          maxLength={120}
+          registration={register("lastName", {
+            required: "Ingresá tu apellido.",
+            setValueAs: (value) => value.trim(),
+            minLength: { value: 2, message: "Escribí al menos 2 caracteres." },
+            maxLength: { value: 120, message: "El apellido no puede superar los 120 caracteres." },
+          })}
+          error={errors.lastName?.message}
         />
 
         <AuthField

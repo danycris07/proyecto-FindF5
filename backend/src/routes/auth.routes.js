@@ -13,20 +13,28 @@ import {
 import { hashPassword, verifyPassword } from "../auth/password.js";
 import { createRequireAuth } from "../middleware/require-auth.js";
 import { DOMINANT_FOOTS, PLAYER_POSITIONS } from "../models/enums.js";
+import { defaultProfilePhotoUrl } from "../services/profile-photos.js";
 
 const REGISTERABLE_ROLES = ["PLAYER", "FIELD_OWNER"];
 let timingHashPromise;
 
 function publicUser(user) {
+  const profile = user.profile ?? user;
   return {
     id: user.id,
-    name: user.name,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    name: [profile.firstName, profile.lastName].filter(Boolean).join(" "),
     email: user.email,
-    phone: user.phone,
+    phone: profile.phone,
+    profilePhotoUrl: profile.profilePhotoUrl || defaultProfilePhotoUrl(user.id),
     role: user.role,
-    position: user.position,
-    dominantFoot: user.dominantFoot,
+    position: profile.position,
+    dominantFoot: profile.dominantFoot,
     reputation: user.reputation,
+    isPhoneVisible: profile.isPhoneVisible,
+    address: profile.address,
+    isAddressVisible: profile.isAddressVisible,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
@@ -62,16 +70,116 @@ export function createAuthRouter({ models, sequelize }) {
   const router = Router();
   const requireAuth = createRequireAuth(models);
 
+  router.patch(
+    "/me",
+    requireAuth,
+    (request, response, next) => {
+      const editableFields = [
+        "firstName",
+        "lastName",
+        "position",
+        "dominantFoot",
+        "phone",
+        "isPhoneVisible",
+        "address",
+        "isAddressVisible",
+      ];
+      if (
+        !request.body ||
+        typeof request.body !== "object" ||
+        Array.isArray(request.body) ||
+        Object.keys(request.body).some((field) => !editableFields.includes(field))
+      ) {
+        return response.status(400).json({
+          message: "Solo podés actualizar posición, pierna hábil y teléfono.",
+        });
+      }
+      return next();
+    },
+    [
+      body("position")
+        .optional({ values: "null" })
+        .isIn(PLAYER_POSITIONS)
+        .withMessage("Elegí jugador de campo o arquero."),
+      body("dominantFoot")
+        .optional({ values: "null" })
+        .isIn(DOMINANT_FOOTS)
+        .withMessage("Elegí una pierna hábil válida."),
+      body("phone")
+        .optional({ values: "null" })
+        .isString()
+        .bail()
+        .trim()
+        .isLength({ max: 30 })
+        .withMessage("El teléfono no puede superar los 30 caracteres.")
+        .bail()
+        .custom((phone) => {
+          const digitCount = phone.replace(/\D/g, "").length;
+          return (
+            phone === "" ||
+            (/^[+\d][\d\s()-]*$/.test(phone) &&
+              digitCount >= 7 &&
+              digitCount <= 15)
+          );
+        })
+        .withMessage("Ingresá un teléfono válido con entre 7 y 15 dígitos."),
+      body("isPhoneVisible")
+        .optional()
+        .isBoolean()
+        .withMessage("Indicá si querés mostrar tu teléfono."),
+      body("address").optional({ values: "null" }).isString().bail().trim().isLength({ max: 160 }),
+      body("isAddressVisible").optional().isBoolean(),
+      body("firstName").optional().isString().bail().trim().isLength({ min: 2, max: 120 }),
+      body("lastName").optional().isString().bail().trim().isLength({ min: 2, max: 120 }),
+      body().custom((_value, { req }) => {
+        if (
+          req.authUser.role !== "PLAYER" &&
+          (Object.hasOwn(req.body, "position") ||
+            Object.hasOwn(req.body, "dominantFoot"))
+        ) {
+          throw new Error("Solo los jugadores pueden editar su perfil deportivo.");
+        }
+        return true;
+      }),
+    ],
+    validationErrors,
+    async (request, response) => {
+      const changes = Object.fromEntries(
+        Object.entries(request.body).map(([field, value]) => [
+          field,
+          field === "phone" || field === "address" ? value?.trim() || null : value,
+        ]),
+      );
+      const profileChanges = Object.fromEntries(
+        Object.entries(changes).filter(([field]) =>
+          ["firstName", "lastName", "position", "dominantFoot", "phone", "isPhoneVisible", "address", "isAddressVisible"].includes(field),
+        ),
+      );
+      if (!request.authUser.profile) {
+        request.authUser.profile = await models.Profile.create({ userId: request.authUser.id });
+      }
+      await request.authUser.profile.update(profileChanges);
+      return response.status(200).json({ user: publicUser(request.authUser) });
+    },
+  );
+
   router.post(
     "/register",
     [
-      body("name")
+      body("firstName")
         .isString()
         .withMessage("Ingresá tu nombre.")
         .bail()
         .trim()
         .isLength({ min: 2, max: 120 })
         .withMessage("El nombre debe tener entre 2 y 120 caracteres."),
+      body("lastName")
+        .isString()
+        .withMessage("IngresÃ¡ tu apellido.")
+        .bail()
+        .trim()
+        .isLength({ min: 2, max: 120 })
+        .withMessage("El apellido debe tener entre 2 y 120 caracteres."),
       body("email")
         .isString()
         .withMessage("Ingresá un correo válido.")
@@ -129,7 +237,8 @@ export function createAuthRouter({ models, sequelize }) {
     validationErrors,
     async (request, response) => {
       const {
-        name,
+        firstName,
+        lastName,
         email,
         password,
         phone,
@@ -142,11 +251,18 @@ export function createAuthRouter({ models, sequelize }) {
         const { user, token } = await sequelize.transaction(async (transaction) => {
           const user = await models.User.create(
             {
-              name,
               email,
               passwordHash: await hashPassword(password),
-              phone: phone?.trim() || null,
               role,
+            },
+            { transaction },
+          );
+          user.profile = await models.Profile.create(
+            {
+              userId: user.id,
+              firstName,
+              lastName,
+              phone: phone?.trim() || null,
               position: role === "PLAYER" ? position : null,
               dominantFoot: role === "PLAYER" ? dominantFoot : null,
             },
@@ -197,6 +313,7 @@ export function createAuthRouter({ models, sequelize }) {
     async (request, response) => {
       const user = await models.User.findOne({
         where: { email: request.body.email },
+        include: [{ model: models.Profile, as: "profile" }],
       });
       timingHashPromise ??= hashPassword(randomBytes(32).toString("base64url"));
       const passwordHash = user?.passwordHash ?? (await timingHashPromise);

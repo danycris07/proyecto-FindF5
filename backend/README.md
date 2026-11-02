@@ -33,12 +33,21 @@ pero no altera ni elimina tablas existentes y se bloquea cuando
 `NODE_ENV=production`. Los cambios futuros de esquema requieren una estrategia
 de migraciones explícita; no se debe habilitar `alter` o `force` en producción.
 
+Para agregar la visibilidad del teléfono a una base existente, ejecutar una vez
+`scripts/add-profile-phone-visibility.sql` contra esa base. El script consulta
+`INFORMATION_SCHEMA` y solo agrega `is_phone_visible` si todavía no existe,
+por lo que se puede volver a ejecutar. Las instalaciones nuevas reciben la
+columna desde el modelo al ejecutar `db:sync`.
+
 La API expone `GET /api/health` y estos endpoints de autenticación:
 
 - `POST /api/auth/register`: crea una cuenta de jugador o dueño de cancha e
   inicia su sesión. La posición y pierna hábil son opcionales para jugadores.
 - `POST /api/auth/login`: valida email y contraseña y crea una sesión.
 - `GET /api/auth/me`: devuelve el perfil público de la sesión activa.
+- `PATCH /api/auth/me`: actualiza posición, pierna hábil, teléfono y visibilidad
+  del teléfono del usuario autenticado. Solo jugadores editan sus datos
+  deportivos; los campos protegidos no se aceptan.
 - `POST /api/auth/logout`: invalida la sesión actual.
 
 Las sesiones usan una cookie `HttpOnly`, `SameSite=Lax`, con duración de siete

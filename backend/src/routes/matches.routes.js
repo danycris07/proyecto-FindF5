@@ -147,7 +147,12 @@ function isValidTime(value) {
 
 function matchIncludes(models) {
   return [
-    { model: models.User, as: "organizer", attributes: ["id", "name"] },
+    {
+      model: models.User,
+      as: "organizer",
+      attributes: ["id"],
+      include: [{ model: models.Profile, as: "profile", attributes: ["firstName", "lastName", "profilePhotoUrl"] }],
+    },
     {
       model: models.Field,
       as: "field",
@@ -156,7 +161,8 @@ function matchIncludes(models) {
     {
       model: models.User,
       as: "participants",
-      attributes: ["id", "name"],
+      attributes: ["id"],
+      include: [{ model: models.Profile, as: "profile", attributes: ["firstName", "lastName", "profilePhotoUrl"] }],
       through: { attributes: ["joinedAt"] },
     },
   ];

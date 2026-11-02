@@ -1,3 +1,8 @@
 node_modules
 .env
 .codebase-memory/
+.claude
+.engram
+.codex
+.taste-skill
+anti-slop

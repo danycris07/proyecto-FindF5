@@ -29,7 +29,9 @@ export function createRequireAuth(models) {
         .json({ message: "Iniciá sesión para continuar." });
     }
 
-    const user = await models.User.findByPk(session.userId);
+    const user = await models.User.findByPk(session.userId, {
+      include: [{ model: models.Profile, as: "profile" }],
+    });
     if (!user) {
       await session.destroy();
       clearSessionCookie(response, process.env.NODE_ENV === "production");

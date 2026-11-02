@@ -22,6 +22,7 @@ const PartidoPublicado = lazy(() => import("./pages/PartidoPublicado.jsx"));
 const ArmarPartido = lazy(() => import("./pages/ArmarPartido.jsx"));
 const MisPartidos = lazy(() => import("./pages/MisPartidos.jsx"));
 const AdminPage = lazy(() => import("./pages/AdminPage.jsx"));
+const EditarPerfil = lazy(() => import("./pages/EditarPerfil.jsx"));
 
 const loadMotionFeatures = () =>
   import("framer-motion").then((module) => module.domAnimation);
@@ -74,6 +75,14 @@ function App() {
         />
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/perfil/editar"
+          element={
+            <AuthenticatedLayout>
+              <EditarPerfil />
+            </AuthenticatedLayout>
+          }
+        />
         <Route
           path="/partidos"
           element={

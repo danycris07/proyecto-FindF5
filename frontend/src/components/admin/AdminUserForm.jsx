@@ -4,7 +4,8 @@ import AdminFormField, { adminInputClass } from "./AdminFormField.jsx";
 import { adminButtonClass } from "./AdminResourceList.jsx";
 
 const EMPTY_USER = {
-  name: "",
+  firstName: "",
+  lastName: "",
   email: "",
   phone: "",
   role: "PLAYER",
@@ -23,7 +24,8 @@ function AdminUserForm({ user, onSave, onCancel }) {
   } = useForm({
     defaultValues: user
       ? {
-          name: user.name,
+          firstName: user.firstName ?? "",
+          lastName: user.lastName ?? "",
           email: user.email,
           phone: user.phone ?? "",
           role: user.role,
@@ -38,7 +40,8 @@ function AdminUserForm({ user, onSave, onCancel }) {
   const submit = async (data) => {
     setSaving(true);
     await onSave({
-      name: data.name,
+      firstName: data.firstName,
+      lastName: data.lastName,
       email: data.email,
       phone: data.phone || null,
       role: data.role,
@@ -55,14 +58,17 @@ function AdminUserForm({ user, onSave, onCancel }) {
         {user ? `Editar ${user.name}` : "Crear usuario"}
       </h3>
       <AdminFormField
-        id="admin-user-name"
+        id="admin-user-first-name"
         label="Nombre"
-        registration={register("name", {
-          required: "Ingresá un nombre.",
-          minLength: { value: 2, message: "Escribí al menos 2 caracteres." },
-        })}
+        registration={register("firstName", { required: "Ingresá un nombre.", minLength: { value: 2, message: "Escribí al menos 2 caracteres." } })}
       />
-      {errors.name && <p role="alert" className="text-sm text-danger">{errors.name.message}</p>}
+      {errors.firstName && <p role="alert" className="text-sm text-danger">{errors.firstName.message}</p>}
+      <AdminFormField
+        id="admin-user-last-name"
+        label="Apellido"
+        registration={register("lastName", { required: "Ingresá un apellido.", minLength: { value: 2, message: "Escribí al menos 2 caracteres." } })}
+      />
+      {errors.lastName && <p role="alert" className="text-sm text-danger">{errors.lastName.message}</p>}
       <AdminFormField
         id="admin-user-email"
         label="Email"
