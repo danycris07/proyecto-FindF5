@@ -24,6 +24,5 @@ export function getProfilePhotoFilePath(photoUrl) {
 export function defaultProfilePhotoUrl(userId) {
   const numericId = Number(userId);
   const safeId = Number.isSafeInteger(numericId) && numericId > 0 ? numericId : 1;
-  const photoNumber = ((safeId * 37) % 70) + 1;
-  return `https://i.pravatar.cc/240?img=${photoNumber}`;
+  return `https://api.dicebear.com/10.x/bottts/svg?seed=findf5-user-${safeId}`;
 }
