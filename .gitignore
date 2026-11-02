@@ -4,3 +4,5 @@ node_modules
 .claude
 .engram
 .codex
+.taste-skill
+anti-slop

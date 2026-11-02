@@ -13,21 +13,28 @@ import {
 import { hashPassword, verifyPassword } from "../auth/password.js";
 import { createRequireAuth } from "../middleware/require-auth.js";
 import { DOMINANT_FOOTS, PLAYER_POSITIONS } from "../models/enums.js";
+import { defaultProfilePhotoUrl } from "../services/profile-photos.js";
 
 const REGISTERABLE_ROLES = ["PLAYER", "FIELD_OWNER"];
 let timingHashPromise;
 
 function publicUser(user) {
+  const profile = user.profile ?? user;
   return {
     id: user.id,
-    name: user.name,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    name: [profile.firstName, profile.lastName].filter(Boolean).join(" "),
     email: user.email,
-    phone: user.phone,
+    phone: profile.phone,
+    profilePhotoUrl: profile.profilePhotoUrl || defaultProfilePhotoUrl(user.id),
     role: user.role,
-    position: user.position,
-    dominantFoot: user.dominantFoot,
+    position: profile.position,
+    dominantFoot: profile.dominantFoot,
     reputation: user.reputation,
-    isPhoneVisible: user.isPhoneVisible,
+    isPhoneVisible: profile.isPhoneVisible,
+    address: profile.address,
+    isAddressVisible: profile.isAddressVisible,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
@@ -68,10 +75,14 @@ export function createAuthRouter({ models, sequelize }) {
     requireAuth,
     (request, response, next) => {
       const editableFields = [
+        "firstName",
+        "lastName",
         "position",
         "dominantFoot",
         "phone",
         "isPhoneVisible",
+        "address",
+        "isAddressVisible",
       ];
       if (
         !request.body ||
@@ -116,6 +127,10 @@ export function createAuthRouter({ models, sequelize }) {
         .optional()
         .isBoolean()
         .withMessage("Indicá si querés mostrar tu teléfono."),
+      body("address").optional({ values: "null" }).isString().bail().trim().isLength({ max: 160 }),
+      body("isAddressVisible").optional().isBoolean(),
+      body("firstName").optional().isString().bail().trim().isLength({ min: 2, max: 120 }),
+      body("lastName").optional().isString().bail().trim().isLength({ min: 2, max: 120 }),
       body().custom((_value, { req }) => {
         if (
           req.authUser.role !== "PLAYER" &&
@@ -132,10 +147,18 @@ export function createAuthRouter({ models, sequelize }) {
       const changes = Object.fromEntries(
         Object.entries(request.body).map(([field, value]) => [
           field,
-          field === "phone" ? value?.trim() || null : value,
+          field === "phone" || field === "address" ? value?.trim() || null : value,
         ]),
       );
-      await request.authUser.update(changes);
+      const profileChanges = Object.fromEntries(
+        Object.entries(changes).filter(([field]) =>
+          ["firstName", "lastName", "position", "dominantFoot", "phone", "isPhoneVisible", "address", "isAddressVisible"].includes(field),
+        ),
+      );
+      if (!request.authUser.profile) {
+        request.authUser.profile = await models.Profile.create({ userId: request.authUser.id });
+      }
+      await request.authUser.profile.update(profileChanges);
       return response.status(200).json({ user: publicUser(request.authUser) });
     },
   );
@@ -143,13 +166,20 @@ export function createAuthRouter({ models, sequelize }) {
   router.post(
     "/register",
     [
-      body("name")
+      body("firstName")
         .isString()
         .withMessage("Ingresá tu nombre.")
         .bail()
         .trim()
         .isLength({ min: 2, max: 120 })
         .withMessage("El nombre debe tener entre 2 y 120 caracteres."),
+      body("lastName")
+        .isString()
+        .withMessage("IngresÃ¡ tu apellido.")
+        .bail()
+        .trim()
+        .isLength({ min: 2, max: 120 })
+        .withMessage("El apellido debe tener entre 2 y 120 caracteres."),
       body("email")
         .isString()
         .withMessage("Ingresá un correo válido.")
@@ -207,7 +237,8 @@ export function createAuthRouter({ models, sequelize }) {
     validationErrors,
     async (request, response) => {
       const {
-        name,
+        firstName,
+        lastName,
         email,
         password,
         phone,
@@ -220,11 +251,18 @@ export function createAuthRouter({ models, sequelize }) {
         const { user, token } = await sequelize.transaction(async (transaction) => {
           const user = await models.User.create(
             {
-              name,
               email,
               passwordHash: await hashPassword(password),
-              phone: phone?.trim() || null,
               role,
+            },
+            { transaction },
+          );
+          user.profile = await models.Profile.create(
+            {
+              userId: user.id,
+              firstName,
+              lastName,
+              phone: phone?.trim() || null,
               position: role === "PLAYER" ? position : null,
               dominantFoot: role === "PLAYER" ? dominantFoot : null,
             },
@@ -275,6 +313,7 @@ export function createAuthRouter({ models, sequelize }) {
     async (request, response) => {
       const user = await models.User.findOne({
         where: { email: request.body.email },
+        include: [{ model: models.Profile, as: "profile" }],
       });
       timingHashPromise ??= hashPassword(randomBytes(32).toString("base64url"));
       const passwordHash = user?.passwordHash ?? (await timingHashPromise);

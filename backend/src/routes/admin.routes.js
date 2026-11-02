@@ -41,13 +41,14 @@ function idValidation(name) {
 }
 
 const userFieldsValidation = [
-  body("name")
+  body("firstName")
     .isString()
     .withMessage("Ingresá un nombre.")
     .bail()
     .trim()
     .isLength({ min: 2, max: 120 })
     .withMessage("El nombre debe tener entre 2 y 120 caracteres."),
+  body("lastName").isString().bail().trim().isLength({ min: 2, max: 120 }),
   body("email")
     .isString()
     .withMessage("Ingresá un correo válido.")
@@ -131,14 +132,17 @@ const fieldValidation = [
 ];
 
 function publicUser(user) {
+  const profile = user.profile ?? user;
   return {
     id: user.id,
-    name: user.name,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    name: [profile.firstName, profile.lastName].filter(Boolean).join(" "),
     email: user.email,
-    phone: user.phone,
+    phone: profile.phone,
     role: user.role,
-    position: user.position,
-    dominantFoot: user.dominantFoot,
+    position: profile.position,
+    dominantFoot: profile.dominantFoot,
     reputation: user.reputation,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
@@ -146,14 +150,9 @@ function publicUser(user) {
 }
 
 function userValues(body) {
-  const isPlayer = body.role === "PLAYER";
   return {
-    name: body.name,
     email: body.email,
-    phone: body.phone?.trim() || null,
     role: body.role,
-    position: isPlayer ? body.position ?? null : null,
-    dominantFoot: isPlayer ? body.dominantFoot ?? null : null,
   };
 }
 
@@ -204,12 +203,18 @@ async function lockAdministrators(models, transaction) {
 
 function matchIncludes(models) {
   return [
-    { model: models.User, as: "organizer", attributes: ["id", "name"] },
+    {
+      model: models.User,
+      as: "organizer",
+      attributes: ["id"],
+      include: [{ model: models.Profile, as: "profile", attributes: ["firstName", "lastName", "profilePhotoUrl"] }],
+    },
     { model: models.Field, as: "field", attributes: ["id", "name"] },
     {
       model: models.User,
       as: "participants",
-      attributes: ["id", "name"],
+      attributes: ["id"],
+      include: [{ model: models.Profile, as: "profile", attributes: ["firstName", "lastName", "profilePhotoUrl"] }],
       through: { attributes: ["joinedAt"] },
     },
   ];
@@ -266,7 +271,10 @@ export function createAdminRouter({
   router.use(createRequireAuth(models), requireRole("ADMIN"));
 
   router.get("/users", async (_request, response) => {
-    const users = await models.User.findAll({ order: [["id", "ASC"]] });
+    const users = await models.User.findAll({
+      include: [{ model: models.Profile, as: "profile" }],
+      order: [["id", "ASC"]],
+    });
     return response.json(users.map(publicUser));
   });
 
@@ -275,7 +283,9 @@ export function createAdminRouter({
     idValidation("userId"),
     validationErrors,
     async (request, response) => {
-      const user = await models.User.findByPk(request.params.userId);
+      const user = await models.User.findByPk(request.params.userId, {
+        include: [{ model: models.Profile, as: "profile" }],
+      });
       if (!user) {
         return response.status(404).json({ message: "No encontramos ese usuario." });
       }
@@ -301,6 +311,14 @@ export function createAdminRouter({
           ...userValues(request.body),
           passwordHash: await hashPassword(request.body.password),
         });
+        user.profile = await models.Profile.create({
+          userId: user.id,
+          firstName: request.body.firstName,
+          lastName: request.body.lastName,
+          phone: request.body.phone?.trim() || null,
+          position: request.body.role === "PLAYER" ? request.body.position ?? null : null,
+          dominantFoot: request.body.role === "PLAYER" ? request.body.dominantFoot ?? null : null,
+        });
         return response.status(201).json({ user: publicUser(user) });
       } catch (error) {
         return routeError(error, response, "Ese email ya está en uso.");
@@ -325,7 +343,10 @@ export function createAdminRouter({
       try {
         const userId = request.params.userId;
         const updated = await sequelize.transaction(async (transaction) => {
-          let user = await models.User.findByPk(userId, { transaction });
+          let user = await models.User.findByPk(userId, {
+            transaction,
+            include: [{ model: models.Profile, as: "profile" }],
+          });
           if (!user) {
             const error = new Error("No encontramos ese usuario.");
             error.status = 404;
@@ -341,6 +362,7 @@ export function createAdminRouter({
             const administrators = await lockAdministrators(models, transaction);
             user = await models.User.findByPk(userId, {
               transaction,
+              include: [{ model: models.Profile, as: "profile" }],
               lock: transaction.LOCK.UPDATE,
             });
             if (!user) {
@@ -360,6 +382,7 @@ export function createAdminRouter({
           } else {
             user = await models.User.findByPk(userId, {
               transaction,
+              include: [{ model: models.Profile, as: "profile" }],
               lock: transaction.LOCK.UPDATE,
             });
             if (!user) {
@@ -378,6 +401,15 @@ export function createAdminRouter({
             },
             { transaction },
           );
+          const profile = user.profile ?? await models.Profile.create({ userId: user.id }, { transaction });
+          await profile.update({
+            firstName: request.body.firstName,
+            lastName: request.body.lastName,
+            phone: request.body.phone?.trim() || null,
+            position: request.body.role === "PLAYER" ? request.body.position ?? null : null,
+            dominantFoot: request.body.role === "PLAYER" ? request.body.dominantFoot ?? null : null,
+          }, { transaction });
+          user.profile = profile;
           if (request.body.password || roleChanged) {
             await models.Session.destroy({
               where: { userId: user.id },

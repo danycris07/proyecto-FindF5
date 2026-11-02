@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
 import healthRouter from "./routes/health.routes.js";
+import {
+  PROFILE_PHOTO_DIRECTORY,
+  PROFILE_PHOTO_PATH,
+} from "./services/profile-photos.js";
 
 export function createApp({
   authRouter,
@@ -27,6 +31,15 @@ export function createApp({
     }),
   );
   app.use(express.json({ limit: "16kb" }));
+  app.use(
+    PROFILE_PHOTO_PATH,
+    express.static(PROFILE_PHOTO_DIRECTORY, {
+      fallthrough: true,
+      maxAge: "1d",
+      immutable: true,
+      dotfiles: "deny",
+    }),
+  );
   app.use("/api/health", healthRouter);
   if (authRouter) {
     app.use("/api/auth", authRouter);
@@ -51,6 +64,11 @@ export function createApp({
       return response
         .status(400)
         .json({ message: "El cuerpo JSON no es válido." });
+    }
+    if (error?.type === "entity.too.large") {
+      return response.status(413).json({
+        message: "La foto supera el mÃ¡ximo de 2 MB.",
+      });
     }
 
     console.error(error);

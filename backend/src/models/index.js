@@ -3,9 +3,11 @@ import { defineMatch, defineMatchParticipant } from "./match.model.js";
 import { defineSession } from "./session.model.js";
 import { defineTeam, defineTeamMember } from "./team.model.js";
 import { defineUser } from "./user.model.js";
+import { defineProfile } from "./profile.model.js";
 
 export function defineModels(sequelize) {
   const User = defineUser(sequelize);
+  const Profile = defineProfile(sequelize);
   const Team = defineTeam(sequelize);
   const TeamMember = defineTeamMember(sequelize);
   const Field = defineField(sequelize);
@@ -13,6 +15,9 @@ export function defineModels(sequelize) {
   const Match = defineMatch(sequelize);
   const MatchParticipant = defineMatchParticipant(sequelize);
   const Session = defineSession(sequelize);
+
+  User.hasOne(Profile, { as: "profile", foreignKey: "userId", onDelete: "CASCADE" });
+  Profile.belongsTo(User, { as: "user", foreignKey: "userId" });
 
   User.hasMany(Team, { as: "captainedTeams", foreignKey: "captainId" });
   Team.belongsTo(User, { as: "captain", foreignKey: "captainId" });
@@ -65,6 +70,7 @@ export function defineModels(sequelize) {
 
   return {
     User,
+    Profile,
     Team,
     TeamMember,
     Field,

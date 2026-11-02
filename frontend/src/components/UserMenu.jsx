@@ -3,10 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
   AnimatePresence,
   m as motion,
-  useMotionTemplate,
-  useMotionValue,
   useReducedMotion,
-  useTransform,
 } from "framer-motion";
 import {
   LuCalendarCheck,
@@ -19,7 +16,9 @@ import {
   LuShieldCheck,
 } from "react-icons/lu";
 import ThemeToggle from "./ui/ThemeToggle.jsx";
-import { getSessionUser, logoutUser } from "../services/sessionService.js";
+import { logoutUser } from "../services/sessionService.js";
+import { useSession } from "../context/useSession.js";
+import { resolveProfilePhotoUrl } from "../utils/profilePhoto.js";
 
 const links = [
   {
@@ -128,15 +127,10 @@ function UserMenu({ placement = "desktop" }) {
   const reputationTitleId = `reputacion-titulo-${menuId}`;
   const isMobile = placement === "mobile";
   const reduceMotion = useReducedMotion();
-  const pointerX = useMotionValue(0.5);
-  const pointerY = useMotionValue(0.5);
-  const rotateX = useTransform(pointerY, [0, 1], [2.5, -2.5]);
-  const rotateY = useTransform(pointerX, [0, 1], [-2.5, 2.5]);
-  const glareX = useTransform(pointerX, (value) => `${value * 100}%`);
-  const glareY = useTransform(pointerY, (value) => `${value * 100}%`);
-  const profileGlare = useMotionTemplate`radial-gradient(ellipse at ${glareX} ${glareY}, rgba(255, 255, 255, 0.18), transparent 56%)`;
   const navigate = useNavigate();
-  const session = getSessionUser();
+  const { user: session } = useSession();
+  const profilePhotoUrl = resolveProfilePhotoUrl(session?.profilePhotoUrl);
+  const [photoFailed, setPhotoFailed] = useState(false);
   const esJugador = (session?.role ?? "PLAYER") === "PLAYER";
   const esDuenio = session?.role === "FIELD_OWNER";
   const perfil = perfilDe(session);
@@ -149,12 +143,6 @@ function UserMenu({ placement = "desktop" }) {
     .map((part) => part[0])
     .join("")
     .toUpperCase();
-  const trackProfilePointer = (event) => {
-    if (event.pointerType === "touch" || reduceMotion) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    pointerX.set((event.clientX - bounds.left) / bounds.width);
-    pointerY.set((event.clientY - bounds.top) / bounds.height);
-  };
   const menuLinks =
     session?.role === "ADMIN"
       ? [
@@ -205,18 +193,27 @@ function UserMenu({ placement = "desktop" }) {
         className={
           isMobile
             ? "flex min-w-16 flex-col items-center justify-center gap-1 text-xs font-medium text-text-secondary transition-colors hover:text-primary-text focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
-            : "flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-surface font-bold text-primary-text shadow-lg shadow-[var(--shadow-color)] transition-colors hover:border-status focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
+            : "flex min-h-12 items-center gap-2.5 rounded-sm px-3 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-hover-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-status"
         }
       >
         {isMobile ? (
           <>
-            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background text-[10px] font-bold text-primary-text">
-              {initials || "U"}
+            <span className="relative flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border border-border bg-background text-[10px] font-bold text-primary-text">
+              {profilePhotoUrl && !photoFailed ? (
+                <img src={profilePhotoUrl} alt="" className="absolute inset-0 h-full w-full object-cover" onError={() => setPhotoFailed(true)} />
+              ) : (initials || "U")}
             </span>
             <span>Perfil</span>
           </>
         ) : (
-          initials || "U"
+          <>
+            <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border bg-background">
+              {profilePhotoUrl && !photoFailed ? (
+                <img src={profilePhotoUrl} alt="" className="absolute inset-0 h-full w-full object-cover" onError={() => setPhotoFailed(true)} />
+              ) : (initials || "U")}
+            </span>
+            <span>Tu Perfil</span>
+          </>
         )}
       </button>
 
@@ -265,45 +262,25 @@ function UserMenu({ placement = "desktop" }) {
             }
             className={
               isMobile
-                ? "fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] right-0 z-50 max-h-[calc(100dvh-5rem)] w-[min(22rem,100vw)] overflow-y-auto rounded-l-sm border border-border bg-surface text-text-primary shadow-2xl shadow-[var(--shadow-color)]"
-                : "absolute right-0 top-14 max-h-[calc(100dvh-5rem)] w-[min(22rem,calc(100vw-2.5rem))] overflow-y-auto rounded-sm border border-border bg-surface text-text-primary shadow-2xl shadow-[var(--shadow-color)]"
+                ? "fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] right-0 z-50 max-h-[calc(100dvh-5rem)] w-[min(22rem,100vw)] overflow-y-auto rounded-l-sm border border-border bg-surface text-text-primary shadow-xl shadow-black/15"
+                : "absolute right-0 top-14 max-h-[calc(100dvh-5rem)] w-[min(22rem,calc(100vw-2.5rem))] overflow-y-auto rounded-sm border border-border bg-surface text-text-primary shadow-xl shadow-black/15"
             }
           >
             {/* Ficha del jugador */}
             <motion.div
-              className="user-profile-card border-b border-border p-5"
-              onPointerMove={trackProfilePointer}
-              style={
-                reduceMotion
-                  ? undefined
-                  : { rotateX, rotateY, transformPerspective: 900 }
-              }
-              variants={{
-                rest: { scale: 1 },
-                hover: { scale: reduceMotion ? 1 : 1.005 },
-              }}
-              initial="rest"
-              whileHover="hover"
-              transition={{ type: "spring", stiffness: 300, damping: 24 }}
+              className="border-b border-border bg-background p-5"
             >
-                <motion.div
-                  aria-hidden="true"
-                  className="user-profile-glare"
-                  style={{ background: profileGlare }}
-                  variants={{
-                    rest: { opacity: 0 },
-                    hover: { opacity: reduceMotion ? 0 : 1 },
-                  }}
-                />
                 <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-sm border-2 border-status bg-background font-display text-2xl font-extrabold uppercase tracking-wider">
-                    {initials || "U"}
+                  <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-status bg-background font-display text-2xl font-extrabold uppercase tracking-wider">
+                    {profilePhotoUrl && !photoFailed ? (
+                      <img src={profilePhotoUrl} alt="" className="absolute inset-0 h-full w-full object-cover" onError={() => setPhotoFailed(true)} />
+                    ) : (initials || "U")}
                   </div>
                   <div className="min-w-0">
                     <p className="truncate font-display text-xl font-bold uppercase tracking-wider">
                       {session?.name || "Usuario"}
                     </p>
-                    <span className="mt-1 inline-flex rounded-sm border border-border px-2 py-0.5 text-xs font-bold uppercase tracking-widest text-text-secondary">
+                    <span className="mt-1 inline-flex text-sm text-text-secondary">
                       {ROLE_LABELS[session?.role] || "Jugador"}
                     </span>
                   </div>
@@ -337,7 +314,7 @@ function UserMenu({ placement = "desktop" }) {
                   >
                     <h3
                       id={reputationTitleId}
-                      className="font-display text-sm font-bold uppercase tracking-[0.2em] text-text-secondary"
+                      className="font-display text-sm font-semibold text-text-primary"
                     >
                       Reputación en cancha
                     </h3>
@@ -368,33 +345,40 @@ function UserMenu({ placement = "desktop" }) {
 
               {/* Navegación */}
               <nav aria-label="Secciones" className="grid gap-1 p-3">
-                {menuLinks.map(({ label, to, description, Icon }) => (
+                <NavLink
+                  to="/perfil/editar"
+                  onClick={() => setOpen(false)}
+                  className="group flex min-h-12 items-center gap-3 rounded-sm px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover-strong)] focus-visible:outline-2 focus-visible:outline-status"
+                >
+                  <span className="min-w-0">
+                    <span className="block font-semibold">Editar perfil</span>
+                    <span className="block text-xs text-text-secondary">
+                      Posición, pierna y contacto
+                    </span>
+                  </span>
+                  <LuChevronRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-text-secondary" />
+                </NavLink>
+                {menuLinks.map(({ label, to, description }) => (
                   <NavLink
                     key={to}
                     to={to}
                     end
                     onClick={() => setOpen(false)}
                     className={({ isActive }) =>
-                      `group flex items-center gap-3 rounded-sm border-l-2 px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover-strong)] focus-visible:outline-2 focus-visible:outline-status ${
+                      `group flex min-h-12 items-center gap-3 rounded-sm px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover-strong)] focus-visible:outline-2 focus-visible:outline-status ${
                         isActive
-                          ? "border-primary bg-[var(--surface-hover-strong)]"
-                          : "border-transparent"
+                          ? "bg-[var(--surface-hover-strong)] text-primary-text"
+                          : ""
                       }`
                     }
                   >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-status">
-                      <Icon aria-hidden="true" className="h-4 w-4" />
-                    </span>
                     <span className="min-w-0">
                       <span className="block font-semibold">{label}</span>
                       <span className="block text-xs text-text-secondary">
                         {description}
                       </span>
                     </span>
-                    <LuChevronRight
-                      aria-hidden="true"
-                      className="ml-auto h-4 w-4 shrink-0 text-text-secondary transition-transform group-hover:translate-x-0.5"
-                    />
+                    <LuChevronRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-text-secondary" />
                   </NavLink>
                 ))}
               </nav>

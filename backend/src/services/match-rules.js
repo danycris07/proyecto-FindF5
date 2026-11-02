@@ -43,7 +43,8 @@ export function getMatchStatus(match, participantCount) {
 export function getMatchResponse(match) {
   const participants = (match.participants ?? []).map((participant) => ({
     userId: participant.id,
-    name: participant.name,
+    name: [participant.profile?.firstName, participant.profile?.lastName].filter(Boolean).join(" ") || "Jugador",
+    profilePhotoUrl: participant.profile?.profilePhotoUrl || participant.profilePhotoUrl || defaultProfilePhotoUrl(participant.id),
     joinedAt: participant.MatchParticipant?.joinedAt ?? null,
   }));
   const participantCount = participants.length;
@@ -59,7 +60,12 @@ export function getMatchResponse(match) {
     endTime: match.endTime,
     expectedPlayers: Number(match.expectedPlayers),
     organizerId: match.organizerId,
-    organizerName: match.organizer?.name ?? "Organizador",
+    organizerName:
+      [match.organizer?.profile?.firstName, match.organizer?.profile?.lastName]
+        .filter(Boolean)
+        .join(" ") || "Organizador",
+    organizerPhotoUrl:
+      match.organizer?.profile?.profilePhotoUrl || match.organizer?.profilePhotoUrl || defaultProfilePhotoUrl(match.organizerId),
     organizerPlays: match.organizerPlays,
     outsideSlots: Number(match.outsideSlots),
     missingPlayers: getMissingPlayers(match, participantCount),
@@ -180,3 +186,4 @@ export function normalizePublicMatchInput(
 
   return values;
 }
+import { defaultProfilePhotoUrl } from "./profile-photos.js";

@@ -6,6 +6,7 @@ import { createAuthRouter } from "./routes/auth.routes.js";
 import { createFieldsRouter } from "./routes/fields.routes.js";
 import { createMatchesRouter } from "./routes/matches.routes.js";
 import { createUsersRouter } from "./routes/users.routes.js";
+import { ensureProfilePhotoDirectory } from "./services/profile-photos.js";
 
 const port = Number(process.env.PORT ?? 3000);
 
@@ -14,6 +15,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 }
 
 await connectDatabase();
+await ensureProfilePhotoDirectory();
 const authRouter = createAuthRouter({ models, sequelize });
 const adminRouter = createAdminRouter({ models, sequelize });
 const fieldsRouter = createFieldsRouter({ models });
