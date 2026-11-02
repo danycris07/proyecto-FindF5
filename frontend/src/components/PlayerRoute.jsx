@@ -2,7 +2,15 @@ import { Navigate } from "react-router-dom";
 import { useSession } from "../context/useSession.js";
 
 function PlayerRoute({ children }) {
-  const { user } = useSession();
+  const { user, loading } = useSession();
+  if (loading) {
+    return (
+      <p role="status" className="p-8 text-center text-text-secondary">
+        Validando tu sesión...
+      </p>
+    );
+  }
+
   if (user?.role !== "PLAYER") {
     return <Navigate to="/partidos" replace />;
   }

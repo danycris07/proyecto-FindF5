@@ -95,9 +95,7 @@ function App() {
           path="/partidos/nuevo"
           element={
             <AuthenticatedLayout>
-              <PlayerRoute>
-                <ArmarPartido />
-              </PlayerRoute>
+              <ArmarPartido />
             </AuthenticatedLayout>
           }
         />
